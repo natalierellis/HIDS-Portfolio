@@ -1,0 +1,100 @@
+<html>
+    <!-- Please complete the code so that:
+     1. All the operators are functioning
+     2. All the buttons work
+     3. Division by 0 is not allowed and an alert is displayed
+     4. All the other bugs are fixed so that its a fully functional calculator
+     You may change the look and feel of the calculator as you wish.
+     -->
+    <style>
+    .content {
+        max-width: 800px;
+        margin: auto;
+    }
+    </style>
+    <script>
+        // The two operands
+        // initialize it all -> create blank objects
+        let num1 = "";
+        let num2 = "";
+        // Stores the result of the calculation
+        let result = "";
+        let operator = "";
+        // Operand keeps track of which number we are entering
+        // The variable result stores the answer.
+        // The variable operand stores the flag which indicates which number is being entered
+        function setup() {
+            num1 = num2 = result = "";
+            operand = 0;
+            operator = "";
+            document.getElementById('answer').innerHTML = "0.0" //start off at 0.0
+        }
+        // Store the numbers being entered, either as operand1 or operand2 in the variables num1 and num2
+        // but do not add variables operand1 and operand2
+        function appendNumber(num) {
+            if (operand === 0) {
+                num1 += num;
+                document.getElementById('answer').innerHTML = num1;
+            } else {
+                num2 += num;
+                document.getElementById('answer').innerHTML = num2;
+            }
+            console.log("Operands are: ", Number(num1) + " and " + Number(num2));
+            
+        }
+        // Toggle the numbers being stored
+        function setOperator(op) {
+            if (operand === 0) {
+                operand = 1;
+            }
+            operator = op;
+            console.log("Operands are: ", Number(num1) + " and " + Number(num2) + " operator is " + op);
+        }
+        // This function is called when = button is pressed // need to fix this 
+        function execute() {
+            if (operator === "") {
+                alert("Enter two numbers first")
+                result = 0
+                return
+            } else if (operator === "+") {
+                result = Number(num1) + Number(num2);
+            }
+            else if (operator === "-") {
+                result = Number(num1) - Number(num2);
+            }
+            else if (operator === "*") {
+                result = Number(num1) * Number(num2);
+            }
+            else if (operator === "/") {
+                if (Number(num2) === 0) {
+                    alert("Division by 0 is not allowed!");
+                    setup();
+                    return;
+                }
+                result = Number(num1) / Number(num2);
+            }
+            console.log("Result is ", result);
+            document.getElementById('answer').innerHTML = result;
+        }
+    </script>
+    <body onload="setup()">
+        <div class="content">
+        <h3>A simple calculator</h3>
+        <table>
+            <tr><td><u><div id='answer'></div></u></td></tr>
+            <tr>
+                <td><button onclick="appendNumber('1')">1</button></td><td><button onclick="appendNumber('2')">2</button></td><td><button onclick="appendNumber('3')">3</button></td><td><button onclick="appendNumber('4')">4</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="appendNumber('5')">5</button></td><td><button onclick="appendNumber('6')">6</button></td><td><button onclick="appendNumber('7')">7</button></td><td><button onclick="appendNumber('8')">8</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="appendNumber('9')">9</button></td><td><button onclick="appendNumber('0')">0</button></td><td><button onclick="setup()">C</button></td><td><button onclick="execute()">=</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="setOperator('+')">+</button></td><td><button onclick="setOperator('-')">-</button></td><td><button onclick="setOperator('*')">*</button></td><td><button onclick="setOperator('/')">/</button></td>
+            </tr>
+        </table>
+        </div>
+    </body>
+</html>

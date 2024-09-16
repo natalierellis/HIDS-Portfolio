@@ -1,0 +1,56 @@
+---
+title: "Quarto database example"
+author: "Nathan Cobb"
+format: html
+---
+
+This is an example Quarto document that shows how to connect to the Synthetic MGUH database (a PostgreSQL database in the Google Cloud environment). Quarto is most commonly used to execute chunks of R or Python code sequentially, but can be used for many different kinds of code, including SQL. Here we will use it as a wrapper around SQL and RStudio as a basic interface to our database to query the database.
+
+After executing the first chunk, you should have be able to see "syntheticmguh" in the connections pane and use that to browse the tables and fields (look for the `public` schema). Note that we are using an additional package called `connections` to make sure that the database is browsable in the "Connections" pane in the top right of the RStudio interface. This package must be installed from source on GitHub - to install, execute the following in the console (the pane immediately below):
+
+```
+install.packages("remotes")
+remotes::install_github("edgararuiz/connections")
+```
+
+
+```{r}
+library(tidyverse) # loads the tidyverse tools
+library(RPostgres) # loads the database driver for PostgreSQL
+library(connections) # helps RPostgres work with RStudio
+
+con <- connection_open(RPostgres::Postgres(),
+#con <- dbConnect(RPostgres::Postgres(),
+          dbname = "syntheticmguh",
+          host = "35.199.26.47",
+          user = "hids502_student",
+          password = "pursuit-parson-trivial",
+          bigint = "numeric")
+```
+
+# Querying via SQL
+
+We can query our database by writing bare SQL, in general this is what we will expect you to do most of the time.
+
+```{sql, connection = con}
+SELECT gender, COUNT(*) total_patients 
+FROM patients
+GROUP BY gender
+```
+
+# Querying and saving 
+
+Sometimes you may want to take the results from your query and then pass them to plotting or other manipulations. You can do this with the `output.var` parameter. (Note that the date manipulations below are PostgreSQL specific - we will review this in more detail in the course.)
+
+```{sql connection=con, output.var="patients_df"}
+-- Here we use `output.var` to assign the results of the query to a variable
+-- rather than printing!
+ SELECT gender, date_part('year', age(current_date, birthdate)) AS age
+ FROM patients
+```
+
+```{r}
+ggplot(patients_df) + 
+  geom_boxplot(aes(x = age, fill = gender)) +
+  ggtitle(label = "Patients Age")
+```

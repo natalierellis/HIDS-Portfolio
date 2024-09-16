@@ -1,0 +1,148 @@
+<html> <!--this is an element tag-->
+<head> <!--put stylistic info within this container-->
+    <title>Document-Like Layout</title> <!--this is what appears in browser tab title-->
+    <style>
+        body { /*refers to everything that is actually displayed, and specific elements are below*/
+            font-family: 'Times New Roman', serif;
+            line-height: 1.4;
+            margin: 10px auto;
+            padding: 30px;
+            background-color: #fff;
+            color: #000;
+            width: 200%; /* if this is removed, width (which affects indentation) depends on window size*/
+            max-width: 940px; /* adjust to change width of document*/
+            border: 1px solid #ccc;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 0;
+        }
+
+        header h1 { /*name*/
+            font-size: 2.2em;
+            margin: 0;
+            padding: 0;
+        }
+
+        header h2 { /*contact info*/
+            margin: 0;
+            padding: 0;
+            font-size: 1.2em;
+            font-weight: normal; /* no bold*/
+        }
+
+        section h2 { /* section titles*/
+            font-size: 1.6em;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        p { /* section paragraphs*/
+            margin-bottom: 0;
+            font-size: 1.2em;
+            margin-top: 0;
+        }
+            ul { /* bulleted lists within sections*/
+            margin: 0;
+            font-size: 1.2em;
+            padding-left: 1.2em; /* Adjust this to align with the header h2 */
+            list-style-type: disc; /* Use disc, circle, square, etc., for bullet points */
+        }
+            ol { /* numeric lists within sections*/
+            margin: 0;
+            font-size: 1.2em;
+            padding-left: 1.2em; /* Adjust this to align with the header h2 */
+        }
+      
+    </style>
+</head>
+<body>
+    <header>
+        <h1>NATALIE ELLIS</h1>
+        <h2>email: ne210@georgetown.edu | phone: 281.755.7057 | <!--the <a tag define the hyperlink, href indicates destination,target="_blank" opens it in a new tab, and what follows is the link text-->
+            <a id="linkedin-link" href="https://www.linkedin.com/in/natalie-ellis2023" target="_blank">LinkedIn</a>
+        </h2>
+        <!--actually do not need javascript here, above code works fine-->
+    </header>
+    
+    <section>
+        <h2>EDUCATION</h2> <!--needed to use inline CSS because so many small stylistic choices here-->
+        <!--can't just use breaks, need to indent with paragraphs, I think? that is what worked-->
+        <p> Master of Science in Health Informatics and Data Science<span style="float: right;font-style: italic">August 2024-Present</span> 
+            <!--span element used to right-align dates, only needed for those--></p>
+        <p style="margin-bottom: 18px;"><b>Georgetown University</b><span style="float: right;font-style: normal">Washington, D.C.</span> </p>
+        <p> Bachelor of Science in Biology<span style="float: right;font-style: italic">August 2019-May 2023</span> </p>
+        <p><b>Wake Forest University</b> <span style="float: right;font-style: normal">Winston-Salem, N.C.</span></p>
+        <p>GPA: 3.95, <i>Summa cum laude</i></p>
+        <p><b>Phi Beta Kappa member</b></p>
+    </section>
+
+    <section>
+        <h2>TECHNICAL SKILLS</h2>
+        <p>
+            <ul> <!--use <li> for each line-->
+                <li>Proficiency in Bash scripting and R programming with dplyr, ggplot2, sqldfr, tidyverse, and base R packages in a high- performance computing environment to analyze, model, and predict associations in biomedical datasets</li>
+                <li>Applied EndNote, BioRender, and Microsoft Office tools in manuscript writing and figure creation</li>
+                <li>Familiarity with comparative genomics tools such as BLAST, Unix, and Seaview in conducting sequence alignment</li>
+                <li>Familiarity with SPSS statistical software to analyze psychological survey data collected in Qualtrics questionnaires</li>
+                <li>Knowledge of laboratory techniques, including column chromatography, spectroscopy, dialysis, electrophoresis, buffer
+                    preparation, dilutions, cell line passaging, microscope work, PCR, blood staining, and vital assessment during surgery</li>
+            </ul>
+        </p>
+    </section>
+
+    <section>
+        <h2>RESEARCH AND CLINICAL EXPERIENCE</h2>
+        <p><b>Research at NIH</b>: <i>(July 2023-June 2024, Full-time Position)</i> Designed scripts to clean electronic health record data and
+            to visualize and model determinants of accelerated aging in alcoholic cohorts using machine learning of multiple linear 
+            regression analysis; developed a standard operating procedure for clinical trial screenings evaluating the safety and 
+            efficacy of PCSK9 inhibition on heavy drinkers and participated in recruitment, scheduling, and execution of screenings<br>
+            <b>Research in Genomics</b>: <i>(August 2022-April 2023, Research for Credit)</i> Evaluated hypotheses of RNAseq contrasts in R with 
+            limma-voom package and performed functional genome annotation to elucidate the genetic basis of drought tolerance of 
+            African acacias with Dr. James Pease and lab personnel<br>
+            <b>Research in Biochemistry</b>: <i>(August 2021-May 2022, Research for Credit)</i> Examined protein purification techniques of 
+            Ferritin heavy chain and Ferritin light chain and completed 130+ hour research goal in purification and crystallization
+            of mouse TREX1 exonuclease with humanized active site, under the supervision of Dr. Tom Hollis and lab personnel<br>
+            <b>Research in Pathology</b>: <i>(June 2019-August 2019, Internship)</i> Tested for <i>C. bovis</i> bacteria in immunodeficient mice
+             at Baylor College of Medicine under Dr. Brian Simmons, veterinary pathologist
+        </p>
+    </section>
+
+    <section>
+        <h2>PUBLICATIONS - IN PREP & AWARDS</h2>
+        <p>
+            <ol>
+                <li><b>N.R. Ellis</b>, D. B. Rosoff, F.W. Lohoff. Investigating the efficacy of the mTOR pathway on alcohol consumption
+                    behaviors: a multi-omic Mendelian randomization study. <i>(manuscript in preparation, 2024)</i>.</li>
+                <li><b>N.R. Ellis</b>, T. Perlstein, J. Jung, F.W. Lohoff. Comparing DNAm GrimAge Version 1 and Version 2 performance to
+                    identify determinants of accelerated epigenetic aging in NIAAA patient cohorts. <i>(manuscript in preparation, 2024)</i>.</li>
+                <li>Recipient of The Walter S. Flory Outstanding Student Award, presented by the WFU Department of Biology, 2023</li>
+            </ol>
+        </p>
+    </section>
+
+    <section>
+        <h2>PROFESSIONAL EXPERIENCE</h2>
+        <p>
+            <b>Kappa Delta, Wake Forest University</b><br>
+            <i>Vice President of Events and Programming</i><span style="float: right;font-style: italic">October 2021-May 2022</span>
+            <ul>
+                <li>Oversaw multi-team collaboration to plan and execute social and philanthropic events for 300-person chapter</li>
+                <li>Managed $15K semester budget for social and fundraising events raising $23K+, which involved delegation of tasks, venue
+                    and transportation contract negotiation, risk management strategies, conflict resolution, and event execution</li>
+            </ul>
+        </p>
+        <p>
+            <b>BioCenter, Wake Forest University</b><br>
+            <i>Biology Tutor</i><span style="float: right;font-style: italic">Fall 2020-Spring 2021</span>
+            <ul>
+                 <li>Tutored undergraduate students virtually for 5 hours a week in introductory Biology classes at Wake Forest University</li>
+            </ul>    
+        </p>
+    </section>
+</body>
+</html>
+
+
