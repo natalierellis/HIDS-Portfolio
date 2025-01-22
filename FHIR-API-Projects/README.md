@@ -32,7 +32,6 @@ This repository contains two HTML projects that demonstrate interactions with FH
   - Updating or creating patient data through PUT and POST requests.
 
 - **Features**:
-  - Bootstrap-based design for enhanced UI/UX.
   - Fetches data for patients based on their IDs.
   - Lists medications and conditions in organized tables.
   - Includes buttons for creating new patients or updating existing ones.
