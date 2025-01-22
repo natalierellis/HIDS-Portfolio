@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head> 
+<script type='text/javascript' src='jquery-1.11.2.min.js'></script> <!-- loading a jQuery library -->
+<script type='text/javascript'> <!-- begins javascript codeblock -->
+function doStuff() {
+    var type = $('#selType')[0].value; // accessing selected resource type, like patient or meds and creating variable type
+    var url = $('#url')[0].value + type + $('#selPt')[0].value; // creating a variable url that concatenates the url + resource type + patient
+
+    $.ajax({ //an ajax request
+        url: url, // uses previously constructed url variable 
+        headers: {         
+            Accept: "application/json+fhir", //requests json data in fhir format
+            "Content-Type": "text/plain; charset=utf-8" 
+        }
+    }).then(function(data) { // specifies that a function should run with data as the returned JSON response 
+        try { 
+            var strRslt = JSON.stringify(data, null, '\t'); // converts object to string
+            $('#txtRslt')[0].value = strRslt; // inserts formatted JSON string into the textarea for display
+            
+            $('#spn')[0].innerHTML = ''; // clears any previous content in the <span id="spn"></span> element
+
+            // Check if "Meds" (MedicationOrder) is selected
+            if (type === 'MedicationOrder?patient=') {
+                addTable(data); // Pass data to addTable function if "Meds" is selected
+            } else {
+                // Ensure data.entry exists before proceeding
+                if (data.entry && Array.isArray(data.entry)) {
+                    var items = data.entry; // extracts entry array from data object and stores in items
+                    var numItems = items.length; // finds the number of entries and stores in numItems
+                    if (numItems > 20) { // if this number of entries is greater than 20
+                        alert('Found ' + numItems + '. Showing only first 20'); // notify user and limit to 20 items
+                        numItems = 20;
+                    }
+                    for (var i = 0; i < numItems; i++) { // loop over the items
+                        var item = items[i].resource.text.div ; // safely access text.div
+                        $('#spn')[0].innerHTML += '<br />' + item; // append item to the spn element
+                    }
+                } else {
+                    $('#spn')[0].innerHTML = 'No data available';
+                }
+            }
+        } catch (e) {
+            alert(e); // catch any errors and provide an alert
+        }
+    });
+}
+
+function addTable(data) { // function to produce a table when meds is selected
+    try { // needed for handling errors
+        var s = $('#spn')[0]; // using tutorial, selecting html element with id of spn, accessing first 
+        // Check if data.entry exists and is an array
+        if (data.entry && Array.isArray(data.entry)) {
+            var items = data.entry; // extracts entry array from data object, which should be medication data entries, and stores in items
+            var numItems = items.length;
+            if (numItems > 20) { // limit display to 20 entries - don't know if this is needed, used from above
+                alert('Found ' + numItems + '. Showing only first 20');
+                numItems = 20;
+            }
+
+            var str = '<table border="1"><tr><th>Drug Name</th><th>Timing</th><th>Route</th><th>Dose</th></tr>'; // table headers 
+
+            for (var i = 0; i < numItems; i++) { // loop over the items
+                var entry = items[i].resource; // accessing medication details for each entry
+				// Log each entry to inspect its structure (for debugging)
+            	console.log("Entry", i, entry); 
+                // Extract each value with a check for path existence - use line from tutorial
+                // Use paths in assignment sheet
+                var drugName = entry.medicationCodeableConcept?.text || 'N/A'; 
+                var timing = entry.dosageInstruction?.[0]?.timing?.code?.text || 'N/A';
+                var route = entry.dosageInstruction?.[0]?.route?.text || 'N/A';
+
+                var doseQuantity = entry.dosageInstruction?.[0]?.doseQuantity;
+                var dose = doseQuantity ? (doseQuantity.value + ' ' + doseQuantity.unit) : 'N/A';
+
+                // Append each row to the table
+                str += `<tr><td>${drugName}</td><td>${timing}</td><td>${route}</td><td>${dose}</td></tr>`;
+            }
+
+            str += '</table>'; // Close the table structure
+
+            // Display the table within the #spn element
+            s.innerHTML = str;
+        } else {
+            s.innerHTML = 'No data available'; // this is what I am getting!!!
+        }
+    } catch (e) { 
+        alert(e); // catch any errors and provide an alert
+    }
+}
+</script>
+</head>
+<body> 
+url root: <input type='text' id='url' style="width:500px;" value="https://fhir-open.cerner.com/dstu2/ec2458f2-1e24-41c8-b71b-0e701af7583d/" /><br /> 
+patientID:
+<select id='selPt'>
+<option value='12507979'>Smith, Frank</option>
+<option value='12742429'>Smart, Connie</option>
+<option value="12743126">Smart, Freddie</option>
+<option value="12724066">Smart, Nancy</option>
+</select>
+<select id='selType'>
+<option value='Patient?_id='>Patient</option>
+<option value='Encounter?patient='>Encounters</option>
+<option value="CarePlan?category=assess-plan&patient=">Care Plan</option>
+<option value='MedicationOrder?patient='>Meds</option> <!-- this is a very important code block, type we are interested in  -->
+<option value='Observation?patient='>Observations</option>
+<option value='AllergyIntolerance?patient='>Allergies</option>
+<option value='Condition?patient='>Conditions</option>
+<option value='Procedure?patient='>Procedures</option>
+<option value='Appointment?date=2017&patient='>Appointments</option>
+</select>
+<input type='button' value='click' onclick='doStuff();' /><br />
+<textarea id='txtRslt' rows=20 cols=150></textarea><br />
+<span id='spn'></span>
+</body>
+</html>
+
