@@ -72,8 +72,27 @@ As a student bioinformatician on an interdisciplinary team, I conducted differen
 
 ## Key Findings
 
-1. **DEGs**: Identified 289 genes with significant expression differences between incipient AD subjects and controls.
-2. **Pathway Insights**: Enriched pathways included those related to neuronal function, synaptic signaling, and inflammatory responses.
-3. **Candidate Biomarkers**: Genes such as CAMK4, SUGT1, and SMAD4 were identified as potential AD biomarkers based on their biological relevance.
+### Pathways and Biological Insights
 
+| **Pathway/Term**                            | **Relevance to AD**                                                                            |
+|---------------------------------------------|-----------------------------------------------------------------------------------------------|
+| **Adherens Junction**                       | Critical for maintaining neuronal cell-cell adhesion and synaptic integrity [1].                  |
+| **Wnt/β-catenin Signaling in Brain**        | Essential for neuronal development, differentiation, and survival. Implicated in synaptic plasticity [2]. |
+| **Interleukin-6 Signaling**                 | Implicated in inflammation and neuronal apoptosis. Consistently appeared across databases [3]. |
+| **Neuronal System**                         | Key organ system affected in AD, essential for synaptic signaling. High overlap in Reactome [4]. |
+| **cAMP Signaling**                          | Linked to neuronal apoptosis and synaptic plasticity. High overlap in KEGG [5].               |
+
+### Gene-Level Insights
+
+- **FZD8 (Wnt/β-catenin)**: Upregulated; supports neuronal connections. Limited direct link to AD, more associated with cancer pathways.
+- **SMAD4**: Mixed regulation suggests complex roles in early-stage AD.
+- **TCF7L1 (Wnt/β-catenin)**: Results contradict literature, suggesting potential compensatory mechanisms in incipient AD.
+
+## References
+
+1. Zenaro E., Piacentino, G., Constantin, G. (2017). The blood-brain barrier in Alzheimer's disease. Neurobiology of Disease 107,41-56. https://doi.org/10.1016/j.nbd.2016.07.007
+2.  Nagu, P., Sharma, V., Behl, T. et al. (2022). Molecular Insights to the Wnt Signaling During Alzheimer’s Disorder: a Potential Target for Therapeutic Interventions. J Mol Neurosci 72, 679–690. https://doi.org/10.1007/s12031-021-01940-5
+3. Kaurani, L., Pradhan R., Schroder, S. et al. (2024).A role for astrocytic miR-129-5p in Frontotemporal Dementia. bioRxiv. https://doi.org/10.1101/2024.04.15.589528
+4. Yu, H., Ding, Y., Wei, Y., Dyrba, M., Wang, D., Kang, X., Xu, W., Zhao, K., Liu, Y., & for the Alzheimer's Disease Neuroimaging Initiative (2023). Morphological connectivity differences in Alzheimer's disease correlate with gene transcription and cell-type. Human Brain Mapping, 44(18), 6364–6374. https://doi.org/10.1002/hbm.26512
+5. Li, H., Yang S., Wul, J. et al. (2017).cAMP/PKA signaling pathway contributes to neuronal apoptosis via regulating IDE expression in a mixed model of type 2 diabetes and Alzheimer's disease. J Cellular Biochemistry 119(2), 1616–1626. https://doi.org/10.1002/jcb.26321
 
