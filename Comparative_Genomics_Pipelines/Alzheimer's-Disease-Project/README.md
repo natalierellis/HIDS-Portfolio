@@ -30,7 +30,7 @@ As a student bioinformatician on an interdisciplinary team, I conducted differen
   - `SigDiffExpressedGenes.tsv`: Significant gene names (duplicates removed).
   - `EnrichR.xlsx`: Multi-tab Excel file with enrichment results.
  
-- `Team1_AD_Midterm_Presentation.pptx`: PowerPoint slides summarizing the analysis and findings.
+- `Team1_midterm_presentation.pdf`: PowerPoint slides summarizing the analysis and findings.
 
 - `combined_pipeline.R`: R script combining all analysis steps.
 
@@ -66,7 +66,7 @@ As a student bioinformatician on an interdisciplinary team, I conducted differen
 
 ### **Step 4: Presentation**
 - **Objective**: Summarize findings in a team presentation.
-- **File**: `Team1_AD_Midterm_Presentation.pptx`
+- **File**: `Team1_midterm_presentation.pdf`
 
 ---
 
