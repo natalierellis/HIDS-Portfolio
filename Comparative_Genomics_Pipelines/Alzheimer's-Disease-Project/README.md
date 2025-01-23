@@ -6,7 +6,7 @@ This project focuses on utilizing gene expression data to identify potential mol
 
 ## Project Overview
 
-As a bioinformatician on an interdisciplinary team, I conducted differential gene expression analysis and systems biology enrichment to uncover pathways and genes relevant to AD.
+As a student bioinformatician on an interdisciplinary team, I conducted differential gene expression analysis and systems biology enrichment to uncover pathways and genes relevant to AD.
 
 ### **Goals:**
 1. Identify differentially expressed genes (DEGs) between incipient AD subjects and controls.
@@ -29,11 +29,9 @@ As a bioinformatician on an interdisciplinary team, I conducted differential gen
   - `AD_Ttest_Shortlisted.tsv`: Shortlisted DEGs (p-value ≤ 0.01).
   - `SigDiffExpressedGenes.tsv`: Significant gene names (duplicates removed).
   - `EnrichR.xlsx`: Multi-tab Excel file with enrichment results.
+ 
+- `Team1_AD_Midterm_Presentation.pptx`: PowerPoint slides summarizing the analysis and findings.
 
-- `presentation/`: Contains the team's presentation slides.
-  - `Team1_AD_Midterm_Presentation.pptx`: PowerPoint slides summarizing the analysis and findings.
-
-- `README.md`: Documentation of the project.
 - `combined_pipeline.R`: R script combining all analysis steps.
 
 ---
@@ -74,21 +72,8 @@ As a bioinformatician on an interdisciplinary team, I conducted differential gen
 
 ## Key Findings
 
-1. **DEGs**: Identified 294 genes with significant expression differences between incipient AD subjects and controls.
+1. **DEGs**: Identified 289 genes with significant expression differences between incipient AD subjects and controls.
 2. **Pathway Insights**: Enriched pathways included those related to neuronal function, synaptic signaling, and inflammatory responses.
 3. **Candidate Biomarkers**: Genes such as CAMK4, SUGT1, and SMAD4 were identified as potential AD biomarkers based on their biological relevance.
 
----
-
-## Usage
-
-### **Requirements**:
-- R (≥ 4.0.0)
-- Libraries: `readr`, `dplyr`, `enrichR`, `knitr`
-
-### **Run the Pipeline**:
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/AD_Project.git
-   cd AD_Project
 
