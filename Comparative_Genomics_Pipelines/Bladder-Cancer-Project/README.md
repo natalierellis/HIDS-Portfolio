@@ -8,7 +8,7 @@ This project explores molecular changes and immune landscape disruptions in blad
 
 **Objective**:  
 - Identify differentially expressed genes (DEGs) and disrupted pathways between precancerous and normal bladder tissues.  
-- Analyze changes in immune cell types infiltrating tumors using the CIBERSORT tool.  
+- Analyze changes in immune cell types infiltrating tumors using the CIBERSORTx tool.  
 - Visualize immune cell dynamics and relate findings to bladder cancer progression and recurrence.  
 
 **Tools**:  
@@ -24,7 +24,7 @@ This project explores molecular changes and immune landscape disruptions in blad
   - `scripts/`: R scripts for T-test and EnrichR analyses.  
 - **Step2-CIBERSORT-Analysis**: Immune cell profiling analysis.  
   - `input/`: Input files for visualization using CIBERSORT.  
-  - `output/`: Visualizations to be included in presentation.  
+  - `output/`: Visualizations to be included in the presentation.  
   - `scripts/`: Scripts for graph generation of CIBERSORT results.  
 
 ---
@@ -57,7 +57,7 @@ This project explores molecular changes and immune landscape disruptions in blad
 
 1. **Immune Cell Analysis**  
    - Uploaded gene expression data to CIBERSORTx.  
-   - Analyzed the immune landscape in precancerous and normal tissue.   
+   - Analyzed the immune landscape in precancerous and normal tissue.  
 
 2. **Visualizations**  
    - Generated graphs to interpret immune cell dynamics:  
@@ -65,9 +65,8 @@ This project explores molecular changes and immune landscape disruptions in blad
      - Stacked bar plot, line plot, and correlation plot (team contributions).  
 
    **Input Files**:  
-   - `CIBERSORTx_Normal_Results.csv`: Normal immune cell fractions generated from CIBERSORT.  
-   - `CIBERSORTx_Precancerous_Results.csv`: Precancerous immune cell fractions generated from CIBERSORT.  
-  
+   - **Note**: Input files for CIBERSORTx are no longer accessible, so replication of the CIBERSORTx analysis is not possible. However, visualizations generated from the available CIBERSORT output data can be fully replicated.  
+
    **Output Files**:  
    - `Average_Bar_Graph.pdf`  
    - `Stacked_Bar_Plot.pdf`  
@@ -104,11 +103,20 @@ These immune cell dynamics highlight a disrupted immune environment promoting tu
 
 ---
 
-## Note 
+## Note  
+
+- Input files for the CIBERSORTx analysis are no longer accessible, so the CIBERSORTx tool's analysis cannot be replicated. However, the visualizations generated from the CIBERSORTx output data, such as bar graphs and correlation plots, can be reproduced using the provided scripts and output files in the project directory.  
 
 ---
 
 ## References  
 
-1.   
+1. **TLR Cascade**  
+   - Takeda, K., & Akira, S. (2005). Toll-like receptors in innate immunity. *International Immunology*, 17(1), 1–14.  
+2. **MHC Class II**  
+   - Rocha, B., et al. (2018). Antigen presentation and its role in immunity. *Nature Reviews Immunology*, 18(8), 485–498.  
+3. **Cell Cycle**  
+   - Malumbres, M., & Barbacid, M. (2009). Cell cycle, CDKs and cancer: A changing paradigm. *Nature Reviews Cancer*, 9, 153–166.  
+4. **RHO GTPase**  
+   - Ridley, A. J. (2001). Rho family proteins: Coordinating cell responses. *Trends in Cell Biology*, 11(12), 471–477.  
 
