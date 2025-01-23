@@ -61,17 +61,16 @@ This project explores molecular changes and immune landscape disruptions in blad
 
 2. **Visualizations**  
    - Generated graphs to interpret immune cell dynamics:  
-     - Average bar graph for immune cell fractions in tumor and normal tissue.  
+     - Average bar graph for immune cell fractions in precancerous and normal tissue.  
      - Stacked bar plot, line plot, and correlation plot (team contributions).  
 
    **Input Files**:  
    - **Note**: Input files for CIBERSORTx are no longer accessible, so replication of the CIBERSORTx analysis is not possible. However, visualizations generated from the available CIBERSORT output data can be fully replicated.  
 
    **Output Files**:  
-   - `Average_Bar_Graph.pdf`  
-   - `Stacked_Bar_Plot.pdf`  
-   - `Line_Plot.pdf`  
-   - `Correlation_Plot.pdf`  
+   - `Ciber_Normal_AvgBarPlot.pdf`
+   - `Ciber_Precancerous_AvgBarPlot.pdf`
+   - The remaining visualizations completed by my other team members are included in the presentation. 
 
 ---
 
@@ -81,10 +80,10 @@ This project explores molecular changes and immune landscape disruptions in blad
 
 | **Pathway/Term**           | **Relevance to Bladder Cancer**                                                                                       |  
 |----------------------------|------------------------------------------------------------------------------------------------------------------|  
-| **TLR Cascade**            | Plays a key role in immune activation. Altered TLR signaling may suppress anti-tumor immunity and promote tumor evasion. |  
-| **MHC Class II**           | Impaired antigen presentation weakens immune responses, potentially contributing to BC recurrence. Impaired dendritic cell function suppresses immune activation, allowing the tumor to evade the immune system. |  
-| **Cell Cycle, Mitotic**    | Abnormal mitotic activity is linked to tumor progression and recurrence, highlighting dysregulation in cell division. |  
-| **RHO GTPase**             | Regulates both tumor progression and the immune microenvironment, playing a pivotal role in bladder cancer development. |  
+| **TLR Cascade**            | Impaired dendritic cells suppressed immune activation, allowing the tumor to evade the immune system [1]. |  
+| **MHC Class II**           | Impaired antigen presentation may weaken immune responses and contribute to BC recurrence [2]. |  
+| **Cell Cycle, Mitotic**    | Abnormal mitotic activity associated with tumor progression and recurrence [3]. |  
+| **RHO GTPase**             | Plays a pivotal role in regulating both tumor progression and the immune microenvironment in BC [4]. |  
 
 ---
 
@@ -96,8 +95,8 @@ This project explores molecular changes and immune landscape disruptions in blad
   - **M2 Macrophages**  
   - **CD8 T Cells**  
 - **Increases** in:  
-  - **Tregs** (Regulatory T Cells): Suppress anti-tumor immunity.  
-  - **Activated Dendritic Cells**: Suggest potential immune activation despite tumor immune evasion.  
+  - **Tregs** (Regulatory T Cells)
+  - **Activated Dendritic Cells**
 
 These immune cell dynamics highlight a disrupted immune environment promoting tumor development and recurrence.  
 
@@ -111,12 +110,8 @@ These immune cell dynamics highlight a disrupted immune environment promoting tu
 
 ## References  
 
-1. **TLR Cascade**  
-   - Takeda, K., & Akira, S. (2005). Toll-like receptors in innate immunity. *International Immunology*, 17(1), 1–14.  
-2. **MHC Class II**  
-   - Rocha, B., et al. (2018). Antigen presentation and its role in immunity. *Nature Reviews Immunology*, 18(8), 485–498.  
-3. **Cell Cycle**  
-   - Malumbres, M., & Barbacid, M. (2009). Cell cycle, CDKs and cancer: A changing paradigm. *Nature Reviews Cancer*, 9, 153–166.  
-4. **RHO GTPase**  
-   - Ridley, A. J. (2001). Rho family proteins: Coordinating cell responses. *Trends in Cell Biology*, 11(12), 471–477.  
+1. Ma Y, Shurin GV, Zhu Peiyuan, Shurin MR. Dendritic Cells in the Cancer Microenvironment. Journal of Cancer. 2013;4(1):36-44. doi:https://doi.org/10.7150/jca.5046
+2. Sfakianos, J.P., Daza, J., Hu, Y. et al. Epithelial plasticity can generate multi-lineage phenotypes in human and murine bladder cancers. Nat Commun 11, 2540 (2020). https://doi.org/10.1038/s41467-020-16162-3
+3. Mercadante AA, Kasi A. Genetics, Cancer Cell Cycle Phases. [Updated 2023 Aug 14]. In: StatPearls [Internet]. Treasure Island (FL): StatPearls Publishing; 2024 Jan-. Available from: https://www.ncbi.nlm.nih.gov/books/NBK563158/
+4. Michael Zaleski, Augustyna Gogoj, Vonn Walter, et al. Mitotic activity in noninvasive papillary urothelial carcinoma: its value in predicting tumor recurrence and comparison with the contemporary 2-tier grading system, Human Pathology, Volume 84, 2019, Pages 275-282, ISSN 0046-8177, https://doi.org/10.1016/j.humpath.2018.10.008. 
 
