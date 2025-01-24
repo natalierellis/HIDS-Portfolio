@@ -1,6 +1,6 @@
 # HIDS Portfolio
 
-Welcome to my **Health Informatics and Data Science (HIDS) Portfolio**! This repository contains a collection of projects showcasing my technical expertise, analytical skills, and collaborative experience in health informatics and data science. Each project reflects my ability to work with diverse datasets, apply advanced computational techniques, and generate actionable insights to improve healthcare outcomes.
+Welcome to my **Health Informatics and Data Science (HIDS) Portfolio**! This repository contains a collection of projects showcasing my technical expertise, analytical skills, and collaborative experience in my HIDS Master's Program at **Georgetown University**. Each project reflects my ability to work with diverse datasets, apply advanced computational techniques, and generate actionable insights to improve healthcare outcomes.
 
 ---
 
