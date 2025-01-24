@@ -79,13 +79,10 @@ The hypertension clinic faces overwhelming patient volumes due to preventable re
 | **Presentation**         | Final PowerPoint summarizing findings and recommendations. |
 
 ---
-
-## **Takeaways**
-Through this project, we gained experience with:
-- **Synthea:** Generating synthetic healthcare data and identifying gaps in care.
-- **OpenEMR:** Modifying an EMR system to address workflow inefficiencies.
-- **Tableau:** Designing actionable dashboards to track performance metrics.
-- **Team Collaboration:** Managing tasks across data analysis, EMR development, and visualization.
+## **Next Steps**
+1. Expand the intervention hospital-wide.
+2. Enhance the Tableau dashboard to include real-time insights.
+3. Gather feedback from users to refine the workflow further.
 
 ---
 
@@ -101,11 +98,12 @@ Through this project, we gained experience with:
 | `/documentation`        | Workflow and project documentation.                     |
 
 ---
-
-## **Next Steps**
-1. Expand the intervention hospital-wide.
-2. Enhance the Tableau dashboard to include real-time insights.
-3. Gather feedback from users to refine the workflow further.
+## **Takeaways**
+Through this project, we gained experience with:
+- **Synthea:** Generating synthetic healthcare data and identifying gaps in care.
+- **OpenEMR:** Modifying an EMR system to address workflow inefficiencies.
+- **Tableau:** Designing actionable dashboards to track performance metrics.
+- **Team Collaboration:** Managing tasks across data analysis, EMR development, and visualization.
 
 For additional details, please refer to the README files in each subdirectory.
 
