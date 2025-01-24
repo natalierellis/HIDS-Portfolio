@@ -91,7 +91,7 @@ The hypertension clinic faces overwhelming patient volumes due to preventable re
 | Folder                  | Description                                             |
 |-------------------------|---------------------------------------------------------|
 | `HIDS 6002 Final Presentation.pdf`               | Final presentation slides summarizing findings.         |
-| `/tableau_dashboards`    | Tableau workbook and dashboard screenshots.             |
+| `tableau_dashboards`    | Tableau workbook and dashboard screenshots.             |
 | `Workflow.xlsx` | Screenshots and files for OpenEMR modifications.        |
 | `Patients_Database.xlsx`                | Placeholder for fabricated data from Synthea.           |
 | `synthea_script.html`              | Data analysis scripts (e.g., Synthea cohort analysis).  |
