@@ -14,8 +14,8 @@ This section highlights the dashboards created for our project, showcasing key m
   - Most patients are in the 30-50 and 50+ age groups, aligning with hypertension risk factors.
 
 - **Baseline Metrics**:
-  - At baseline, 93.2% of referrals were inappropriate, indicating the need for stricter referral criteria.
-  - Our refined referral criteria reduced inappropriate referrals from **93.2% at baseline** to **30% during the intervention period**.
+  - At baseline, 93.2% of referrals were inappropriate, indicating the need for to more effectively manage hypertension patients by PCPs. 
+  - Our OpenEMR intervention reduced inappropriate referrals by PCPs from **93.2% at baseline** to **30% during the intervention period**, reducing unnecessary clinic overload.
 
 - **Goal Achievement**:
   - Our target was to achieve **≤60% inappropriate referrals**. Achieving 30% surpasses this goal, demonstrating the intervention's effectiveness.
