@@ -39,9 +39,10 @@ The hypertension clinic faces overwhelming patient volumes due to preventable re
 ### **2. Data Analysis (Synthea)**
 - **Goal:** Assess primary care management for hypertension patients and identify gaps.
 - **Findings:**
-  - 93.24% of referrals were inappropriate.
-  - 100% of referred patients met "adequate primary care" criteria but did not meet stricter clinical guidelines for referral.
-  - Stricter referral criteria were implemented based on **British and Irish Hypertension Society Guidelines**.
+   - 100% of referred patients met "adequate primary care" criteria but did not meet stricter clinical guidelines for referral.
+   - Stricter referral criteria were implemented based on **British and Irish Hypertension Society Guidelines**.
+   - Based on the more stringent referral criteria, 93.24% of the hypertension cohort were inapproporaitely referred to a hypertension clinic.
+
 
 ---
 
