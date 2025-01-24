@@ -1,6 +1,6 @@
-# README: Biomedical Data Analysis Projects  
+# Biomedical Data Analysis Projects  
 
-This folder contains two bioinformatics projects focused on analyzing clinical and genomic data to uncover biological insights using advanced statistical methods and data visualization techniques.
+This folder contains two bioinformatics projects focused on analyzing clinical and genomic data to uncover biological insights using statistical methods and data visualization techniques.
 
 ---
 
@@ -11,8 +11,7 @@ Identify differentially expressed genes (DEGs) and enriched pathways in Alzheime
 
 ### Tools & Skills  
 - **Statistical Analysis**: DEG identification using R (T-tests).  
-- **Pathway Enrichment**: Analysis with EnrichR to uncover biological pathways and molecular functions.  
-- **Visualization**: Data interpretation and creation of visual outputs to summarize findings.  
+- **Pathway Enrichment**: Analysis with EnrichR to uncover biological pathways and molecular functions.   
 
 ### Key Results  
 - Identified critical pathways for neuronal adhesion, synaptic signaling, and inflammation.  
