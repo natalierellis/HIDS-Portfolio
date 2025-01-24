@@ -32,7 +32,7 @@ The hypertension clinic faces overwhelming patient volumes due to preventable re
 - Inefficient primary care management of hypertension.
 - Overwhelming patient backlog at specialty clinics.
 
-**Solution:** Enhance referral workflows by implementing stricter referral criteria within the EMR and tracking key performance indicators (KPIs).
+**Solution:** Enhance referral workflows by implementing structured referral process within the EMR and tracking key performance indicators (KPIs).
 
 ---
 
