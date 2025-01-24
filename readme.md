@@ -54,7 +54,7 @@ This folder documents a process improvement project aimed at enhancing hypertens
 
 ---
 
-### 4. **SQL Reports** (within `/docs`)
+### 4. **SQL Reports** (within `docs/`)
 This folder contains SQL reports and Tableau dashboards demonstrating data visualization and analysis skills.
 
 #### Featured Reports:
