@@ -60,7 +60,7 @@ The hypertension clinic faces overwhelming patient volumes due to preventable re
 ### **4. Tableau Dashboard**
 - **Goal:** Visualize key performance indicators (KPIs) to measure intervention success.
 - **KPIs Tracked:**
-  - **Inappropriate Referral Rate:** Percentage of referrals made without meeting strict criteria.
+  - **Inappropriate Referral Rate:** Percentage of referrals made before and after implementing intervention.
   - **Provider Adherence:** Percentage of providers following proper patient management protocols before referring.
 
 **Features:**
