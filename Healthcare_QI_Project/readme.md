@@ -90,12 +90,11 @@ The hypertension clinic faces overwhelming patient volumes due to preventable re
 
 | Folder                  | Description                                             |
 |-------------------------|---------------------------------------------------------|
-| `/slides`               | Final presentation slides summarizing findings.         |
-| `/tableau_dashboard`    | Tableau workbook and dashboard screenshots.             |
-| `/openemr_intervention` | Screenshots and files for OpenEMR modifications.        |
-| `/data`                 | Placeholder for fabricated data from Synthea.           |
-| `/scripts`              | Data analysis scripts (e.g., Synthea cohort analysis).  |
-| `/documentation`        | Workflow and project documentation.                     |
+| `HIDS 6002 Final Presentation.pdf`               | Final presentation slides summarizing findings.         |
+| `/tableau_dashboards`    | Tableau workbook and dashboard screenshots.             |
+| `Workflow.xlsx` | Screenshots and files for OpenEMR modifications.        |
+| `Patients_Database.xlsx`                | Placeholder for fabricated data from Synthea.           |
+| `synthea_script.html`              | Data analysis scripts (e.g., Synthea cohort analysis).  |
 
 ---
 ## **Takeaways**
@@ -105,5 +104,4 @@ Through this project, we gained experience with:
 - **Tableau:** Designing actionable dashboards to track performance metrics.
 - **Team Collaboration:** Managing tasks across data analysis, EMR development, and visualization.
 
-For additional details, please refer to the README files in each subdirectory.
 
