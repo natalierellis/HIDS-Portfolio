@@ -1,3 +1,3 @@
 ## Dashboard Demo
-![Tableau Dashboard Interaction](path_to_your_gif/dashboard_demo.gif)
+![Tableau Dashboard Interaction](Healthcare_QI_Project/tableau_dashboards/ScreenRecording2025-01-24at11.09.04AM-ezgif.com-video-to-gif-converter (1).gif)
 
