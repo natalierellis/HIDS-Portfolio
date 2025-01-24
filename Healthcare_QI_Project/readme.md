@@ -80,7 +80,7 @@ The hypertension clinic faces overwhelming patient volumes due to preventable re
 
 ---
 
-## **Lessons Learned**
+## **Takeaways**
 Through this project, we gained experience with:
 - **Synthea:** Generating synthetic healthcare data and identifying gaps in care.
 - **OpenEMR:** Modifying an EMR system to address workflow inefficiencies.
