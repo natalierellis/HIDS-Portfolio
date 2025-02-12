@@ -55,18 +55,13 @@ This folder documents a process improvement project aimed at enhancing hypertens
 ---
 
 ### 4. **SQL Reports** (within `docs/`)
-This folder contains SQL reports and Tableau dashboards demonstrating data visualization and analysis skills.
+This folder contains SQL reports demonstrating data analysis skills.
 
 #### Featured Reports:
 - **COVID-19 Patient Registry Proposal**
 - **De-identification of Patient Data**
 - **Asthma Care Quality Analysis**
 - **Insurance Claims Metrics**
-
-#### Featured Dashboards:
-- **Hypertension Referral Workflow Analysis**
-  - Visualized referral trends and provider adherence.
-  - Tools: Tableau, SQL
 
 ---
 
