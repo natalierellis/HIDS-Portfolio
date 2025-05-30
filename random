@@ -24,28 +24,16 @@ dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
     filter(tdan_dx_grp == "Concurrent GynCAs") %>%
     rowwise() %>%
     mutate(
-      # Clean and lower-case site values
-      all_sites = list(tolower(na.omit(c(site_p, site_p2, site_p3)))),
-      all_sites_clean = list(all_sites[all_sites != ""]),
-      # Check validity
-      valid_sites_only = all(all_sites_clean[[1]] %in% valid_gyn_sites),
-      n_unique_valid = length(unique(all_sites_clean[[1]])),
-      # Flag if not "Concurrent GYN Sites" and not valid enough sites
-      violation = !(tolower(site_p) == "concurrent gyn sites") &
-                  (!valid_sites_only | n_unique_valid < 2),
-      issue_description = "Concurrent GynCAs: site_p can be 'Concurrent GYN Sites' OR include ≥2 distinct valid GYN site values among site_p/p2/p3"
+      sites = tolower(na.omit(c(site_p, site_p2, site_p3))),
+      valid_sites = sites[sites %in% valid_gyn_sites],
+      n_valid = length(valid_sites),
+      n_unique_valid = length(unique(valid_sites)),
+      violation = !(tolower(site_p) == "concurrent gyn sites") & (
+        n_valid < 2 | n_unique_valid < 2
+      ),
+      issue_description = "Concurrent GynCAs: site_p can be 'Concurrent GYN Sites' OR must include ≥2 distinct valid GYN sites among site_p/p2/p3"
     ) %>%
     ungroup() %>%
     filter(violation) %>%
     select(cid, issue_description)
 }
-
-test_df <- tibble::tibble(
-  cid = 1:4,
-  tdan_dx_grp = rep("Concurrent GynCAs", 4),
-  site_p = c("Fallopian Tube", "Ovarian", "Concurrent GYN Sites", "Ovarian"),
-  site_p2 = c("Uterine Corpus", "Ovarian", "", "Invalid Site"),
-  site_p3 = c("", "", "", "")
-)
-
-dx_grp_concurrent_gyncas_missing_gyn_variants(test_df)
