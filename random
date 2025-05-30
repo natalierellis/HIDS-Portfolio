@@ -1,27 +1,8 @@
-dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
-  required_cols <- c("tdan_dx_grp", "site_p", "site_p2", "site_p3")
-  if (!all(required_cols %in% names(df))) return(NULL)
-
-  valid_gyn_sites <- c(
-    "Ovarian",
-    "Fallopian Tube",
-    "Primary Peritoneal",
-    "Tubo-Ovarian",
-    "Uterine Corpus",
-    "Mullerian origin NOS Unk GYN Site"
-  )
-
-  df %>%
-    filter(tdan_dx_grp == "Concurrent GynCAs") %>%
-    mutate(
-      site_p_valid = site_p %in% valid_gyn_sites,
-      site_p2_valid = site_p2 %in% valid_gyn_sites & site_p2 != site_p,
-      site_p3_valid = site_p3 %in% valid_gyn_sites & site_p3 != site_p,
-      has_other_gyn_site = site_p2_valid | site_p3_valid
-    ) %>%
-    filter(!(site_p_valid & has_other_gyn_site)) %>%
-    mutate(
-      issue_description = "Concurrent GynCAs: site_p must be a GYN site and at least one of site_p2 or site_p3 must also be a different GYN site"
-    ) %>%
-    select(cid, issue_description)
-}
+test_df <- data.frame(
+  cid = c(1, 2, 3, 4),
+  tdan_dx_grp = c("Cervical CA", "Cervical CA", "Ovarian CA", "Cervical CA"),
+  site_p = c("Cervical", "Ovarian", "Ovarian", "Cervical"),
+  site_p2 = c("", "Other", "", "Cervical"),
+  site_p3 = c("", "", "Other", "Ovarian"),
+  stringsAsFactors = FALSE
+)
