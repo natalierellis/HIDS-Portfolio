@@ -1,32 +1,32 @@
-test_df2 <- data.frame(
-  cid = c(101, 102, 103, 104, 105),
-  tdan_dx_grp = c(
-    "Concurrent GynCA and NonGynCA",
-    "Concurrent GynCA and NonGynCA",
-    "Concurrent GynCA and NonGynCA",
-    "Concurrent GynCA and NonGynCA",
-    "Ovarian CA"  # control row: different group
-  ),
-  site_p = c(
-    "Ovarian",              # ✅ valid
-    "Fallopian Tube",       # ❌ invalid p2
-    "Uterine Corpus",       # ❌ invalid p3
-    "Primary Peritoneal",   # ✅ valid
-    "Ovarian"               # not evaluated
-  ),
-  site_p2 = c(
-    "Other",         # ✅
-    "Cervical",      # ❌
-    "",              # ✅
-    "Other",         # ✅
-    "Other"          # ✅ but irrelevant
-  ),
-  site_p3 = c(
-    "",              # ✅
-    "",              # ✅
-    "Ovarian",       # ❌
-    "Other",         # ✅
-    ""               # ✅
-  ),
-  stringsAsFactors = FALSE
-)
+dx_grp_concurrent_gyncas_invalid_combination <- function(df) {
+  required_cols <- c("tdan_dx_grp", "site_p", "site_p2", "site_p3")
+  if (!all(required_cols %in% names(df))) return(NULL)
+
+  valid_gyn_sites <- c(
+    "Ovarian",
+    "Fallopian Tube",
+    "Primary Peritoneal",
+    "Tubo-Ovarian",
+    "Uterine Corpus",
+    "Mullerian origin NOS Unk GYN Site",
+    "Cervical",
+    "Uterine Cervix",
+    "Endometrium",
+    "Myometrium"
+  )
+
+  df %>%
+    filter(tdan_dx_grp == "Concurrent GynCAs") %>%
+    rowwise() %>%
+    mutate(
+      sites = list(na.omit(c(site_p, site_p2, site_p3))),
+      non_blank_sites = sites[sites != ""],
+      all_sites_valid = all(non_blank_sites %in% valid_gyn_sites),
+      n_unique_sites = length(unique(non_blank_sites)),
+      violation = (!all_sites_valid) | (n_unique_sites < 2),
+      issue_description = "Concurrent GynCAs: Must have ≥2 different valid GYN sites among site_p, site_p2, site_p3"
+    ) %>%
+    ungroup() %>%
+    filter(violation) %>%
+    select(cid, issue_description)
+}
