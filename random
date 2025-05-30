@@ -1,8 +1,32 @@
-test_df <- data.frame(
-  cid = c(1, 2, 3, 4),
-  tdan_dx_grp = c("Cervical CA", "Cervical CA", "Ovarian CA", "Cervical CA"),
-  site_p = c("Cervical", "Ovarian", "Ovarian", "Cervical"),
-  site_p2 = c("", "Other", "", "Cervical"),
-  site_p3 = c("", "", "Other", "Ovarian"),
+test_df2 <- data.frame(
+  cid = c(101, 102, 103, 104, 105),
+  tdan_dx_grp = c(
+    "Concurrent GynCA and NonGynCA",
+    "Concurrent GynCA and NonGynCA",
+    "Concurrent GynCA and NonGynCA",
+    "Concurrent GynCA and NonGynCA",
+    "Ovarian CA"  # control row: different group
+  ),
+  site_p = c(
+    "Ovarian",              # ✅ valid
+    "Fallopian Tube",       # ❌ invalid p2
+    "Uterine Corpus",       # ❌ invalid p3
+    "Primary Peritoneal",   # ✅ valid
+    "Ovarian"               # not evaluated
+  ),
+  site_p2 = c(
+    "Other",         # ✅
+    "Cervical",      # ❌
+    "",              # ✅
+    "Other",         # ✅
+    "Other"          # ✅ but irrelevant
+  ),
+  site_p3 = c(
+    "",              # ✅
+    "",              # ✅
+    "Ovarian",       # ❌
+    "Other",         # ✅
+    ""               # ✅
+  ),
   stringsAsFactors = FALSE
 )
