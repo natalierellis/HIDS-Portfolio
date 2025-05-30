@@ -1,58 +1,51 @@
-dx_grp_cervical_invalid_sites <- function(df) {
+If:
+
+r
+Copy
+Edit
+tdan_dx_grp == "Concurrent GynCA and NonGynCA"
+Then:
+
+site_p must be one of the valid GYN sites:
+
+"Ovarian"
+
+"Fallopian Tube"
+
+"Primary Peritoneal"
+
+"Tubo-Ovarian"
+
+"Uterine Corpus"
+
+"Mullerian origin NOS Unk GYN Site"
+
+site_p2 and site_p3 must be:
+
+"Other", blank (""), or NA
+
+dx_grp_concurrent_gynca_nongynca_invalid_sites <- function(df) {
   required_cols <- c("tdan_dx_grp", "site_p", "site_p2", "site_p3")
   if (!all(required_cols %in% names(df))) return(NULL)
 
+  valid_primary <- c(
+    "Ovarian",
+    "Fallopian Tube",
+    "Primary Peritoneal",
+    "Tubo-Ovarian",
+    "Uterine Corpus",
+    "Mullerian origin NOS Unk GYN Site"
+  )
+  
+  valid_secondary <- c("Other", "", NA)
+
   df %>%
-    filter(tdan_dx_grp == "Cervical CA") %>%
-    filter(!(site_p == "Cervical" &
-             site_p2 %in% c("Cervical", "", NA) &
-             site_p3 %in% c("Cervical", "", NA))) %>%
+    filter(tdan_dx_grp == "Concurrent GynCA and NonGynCA") %>%
+    filter(!(site_p %in% valid_primary &
+             site_p2 %in% valid_secondary &
+             site_p3 %in% valid_secondary)) %>%
     mutate(
-      issue_description = "Diagnosis Group 'Cervical CA' requires site_p, site_p2, and site_p3 to be 'Cervical' or blank"
+      issue_description = "Concurrent GynCA and NonGynCA: site_p must be a valid GYN site; site_p2 and site_p3 must be 'Other' or blank"
     ) %>%
     select(cid, issue_description)
 }
-
-run_qc_checks <- function(df) {
-  flag_functions <- list(
-    dx_grp_cervical_invalid_sites,
-    dx_grp_concurrent_gynca_nongynca_invalid_sites
-    # Add more here
-  )
-
-  purrr::map_dfr(flag_functions, function(f) {
-    tryCatch({
-      flagged <- f(df)
-      if (is.null(flagged) || nrow(flagged) == 0) return(NULL)
-
-      # Join back full row from original df
-      left_join(flagged, df, by = "cid")
-    }, error = function(e) NULL)
-  })
-}
-
-# Load required packages
-library(readr)
-library(DT)
-library(dplyr)
-
-# Load QC engine
-source("qc_engine/run_qc_checks.R")
-
-# Load data
-df <- read_csv("input/your_report/report.csv")
-
-# Run QC checks
-violations <- run_qc_checks(df)
-
-# View results
-if (nrow(violations) > 0) {
-  datatable(
-    violations,
-    options = list(pageLength = 25, scrollX = TRUE)
-  )
-} else {
-  print("✅ No violations found.")
-}
-
-                
