@@ -24,13 +24,13 @@ dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
     filter(tdan_dx_grp == "Concurrent GynCAs") %>%
     rowwise() %>%
     mutate(
-      # Normalize case and trim whitespace
       sites = list(trimws(tolower(na.omit(c(site_p, site_p2, site_p3))))),
       non_blank_sites = list(sites[sites != ""]),
       all_sites_valid = all(non_blank_sites[[1]] %in% valid_gyn_sites),
       n_unique_valid_sites = length(unique(non_blank_sites[[1]])),
-      violation = !(tolower(site_p) == "concurrent gyn sites") & (
-        !all_sites_valid | n_unique_valid_sites < 2
+      violation = !(
+        tolower(site_p) == "concurrent gyn sites" |
+        (all_sites_valid & n_unique_valid_sites >= 2)
       ),
       issue_description = "Concurrent GynCAs: site_p can be 'Concurrent GYN Sites' OR include ≥2 valid GYN site values among site_p/p2/p3"
     ) %>%
@@ -38,3 +38,4 @@ dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
     filter(violation) %>%
     select(cid, issue_description)
 }
+
