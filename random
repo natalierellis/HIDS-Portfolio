@@ -1,10 +1,20 @@
+test_df <- tibble::tibble(
+  cid = 1:4,
+  tdan_dx_grp = rep("Concurrent GynCAs", 4),
+  site_p = c("Fallopian Tube", "Ovarian", "Concurrent GYN Sites", "Ovarian"),
+  site_p2 = c("Uterine Corpus", "Ovarian", "", "Invalid Site"),
+  site_p3 = c("", "", "", "")
+)
+
+View(test_df)
+
 dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
   required_cols <- c("cid", "tdan_dx_grp", "site_p", "site_p2", "site_p3")
   if (!all(required_cols %in% names(df))) {
     message("Missing required columns: ", paste(setdiff(required_cols, names(df)), collapse = ", "))
     return(NULL)
   }
-
+  
   valid_gyn_sites <- tolower(c(
     "Ovarian",
     "Uterine including Isthmus Uteri, Endometrium, Myometrium, Fundus Uteri or Corpus Uteri",
@@ -19,15 +29,14 @@ dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
     "Primary Peritoneal",
     "Mullerian origin NOS Unk GYN Site"
   ))
-
+  
   df %>%
     filter(tdan_dx_grp == "Concurrent GynCAs") %>%
     rowwise() %>%
     mutate(
-      sites = tolower(na.omit(c(site_p, site_p2, site_p3))),
-      valid_sites = sites[sites %in% valid_gyn_sites],
-      n_valid = length(valid_sites),
-      n_unique_valid = length(unique(valid_sites)),
+      sites = list(tolower(na.omit(c(site_p, site_p2, site_p3)))),
+      n_valid = sum(sites[[1]] %in% valid_gyn_sites),
+      n_unique_valid = length(unique(sites[[1]][sites[[1]] %in% valid_gyn_sites])),
       violation = !(tolower(site_p) == "concurrent gyn sites") & (
         n_valid < 2 | n_unique_valid < 2
       ),
@@ -37,3 +46,7 @@ dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
     filter(violation) %>%
     select(cid, issue_description)
 }
+
+
+
+dx_grp_concurrent_gyncas_missing_gyn_variants(test_df)
