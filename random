@@ -1,34 +1,8 @@
-If:
-
-r
-Copy
-Edit
-tdan_dx_grp == "Concurrent GynCA and NonGynCA"
-Then:
-
-site_p must be one of the valid GYN sites:
-
-"Ovarian"
-
-"Fallopian Tube"
-
-"Primary Peritoneal"
-
-"Tubo-Ovarian"
-
-"Uterine Corpus"
-
-"Mullerian origin NOS Unk GYN Site"
-
-site_p2 and site_p3 must be:
-
-"Other", blank (""), or NA
-
-dx_grp_concurrent_gynca_nongynca_invalid_sites <- function(df) {
+dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
   required_cols <- c("tdan_dx_grp", "site_p", "site_p2", "site_p3")
   if (!all(required_cols %in% names(df))) return(NULL)
 
-  valid_primary <- c(
+  valid_gyn_sites <- c(
     "Ovarian",
     "Fallopian Tube",
     "Primary Peritoneal",
@@ -36,16 +10,18 @@ dx_grp_concurrent_gynca_nongynca_invalid_sites <- function(df) {
     "Uterine Corpus",
     "Mullerian origin NOS Unk GYN Site"
   )
-  
-  valid_secondary <- c("Other", "", NA)
 
   df %>%
-    filter(tdan_dx_grp == "Concurrent GynCA and NonGynCA") %>%
-    filter(!(site_p %in% valid_primary &
-             site_p2 %in% valid_secondary &
-             site_p3 %in% valid_secondary)) %>%
+    filter(tdan_dx_grp == "Concurrent GynCAs") %>%
     mutate(
-      issue_description = "Concurrent GynCA and NonGynCA: site_p must be a valid GYN site; site_p2 and site_p3 must be 'Other' or blank"
+      site_p_valid = site_p %in% valid_gyn_sites,
+      site_p2_valid = site_p2 %in% valid_gyn_sites & site_p2 != site_p,
+      site_p3_valid = site_p3 %in% valid_gyn_sites & site_p3 != site_p,
+      has_other_gyn_site = site_p2_valid | site_p3_valid
+    ) %>%
+    filter(!(site_p_valid & has_other_gyn_site)) %>%
+    mutate(
+      issue_description = "Concurrent GynCAs: site_p must be a GYN site and at least one of site_p2 or site_p3 must also be a different GYN site"
     ) %>%
     select(cid, issue_description)
 }
