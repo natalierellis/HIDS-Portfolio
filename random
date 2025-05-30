@@ -1,4 +1,4 @@
-dx_grp_concurrent_gyncas_invalid_combination <- function(df) {
+dx_grp_concurrent_gyncas_invalid <- function(df) {
   required_cols <- c("tdan_dx_grp", "site_p", "site_p2", "site_p3")
   if (!all(required_cols %in% names(df))) return(NULL)
 
@@ -11,8 +11,7 @@ dx_grp_concurrent_gyncas_invalid_combination <- function(df) {
     "Mullerian origin NOS Unk GYN Site",
     "Cervical",
     "Uterine Cervix",
-    "Endometrium",
-    "Myometrium"
+    "Endometrium"
   )
 
   df %>%
@@ -22,9 +21,11 @@ dx_grp_concurrent_gyncas_invalid_combination <- function(df) {
       sites = list(na.omit(c(site_p, site_p2, site_p3))),
       non_blank_sites = sites[sites != ""],
       all_sites_valid = all(non_blank_sites %in% valid_gyn_sites),
-      n_unique_sites = length(unique(non_blank_sites)),
-      violation = (!all_sites_valid) | (n_unique_sites < 2),
-      issue_description = "Concurrent GynCAs: Must have ≥2 different valid GYN sites among site_p, site_p2, site_p3"
+      n_unique_valid_sites = length(unique(non_blank_sites)),
+      violation = !(site_p == "Concurrent GYN Sites") & (
+        !all_sites_valid | n_unique_valid_sites < 2
+      ),
+      issue_description = "Concurrent GynCAs: site_p can be 'Concurrent GYN Sites' OR include ≥2 valid GYN site values among site_p/p2/p3"
     ) %>%
     ungroup() %>%
     filter(violation) %>%
