@@ -4,7 +4,7 @@ dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
     message("Missing required columns: ", paste(setdiff(required_cols, names(df)), collapse = ", "))
     return(NULL)
   }
-
+  
   valid_gyn_sites <- c(
     "Ovarian",
     "Uterine including Isthmus Uteri, Endometrium, Myometrium, Fundus Uteri or Corpus Uteri",
@@ -16,7 +16,7 @@ dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
     "Vaginal",
     "Vulvar"
   )
-
+  
   df %>%
     filter(tdan_dx_grp == "Concurrent GynCAs") %>%
     rowwise() %>%
