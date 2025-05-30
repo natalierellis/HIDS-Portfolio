@@ -15,9 +15,12 @@ dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
     "Mullerian origin NOS or GYN Site Unk",
     "Cervical",
     "Vaginal",
-    "Vulvar"
+    "Vulvar",
+    "Uterine Corpus",
+    "Primary Peritoneal",
+    "Mullerian origin NOS Unk GYN Site"
   )
-  
+
   df %>%
     filter(tdan_dx_grp == "Concurrent GynCAs") %>%
     rowwise() %>%
