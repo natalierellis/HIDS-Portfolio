@@ -1,19 +1,26 @@
-import pandas as pd
-
-# Sample: Replace with your actual DataFrame
-# df = pd.read_csv("your_file.csv")
-
 # Rule violation mask
 violation_mask = (
-    (df['tdan_dx_group'] == 3) & (
-        (df['site_p'] != 3) |
-        ((df['site_p2'].notna()) & (df['site_p2'] != 3)) |
-        ((df['site_p3'].notna()) & (df['site_p3'] != 3))
+    (raw['tdan_dx_grp'] == 3) & (
+        (raw['site_p'] != 3) |
+        ((raw['site_p2'].notna()) & (raw['site_p2'] != 3)) |
+        ((raw['site_p3'].notna()) & (raw['site_p3'] != 3))
     )
 )
 
 # Get rows that violate the rule
-violations = df[violation_mask]
+violations = raw[violation_mask]
 
-# Display the violating rows
-import ace_tools as tools; tools.display_dataframe_to_user(name="Rule Violations", dataframe=violations)
+violations
+
+violation_mask = (
+    (raw['tdan_dx_grp'] == 13) & (
+        (~raw['site_p'].isin({1, 2, 3, 4, 4.5, 5, 6, 7, 10})) |
+        (~(raw['site_p2'].isin([8]) | raw['site_p2'].isna())) |
+        (~(raw['site_p3'].isin([8]) | raw['site_p3'].isna()))
+    )
+)
+
+# Get rows that violate the rule
+violations = raw[violation_mask]
+
+violations
