@@ -1,26 +1,24 @@
-# Rule violation mask
-violation_mask = (
-    (raw['tdan_dx_grp'] == 3) & (
-        (raw['site_p'] != 3) |
-        ((raw['site_p2'].notna()) & (raw['site_p2'] != 3)) |
-        ((raw['site_p3'].notna()) & (raw['site_p3'] != 3))
-    )
-)
+allowed = {1, 2, 3, 4, 4.5, 5, 6, 7, 10}
 
-# Get rows that violate the rule
+def is_valid_group_8(row):
+    if row['site_p'] == 11:
+        return True
+    if row['site_p'] not in allowed:
+        return False
+    if row['site_p2'] not in allowed or row['site_p2'] == row['site_p']:
+        return False
+    if pd.notna(row['site_p3']):
+        if (
+            row['site_p3'] not in allowed or 
+            row['site_p3'] == row['site_p'] or 
+            row['site_p3'] == row['site_p2']
+        ):
+            return False
+    return True
+
+# Apply to rows where tdan_dx_grp == 8
+mask = (raw['tdan_dx_grp'] == 8)
+violation_mask = mask & ~raw[mask].apply(is_valid_group_8, axis=1)
+
 violations = raw[violation_mask]
 
-violations
-
-violation_mask = (
-    (raw['tdan_dx_grp'] == 13) & (
-        (~raw['site_p'].isin({1, 2, 3, 4, 4.5, 5, 6, 7, 10})) |
-        (~(raw['site_p2'].isin([8]) | raw['site_p2'].isna())) |
-        (~(raw['site_p3'].isin([8]) | raw['site_p3'].isna()))
-    )
-)
-
-# Get rows that violate the rule
-violations = raw[violation_mask]
-
-violations
