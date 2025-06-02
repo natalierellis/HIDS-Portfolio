@@ -1,52 +1,19 @@
-test_df <- tibble::tibble(
-  cid = 1:4,
-  tdan_dx_grp = rep("Concurrent GynCAs", 4),
-  site_p = c("Fallopian Tube", "Ovarian", "Concurrent GYN Sites", "Ovarian"),
-  site_p2 = c("Uterine Corpus", "Ovarian", "", "Invalid Site"),
-  site_p3 = c("", "", "", "")
+import pandas as pd
+
+# Sample: Replace with your actual DataFrame
+# df = pd.read_csv("your_file.csv")
+
+# Rule violation mask
+violation_mask = (
+    (df['tdan_dx_group'] == 3) & (
+        (df['site_p'] != 3) |
+        ((df['site_p2'].notna()) & (df['site_p2'] != 3)) |
+        ((df['site_p3'].notna()) & (df['site_p3'] != 3))
+    )
 )
 
-View(test_df)
+# Get rows that violate the rule
+violations = df[violation_mask]
 
-dx_grp_concurrent_gyncas_missing_gyn_variants <- function(df) {
-  required_cols <- c("cid", "tdan_dx_grp", "site_p", "site_p2", "site_p3")
-  if (!all(required_cols %in% names(df))) {
-    message("Missing required columns: ", paste(setdiff(required_cols, names(df)), collapse = ", "))
-    return(NULL)
-  }
-  
-  valid_gyn_sites <- tolower(c(
-    "Ovarian",
-    "Uterine including Isthmus Uteri, Endometrium, Myometrium, Fundus Uteri or Corpus Uteri",
-    "Cervical including Cervix Uteri, Endocervix or Exocervix",
-    "Fallopian Tube",
-    "Tubo-Ovarian",
-    "Mullerian origin NOS or GYN Site Unk",
-    "Cervical",
-    "Vaginal",
-    "Vulvar",
-    "Uterine Corpus",
-    "Primary Peritoneal",
-    "Mullerian origin NOS Unk GYN Site"
-  ))
-  
-  df %>%
-    filter(tdan_dx_grp == "Concurrent GynCAs") %>%
-    rowwise() %>%
-    mutate(
-      sites = list(tolower(na.omit(c(site_p, site_p2, site_p3)))),
-      n_valid = sum(sites[[1]] %in% valid_gyn_sites),
-      n_unique_valid = length(unique(sites[[1]][sites[[1]] %in% valid_gyn_sites])),
-      violation = !(tolower(site_p) == "concurrent gyn sites") & (
-        n_valid < 2 | n_unique_valid < 2
-      ),
-      issue_description = "Concurrent GynCAs: site_p can be 'Concurrent GYN Sites' OR must include ≥2 distinct valid GYN sites among site_p/p2/p3"
-    ) %>%
-    ungroup() %>%
-    filter(violation) %>%
-    select(cid, issue_description)
-}
-
-
-
-dx_grp_concurrent_gyncas_missing_gyn_variants(test_df)
+# Display the violating rows
+import ace_tools as tools; tools.display_dataframe_to_user(name="Rule Violations", dataframe=violations)
