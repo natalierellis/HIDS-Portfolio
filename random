@@ -1,30 +1,76 @@
-# tdan_dx_grp: concurrent GynCAs
-def tdan_dx_grp_concurrent_gyncas(raw):
-    try:
-        allowed = {1, 2, 3, 4, 4.5, 5, 6, 7, 10}
+Inclusion:
+	• Women aged ≥18 years.
+	• Diagnosed with FIGO stage IIIC–IV epithelial ovarian, fallopian tube, or primary peritoneal cancer.
+	• Underwent primary debulking surgery (PDS) followed by platinum-based chemotherapy.
+	• Histology types included: serous, endometrioid, mucinous, and clear cell.
+Exclusion:
+	• Received neoadjuvant chemotherapy followed by interval debulking surgery (IDS).
+	• Had PDS without subsequent chemotherapy.
+	• Received chemotherapy alone or no treatment.
+	• Patients with chemotherapy start dates >90 days after surgery were excluded due to suspected registration bias.
+📌 So no, patients who received neoadjuvant therapy were not included.
 
-        def is_invalid_group_8(row):
-            if row['site_p'] == 11:
-                return False
-            if row['site_p'] not in allowed:
-                return True
-            if row['site_p2'] not in allowed or row['site_p2'] == row['site_p']:
-                return True
-            if pd.notna(row['site_p3']):
-                if (
-                    row['site_p3'] not in allowed or 
-                    row['site_p3'] == row['site_p'] or 
-                    row['site_p3'] == row['site_p2']
-                ):
-                    return True
-            return False
+Inclusion Criteria
+	• Stage IIIB–IVB EOC
+	• Underwent primary cytoreductive surgery
+	• Received postoperative chemotherapy
+	• Known TTC interval
+Exclusion Criteria
+	• Low malignant potential tumors (n=15)
+	• Neoadjuvant chemotherapy (n=14)
+	• Refused chemotherapy (n=2)
+	• Died before chemotherapy (n=4)
+	• Lost to follow-up or relocated (n=3)
+	• Missing TTC data (n=5)
 
-        mask = (raw['tdan_dx_grp'] == 8)
-        violation_mask = mask & raw[mask].apply(is_invalid_group_8, axis=1)
+Inclusion / Exclusion Criteria
+Included	Excluded
+EOC (any FIGO stage)	Neoadjuvant chemotherapy
+Primary complete macroscopic CRS	Borderline/non-epithelial tumors
+Platinum-based adjuvant chemo (6 cycles)	Incomplete resection (residual tumor)
 
-        violations = raw[violation_mask]
-        return violations
+👥 Inclusion/Exclusion Criteria
+	• Inclusion:
+		○ Primary epithelial ovarian cancer
+		○ FIGO stage IIIC or IV
+		○ Surgery performed at Mayo Clinic
+		○ Received postoperative chemotherapy
+	• Exclusion:
+		○ Prior chemotherapy
+		○ Surgery at outside institutions
+		○ Missing chemotherapy data
+		○ No chemotherapy due to death or performance status (13 patients)
 
-    except KeyError:
-        return pd.DataFrame()
+Inclusion Criteria
+	• Women in Denmark who:
+		○ Underwent primary surgery for epithelial ovarian cancer (OC) between January 1, 2005 and December 31, 2006
+		○ Had documented initiation of adjuvant chemotherapy
+		○ Were registered in the Danish Gynaecological Cancer Database (DGCD)
+
+Exclusion Criteria
+Patients were excluded for the following reasons:
+	1. Age < 18 years (n = 4)
+	2. No surgery performed (n = 1)
+	3. No chemotherapy administered (n = 473), reasons included:
+		○ Low-stage OC (n = 57)
+		○ Borderline tumor (n = 261)
+		○ Sex-cord stromal cancer (n = 14)
+		○ Germ cell tumor (n = 3)
+		○ Poor general condition, high age, death, or patient refusal (n = 100)
+		○ Other cancer types (n = 17)
+		○ Unknown reasons (n = 21)
+	4. Missing data on chemotherapy administration (n = 12)
+	5. Neoadjuvant chemotherapy (i.e., chemotherapy before surgery) (n = 69)
+	6. Chemotherapy initiated >100 days after surgery (n = 14)
+		○ These were excluded because delays were typically due to special clinical reasons, such as severe complications or patient refusal
+
+✅ Inclusion Criteria
+	• Stage IA/IB (grade 3), IC, II, or any Stage I/II clear cell carcinoma
+	• Surgery performed per GOG protocol by gynecologic oncologists
+	• Randomized to adjuvant chemotherapy per protocol
+	• Complete follow-up and timing data
+
+❌ Exclusion Criteria
+	• Missing or incomplete data on surgery or chemotherapy start dates
+	• Patients not meeting GOG protocol eligibility (e.g., wrong histology or stage)
 
