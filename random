@@ -1,76 +1,63 @@
-Inclusion:
-	• Women aged ≥18 years.
-	• Diagnosed with FIGO stage IIIC–IV epithelial ovarian, fallopian tube, or primary peritoneal cancer.
-	• Underwent primary debulking surgery (PDS) followed by platinum-based chemotherapy.
-	• Histology types included: serous, endometrioid, mucinous, and clear cell.
-Exclusion:
-	• Received neoadjuvant chemotherapy followed by interval debulking surgery (IDS).
-	• Had PDS without subsequent chemotherapy.
-	• Received chemotherapy alone or no treatment.
-	• Patients with chemotherapy start dates >90 days after surgery were excluded due to suspected registration bias.
-📌 So no, patients who received neoadjuvant therapy were not included.
-
-Inclusion Criteria
-	• Stage IIIB–IVB EOC
-	• Underwent primary cytoreductive surgery
-	• Received postoperative chemotherapy
-	• Known TTC interval
-Exclusion Criteria
-	• Low malignant potential tumors (n=15)
-	• Neoadjuvant chemotherapy (n=14)
-	• Refused chemotherapy (n=2)
-	• Died before chemotherapy (n=4)
-	• Lost to follow-up or relocated (n=3)
-	• Missing TTC data (n=5)
-
-Inclusion / Exclusion Criteria
-Included	Excluded
-EOC (any FIGO stage)	Neoadjuvant chemotherapy
-Primary complete macroscopic CRS	Borderline/non-epithelial tumors
-Platinum-based adjuvant chemo (6 cycles)	Incomplete resection (residual tumor)
-
-👥 Inclusion/Exclusion Criteria
-	• Inclusion:
-		○ Primary epithelial ovarian cancer
-		○ FIGO stage IIIC or IV
-		○ Surgery performed at Mayo Clinic
-		○ Received postoperative chemotherapy
-	• Exclusion:
-		○ Prior chemotherapy
-		○ Surgery at outside institutions
-		○ Missing chemotherapy data
-		○ No chemotherapy due to death or performance status (13 patients)
-
-Inclusion Criteria
-	• Women in Denmark who:
-		○ Underwent primary surgery for epithelial ovarian cancer (OC) between January 1, 2005 and December 31, 2006
-		○ Had documented initiation of adjuvant chemotherapy
-		○ Were registered in the Danish Gynaecological Cancer Database (DGCD)
-
-Exclusion Criteria
-Patients were excluded for the following reasons:
-	1. Age < 18 years (n = 4)
-	2. No surgery performed (n = 1)
-	3. No chemotherapy administered (n = 473), reasons included:
-		○ Low-stage OC (n = 57)
-		○ Borderline tumor (n = 261)
-		○ Sex-cord stromal cancer (n = 14)
-		○ Germ cell tumor (n = 3)
-		○ Poor general condition, high age, death, or patient refusal (n = 100)
-		○ Other cancer types (n = 17)
-		○ Unknown reasons (n = 21)
-	4. Missing data on chemotherapy administration (n = 12)
-	5. Neoadjuvant chemotherapy (i.e., chemotherapy before surgery) (n = 69)
-	6. Chemotherapy initiated >100 days after surgery (n = 14)
-		○ These were excluded because delays were typically due to special clinical reasons, such as severe complications or patient refusal
-
-✅ Inclusion Criteria
-	• Stage IA/IB (grade 3), IC, II, or any Stage I/II clear cell carcinoma
-	• Surgery performed per GOG protocol by gynecologic oncologists
-	• Randomized to adjuvant chemotherapy per protocol
-	• Complete follow-up and timing data
-
-❌ Exclusion Criteria
-	• Missing or incomplete data on surgery or chemotherapy start dates
-	• Patients not meeting GOG protocol eligibility (e.g., wrong histology or stage)
+[1] "PUF_CASE_ID"                 "PUF_FACILITY_ID"             "FACILITY_TYPE_CD"           
+  [4] "FACILITY_LOCATION_CD"        "AGE"                         "SEX"                        
+  [7] "RACE"                        "SPANISH_HISPANIC_ORIGIN"     "INSURANCE_STATUS"           
+ [10] "MED_INC_QUAR_00"             "NO_HSD_QUAR_00"              "UR_CD_03"                   
+ [13] "MED_INC_QUAR_12"             "NO_HSD_QUAR_12"              "UR_CD_13"                   
+ [16] "CROWFLY"                     "CDCC_TOTAL_BEST"             "SEQUENCE_NUMBER"            
+ [19] "CLASS_OF_CASE"               "YEAR_OF_DIAGNOSIS"           "PRIMARY_SITE"               
+ [22] "LATERALITY"                  "HISTOLOGY"                   "BEHAVIOR"                   
+ [25] "GRADE"                       "DIAGNOSTIC_CONFIRMATION"     "TUMOR_SIZE"                 
+ [28] "REGIONAL_NODES_POSITIVE"     "REGIONAL_NODES_EXAMINED"     "DX_STAGING_PROC_DAYS"       
+ [31] "RX_SUMM_DXSTG_PROC"          "TNM_CLIN_T"                  "TNM_CLIN_N"                 
+ [34] "TNM_CLIN_M"                  "TNM_CLIN_STAGE_GROUP"        "TNM_PATH_T"                 
+ [37] "TNM_PATH_N"                  "TNM_PATH_M"                  "TNM_PATH_STAGE_GROUP"       
+ [40] "TNM_EDITION_NUMBER"          "ANALYTIC_STAGE_GROUP"        "CS_METS_AT_DX"              
+ [43] "CS_METS_EVAL"                "CS_EXTENSION"                "CS_TUMOR_SIZEEXT_EVAL"      
+ [46] "CS_METS_DX_BONE"             "CS_METS_DX_BRAIN"            "CS_METS_DX_LIVER"           
+ [49] "CS_METS_DX_LUNG"             "LYMPH_VASCULAR_INVASION"     "CS_SITESPECIFIC_FACTOR_1"   
+ [52] "CS_SITESPECIFIC_FACTOR_2"    "CS_SITESPECIFIC_FACTOR_3"    "CS_SITESPECIFIC_FACTOR_4"   
+ [55] "CS_SITESPECIFIC_FACTOR_5"    "CS_SITESPECIFIC_FACTOR_6"    "CS_SITESPECIFIC_FACTOR_7"   
+ [58] "CS_SITESPECIFIC_FACTOR_8"    "CS_SITESPECIFIC_FACTOR_9"    "CS_SITESPECIFIC_FACTOR_10"  
+ [61] "CS_SITESPECIFIC_FACTOR_11"   "CS_SITESPECIFIC_FACTOR_12"   "CS_SITESPECIFIC_FACTOR_13"  
+ [64] "CS_SITESPECIFIC_FACTOR_14"   "CS_SITESPECIFIC_FACTOR_15"   "CS_SITESPECIFIC_FACTOR_16"  
+ [67] "CS_SITESPECIFIC_FACTOR_17"   "CS_SITESPECIFIC_FACTOR_18"   "CS_SITESPECIFIC_FACTOR_19"  
+ [70] "CS_SITESPECIFIC_FACTOR_20"   "CS_SITESPECIFIC_FACTOR_21"   "CS_SITESPECIFIC_FACTOR_22"  
+ [73] "CS_SITESPECIFIC_FACTOR_23"   "CS_SITESPECIFIC_FACTOR_24"   "CS_SITESPECIFIC_FACTOR_25"  
+ [76] "CS_VERSION_LATEST"           "DX_RX_STARTED_DAYS"          "DX_SURG_STARTED_DAYS"       
+ [79] "DX_DEFSURG_STARTED_DAYS"     "RX_SUMM_SURG_PRIM_SITE"      "RX_HOSP_SURG_APPR_2010"     
+ [82] "RX_SUMM_SURGICAL_MARGINS"    "RX_SUMM_SCOPE_REG_LN_SUR"    "RX_SUMM_SURG_OTH_REGDIS"    
+ [85] "SURG_DISCHARGE_DAYS"         "READM_HOSP_30_DAYS"          "REASON_FOR_NO_SURGERY"      
+ [88] "DX_RAD_STARTED_DAYS"         "RAD_LOCATION_OF_RX"          "RX_SUMM_SURGRAD_SEQ"        
+ [91] "RAD_ELAPSED_RX_DAYS"         "REASON_FOR_NO_RADIATION"     "DX_SYSTEMIC_STARTED_DAYS"   
+ [94] "DX_CHEMO_STARTED_DAYS"       "RX_SUMM_CHEMO"               "DX_HORMONE_STARTED_DAYS"    
+ [97] "RX_SUMM_HORMONE"             "DX_IMMUNO_STARTED_DAYS"      "RX_SUMM_IMMUNOTHERAPY"      
+[100] "RX_SUMM_TRNSPLNT_ENDO"       "RX_SUMM_SYSTEMIC_SUR_SEQ"    "DX_OTHER_STARTED_DAYS"      
+[103] "RX_SUMM_OTHER"               "PALLIATIVE_CARE"             "RX_SUMM_TREATMENT_STATUS"   
+[106] "PUF_30_DAY_MORT_CD"          "PUF_90_DAY_MORT_CD"          "DX_LASTCONTACT_DEATH_MONTHS"
+[109] "PUF_VITAL_STATUS"            "RX_HOSP_SURG_PRIM_SITE"      "RX_HOSP_CHEMO"              
+[112] "RX_HOSP_IMMUNOTHERAPY"       "RX_HOSP_HORMONE"             "RX_HOSP_OTHER"              
+[115] "PUF_MULT_SOURCE"             "PUF_REFERENCE_DATE_FLAG"     "RX_SUMM_SCOPE_REG_LN_2012"  
+[118] "RX_HOSP_DXSTG_PROC"          "PALLIATIVE_CARE_HOSP"        "TUMOR_SIZE_SUMMARY_2016"    
+[121] "METS_AT_DX_OTHER"            "METS_AT_DX_DISTANT_LN"       "METS_AT_DX_BONE"            
+[124] "METS_AT_DX_BRAIN"            "METS_AT_DX_LIVER"            "METS_AT_DX_LUNG"            
+[127] "NO_HSD_QUAR_2016"            "MED_INC_QUAR_2016"           "PUF_MEDICAID_EXPN_CODE"     
+[130] "PHASE_I_RT_VOLUME"           "PHASE_I_RT_TO_LN"            "PHASE_I_DOSE_FRACT"         
+[133] "PHASE_I_NUM_FRACT"           "PHASE_I_BEAM_TECH"           "PHASE_I_TOTAL_DOSE"         
+[136] "PHASE_I_RT_MODALITY"         "PHASE_II_RT_VOLUME"          "PHASE_II_RT_TO_LN"          
+[139] "PHASE_II_DOSE_FRACT"         "PHASE_II_NUM_FRACT"          "PHASE_II_BEAM_TECH"         
+[142] "PHASE_II_TOTAL_DOSE"         "PHASE_II_RT_MODALITY"        "PHASE_III_RT_VOLUME"        
+[145] "PHASE_III_RT_TO_LN"          "PHASE_III_DOSE_FRACT"        "PHASE_III_NUM_FRACT"        
+[148] "PHASE_III_BEAM_TECH"         "PHASE_III_TOTAL_DOSE"        "PHASE_III_RT_MODALITY"      
+[151] "NUMBER_PHASES_RAD_RX"        "RAD_RX_DISC_EARLY"           "TOTAL_DOSE"                 
+[154] "AJCC_ID"                     "AJCC_TNM_CLIN_M"             "AJCC_TNM_CLIN_N"            
+[157] "AJCC_TNM_CLIN_STG_GRP"       "AJCC_TNM_CLIN_T"             "AJCC_TNM_PATH_M"            
+[160] "AJCC_TNM_PATH_N"             "AJCC_TNM_PATH_N_SFX"         "AJCC_TNM_PATH_STG_GRP"      
+[163] "AJCC_TNM_PATH_T"             "AJCC_TNM_PATH_T_SFX"         "AJCC_TNM_POST_PATH_M"       
+[166] "AJCC_TNM_POST_PATH_N"        "AJCC_TNM_POST_PATH_STG_GRP"  "AJCC_TNM_POST_PATH_T"       
+[169] "AJCC_TNM_POST_PATH_T_SFX"    "BONE_INVASION"               "CA125_PRE_INTERP"           
+[172] "FIGO_STAGE"                  "GRADE_CLIN"                  "GRADE_PATH"                 
+[175] "GRADE_PATH_POST"             "SCHEMA_DISC_1"               "SCHEMA_ID"                  
+[178] "REG_LN_DISS_STARTED_DAY"     "RESID_POST_CYTOREDU"         "NO_HSD_QUAR_2020"           
+[181] "MED_INC_QUAR_2020"           "SARSCOV2_POS"                "SARSCOV2_POS_DAYS"          
+[184] "SARSCOV2_TEST" 
 
