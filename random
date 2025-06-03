@@ -1,18 +1,101 @@
-#let's try those flags 
-#check NonGynCA in tdan_dx_grp 
+
+#engine that brings in all the flags 
 import pandas as pd
+def qc_engine(df):
+    violations = []
 
-# Sample: Replace with your actual DataFrame
-# df = pd.read_csv("your_file.csv")
+    flag_functions = {
+        'tdan_dx_grp_cervical_ca': tdan_dx_grp_cervical_ca,
+        'tdan_dx_grp_concurrentgynca_nongynca': tdan_dx_grp_concurrentgynca_nongynca,
+        'tdan_dx_grp_concurrent_gyncas': tdan_dx_grp_concurrent_gyncas,
+        'tdan_dx_grp_mullerian_ca': tdan_dx_grp_mullerian_ca
+    }
 
-# Rule violation mask
-violation_mask = (
-    (raw['tdan_dx_grp'] == 11) & (
-        (raw['site_p'] != 8) 
-)
-)
+    for name, func in flag_functions.items():
+        try: 
+            result = func(df)
+            if not result.empty:
+                result = result.copy()
+                result['violation_flag'] = name
+                violations.append(result)
 
-# Get rows that violate the rule
-violations = raw[violation_mask]
 
-violations
+        except KeyError:
+            continue
+    if violations:
+            return pd.concat(violations, ignore_index = True)
+    else: 
+         print("No violations found.")
+         return pd.DataFrame
+    
+
+#tdan_dx_grp: check Cervical CA
+def tdan_dx_grp_cervical_ca(raw): 
+
+    violation = (
+        (raw['tdan_dx_grp'] == 3) & (
+            (raw['site_p'] != 3) |
+            ((raw['site_p2'].notna()) & (raw['site_p2'] != 3)) |
+            ((raw['site_p3'].notna()) & (raw['site_p3'] != 3))
+        )
+    )
+
+
+    return raw[violation]
+
+
+# tdan_dx_grp: check concurrent gynca and nongynca
+
+def tdan_dx_grp_concurrentgynca_nongynca(raw): 
+
+    violation = (
+        (raw['tdan_dx_grp'] == 13) & (
+            (~raw['site_p'].isin({1, 2, 3, 4, 4.5, 5, 6, 7, 10})) |
+            (~(raw['site_p2'].isin([8]) | raw['site_p2'].isna())) |
+            (~(raw['site_p3'].isin([8]) | raw['site_p3'].isna()))
+        )
+    )
+
+
+    return raw[violation]
+
+
+#tdan_dx_grp: concurrent gyncas
+def tdan_dx_grp_concurrent_gyncas(raw):
+    allowed = {1, 2, 3, 4, 4.5, 5, 6, 7, 10}
+
+    def is_valid_group_8(row):
+        if row['site_p'] == 11:
+            return True
+        if row['site_p'] not in allowed:
+            return False
+        if row['site_p2'] not in allowed or row['site_p2'] == row['site_p']:
+            return False
+        if pd.notna(row['site_p3']):
+            if (
+                row['site_p3'] not in allowed or 
+                row['site_p3'] == row['site_p'] or 
+                row['site_p3'] == row['site_p2']
+            ):
+                return False
+        return True
+
+
+    mask = (raw['tdan_dx_grp'] == 8)
+    violation = mask & ~raw[mask].apply(is_valid_group_8, axis=1)
+
+    return raw[violation]
+
+
+#check mullerian ca in tdan_dx_grp 
+def tdan_dx_grp_mullerian_ca(raw): 
+    violation_mask = (
+        (raw['tdan_dx_grp'] == 6) & (
+            (raw['site_p'] != 10) |
+            ((raw['site_p2'].notna()) & (raw['site_p2'] != 10)) |
+            ((raw['site_p3'].notna()) & (raw['site_p3'] != 10))
+        )
+    )
+
+
+    return raw[violation_mask]
