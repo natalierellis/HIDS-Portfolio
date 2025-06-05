@@ -1,10 +1,97 @@
-Last week, we discussed examining the Summary TDAN Histology Group in the Final Diagnosis CRF. As a first step, we generated a report called PreopDzPathandFinalDx, which was filtered to include only valid DUKE cases from 2012 to the present.
+🟩 1. Ovarian CA Flag:
+"If site_p = Mullerian, then nothing should be in site_p2."
 
-Our goal was to evaluate whether the TDAN summary diagnosis group aligned with site, histology, and grade across the Preoperative Diagnosis, Pathology, and Final Diagnosis CRFs.
+Interpretation:
+If the primary site is already designated as Müllerian (code 10), that should represent a final determination. Having values in site_p2 (suggesting another possible site) would be inconsistent.
 
-Taylor and I began developing a series of data quality flags focused on the tdan_dx_grp variable. These flags were designed to compare TDAN group assignments to primary site and cell type information across the different pathology forms.
+Action:
+Add a flag to identify records where site_p == 10 and site_p2 is not null — i.e., a conflict in site designation.
 
-Before implementing the flags, I took a step back to map out the logic for each rule. After understanding the inclusion logic for each TDAN group, I translated that logic into Python code.
+🟩 2. Concurrent Flag:
+"We should be looking for 1 surgery, 2 path reports?"
 
-I'll walk through a few examples of those flags shortly. Then, I ran the entire set of flags on our filtered dataset of valid DUKE cases since 2012, and these are the cases that were flagged based on the logic that Taylor and I defined.
+Interpretation:
+For cases flagged as concurrent cancers, she may expect to see:
+
+One surgical procedure.
+
+Two distinct pathology confirmations (possibly suggesting 2 primaries).
+
+Action:
+Consider comparing data from the surgery form and pathology forms. This may not be codified yet, so keep it in mind for future QC logic or documentation tracking.
+
+🟩 3. Primary Peritoneal Clues:
+"Encounter note for follow-up primary peritoneal..."
+"Not radiation upfront is a sign of PP; if radiation upfront, other disease?"
+
+Interpretation:
+
+Primary Peritoneal Cancer (PPC) often doesn’t get radiation upfront, so if a patient had radiation early, maybe it's not PPC.
+
+She might be thinking that absence of early radiation aligns with PPC diagnosis.
+
+Action:
+This seems clinical rather than something you can flag easily yet — unless you have a variable for radiation timing or intent.
+
+🟩 4. Molecular Evidence, Surgery, and Prior Disease:
+"Prior note says cancer, but surgery says no cancer — supposed to be following up for molecular evidence of disease."
+
+Interpretation:
+This is about discordance between:
+
+a prior diagnosis or suspicion of cancer, and
+
+a negative surgical finding.
+
+She may be saying: if the surgery form says no cancer was found, but prior documentation (like clinical notes or molecular test results) suggests cancer, we should track these cases.
+
+Action:
+These might become exception cases — not necessarily flaggable now but could be documented manually as QC exceptions.
+
+🟩 5. Benign Conditions:
+"Something about other benign conditions..."
+
+Interpretation:
+She might be referring to benign pathologies being misclassified or requiring exclusion from analyses.
+
+Action:
+May require checking histology codes against a list of benign vs. malignant conditions. You can ask her for clarification or refer to SEER code groupings.
+
+🟩 6. Staging & Site-Histology Concordance:
+"We'll need to check staging..."
+"...something about site and histology..."
+
+Interpretation:
+
+Ensure stage aligns with disease type (e.g., PPC often has advanced stage).
+
+Make sure histology matches site (e.g., a uterine histology shouldn’t be paired with an ovarian site).
+
+Action:
+These are QC checks — some are already part of what you're building. You might need to crosswalk histology-site rules based on SEER/NCDB definitions.
+
+🟩 7. QC Tracker & Exceptions:
+"Maybe we'll have a QC check CRF and track exceptions so we don't waste time checking the same cases over and over again."
+
+Interpretation:
+
+She wants a log or tracker for cases already reviewed, or known exceptions to QC rules.
+
+Prevent re-checking cases where a known clinical nuance overrides the flag.
+
+Action:
+Create an exceptions list (e.g., Excel sheet or tab in your QC output) where reviewed and cleared cases are stored with a note.
+
+🟩 8. Completed Status:
+"Something about completed study status and completed and dead."
+
+Interpretation:
+She may want to differentiate between:
+
+Completed study participation vs.
+
+Patients who are deceased.
+
+Action:
+Check if there's a study status variable and an overall vital status variable — and be mindful that these can be different endpoints in your data.
 
