@@ -5,10 +5,8 @@ def tdan_dx_grp_mullerian_ca_new(raw):
     valid_primary_sites = {1,4,4.5,5,10}
     violation_mask = (
         (raw['tdan_dx_grp'] == 6) & (
-            (~raw['site_p'].isin(valid_primary_sites)) |
-            ((raw['site_p2'].notna()) & ~raw['site_p2'].isin(valid_primary_sites)) |
-            ((raw['site_p3'].notna()) & ~raw['site_p3'].isin(valid_primary_sites))
+            (~raw['site_p'].isin(valid_primary_sites)) 
         )
     )
 
-    return raw[violation_mask]
+    return raw[violation_mask] what does this mean
