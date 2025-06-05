@@ -1,16 +1,33 @@
-🧪 Why "1 surgery, 2 path reports"?
-Because:
+# tdan_dx_grp: concurrent GynCAs
+# allowed = GYN sites
+# site_p = 11 = concurrent GYN Sites
+def tdan_dx_grp_concurrent_gyncas_new(raw):
+    try:
+        allowed = {1, 2, 3, 4, 4.5, 5, 6, 7, 10}
 
-One surgery may remove tissue from multiple sites (e.g., uterus and colon).
+        def is_invalid_group_8(row):
+            if row['site_p'] == 11:
+                return False
+            if row['site_p'] not in allowed:
+                return True
+            if row['site_p2'] not in allowed or row['site_p2'] == row['site_p']:
+                return True
+            if pd.notna(row['site_p3']):
+                if (
+                    row['site_p3'] not in allowed or 
+                    row['site_p3'] == row['site_p'] or 
+                    row['site_p3'] == row['site_p2']
+                ):
+                    return True
+            return False
 
-If two distinct cancers are present, there should be:
+        mask = (raw['tdan_dx_grp'] == 8)
+        violation_mask = mask & raw[mask].apply(is_invalid_group_8, axis=1)
 
-Two distinct pathology results confirming two primaries.
+        violations = raw[violation_mask]
+        return violations
 
-Possibly two different sites in site_p, site_p2, etc., from different anatomic origins.
-
-So, she's likely pointing out that to verify true concurrency, the patient record should:
-
-Have one surgery that captures multiple specimens.
-
-Show two distinct pathology reports (or fields
+    except KeyError:
+        return pd.DataFrame()
+    
+    #should either be allowed or concurrent, and if allowed, then sites cannot match
