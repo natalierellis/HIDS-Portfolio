@@ -2,6 +2,38 @@
 #valid = OV, FT, PP, TO
 #tdan_dx_grp = 1 = ovarian ca
 # site_p = 10 = mullerian
+def tdan_dx_grp_ovarian_ca(raw):
+    # Rule violation mask
+    valid_primary_sites = {1,4,4.5,5}
+
+    #Violate Rule 1: tdan = 1 & site_p2 must be in valid_primary_sites where site_p = site_p2 = site_p3
+    rule1_violation = (
+        (raw['tdan_dx_grp'] == 1) &
+        (~raw['site_p'].isin(valid_primary_sites)) |
+        (raw['site_p2'].notna() & (raw['site_p2'] != raw['site_p'])) |
+        (raw['site_p3'].notna() & (raw['site_p3'] != raw['site_p']))
+        )
+    
+
+    #Violate Rule 2: tdan = 1 & site_p = 10, then site_p2 must be in valid_primary_sites
+    rule2_violation = (
+        (raw['tdan_dx_grp'] == 1) &
+        (raw['site_p'] == 10) &
+        (~raw['site_p2'].isin(valid_primary_sites))
+    )
+
+
+
+    # Get rows that violate the rule
+    violation_mask = rule1_violation | rule2_violation
+
+    violations = raw[violation_mask]
+    return(violations)
+
+#check Ovarian CA
+#valid = OV, FT, PP, TO
+#tdan_dx_grp = 1 = ovarian ca
+# site_p = 10 = mullerian
 def tdan_dx_grp_ovarian_ca_new(raw):
     valid_primary_sites = {1, 4, 4.5, 5}
 
