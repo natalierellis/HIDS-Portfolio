@@ -1,12 +1,7 @@
-#check mullerian ca in tdan_dx_grp 
-# tdan_dx_grp = 6 = mullerian
-# site_p = 10 = mullerian
-def tdan_dx_grp_mullerian_ca_new(raw): 
-    valid_primary_sites = {1,4,4.5,5,10}
-    violation_mask = (
-        (raw['tdan_dx_grp'] == 6) & (
-            (~raw['site_p'].isin(valid_primary_sites)) 
-        )
+violation_mask = (
+    (raw['tdan_dx_grp'] == 6) & (    # ONLY applies to Mullerian cancer cases
+        (~raw['site_p'].isin(valid_primary_sites))        # site_p must be in the valid set
+        | ((raw['site_p2'].notna()) & ~raw['site_p2'].isin(valid_primary_sites))  # if site_p2 is filled, it must be valid
+        | ((raw['site_p3'].notna()) & ~raw['site_p3'].isin(valid_primary_sites))  # if site_p3 is filled, it must be valid
     )
-
-    return raw[violation_mask] what does this mean
+)
