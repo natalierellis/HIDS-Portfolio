@@ -1,23 +1,1018 @@
-def ovarian_flag_violation(raw):
-    valid_primary_sites = {1, 4, 4.5, 5}
 
-    rule_non_mullerian = (
-        (raw['tdan_dx_grp'] == 1) & (
-            (raw['site_p'] != 10) & (
-                (~raw['site_p'].isin(valid_primary_sites)) |
-                (raw['site_p2'].notna() & (raw['site_p2'] != raw['site_p'])) |
-                (raw['site_p3'].notna() & (raw['site_p3'] != raw['site_p']))
-            )
-        )
-    )
+Dahm-Kahler et al. Gynecologic Oncology 2024 TTC PDS SweGCG n1694
+Study Summary – SweGCG 2024
+Design: Nationwide, retrospective population-based cohort study
+Data Source: Swedish Quality Register for Gynecologic Cancer (SQRGC)
+Population: Women ≥18 years with FIGO IIIC–IV epithelial ovarian/fallopian tube/primary peritoneal cancer treated with primary debulking surgery (PDS) followed by platinum-based chemotherapy (2008–2018)
 
-    rule_mullerian = (
-        (raw['tdan_dx_grp'] == 1) &
-        (raw['site_p'] == 10) &
-        (raw['site_p2'].notna()) &
-        (~raw['site_p2'].isin(valid_primary_sites))
-    )
+The study found that:
+	• In the total cohort (n = 1694), time to chemotherapy (TTC) after PDS did not affect 5-year relative survival.
+	• In the no residual disease (R0) subgroup (n = 806), TTC >42 days was associated with:
+		○ Worse 2-year relative survival (79.1%) vs. ≤28 days (91.4–91.6%).
+		○ Excess mortality rate ratio (EMRR) 2.33 (p = 0.026) compared to TTC ≤21 days.
+	• The effect was especially strong in stage IV R0 patients, where TTC >42 days significantly reduced 2-year survival.
+	• No significant association between TTC and survival was found in patients with residual disease (R > 0).
 
-    violation_mask = rule_non_mullerian | rule_mullerian
-    return raw[violation_mask]
+Inclusion:
+	• Women aged ≥18 years.
+	• Diagnosed with FIGO stage IIIC–IV epithelial ovarian, fallopian tube, or primary peritoneal cancer.
+	• Underwent primary debulking surgery (PDS) followed by platinum-based chemotherapy.
+	• Histology types included: serous, endometrioid, mucinous, and clear cell.
+Exclusion:
+	• Received neoadjuvant chemotherapy followed by interval debulking surgery (IDS).
+	• Had PDS without subsequent chemotherapy.
+	• Received chemotherapy alone or no treatment.
+	• Patients with chemotherapy start dates >90 days after surgery were excluded due to suspected registration bias.
+📌 So no, patients who received neoadjuvant therapy were not included.
+
+Time to Chemotherapy (TTC) Definition
+	• TTC = Number of days between PDS and chemotherapy initiation
+	• Categorized into 5 groups:
+		○ ≤21 days
+		○ 22–28 days
+		○ 29–35 days
+		○ 36–42 days
+		○ 42 days
+	• Reference category in regression models: TTC ≤21 days
+
+📉 Statistical Model Used
+	• Poisson regression for Excess Mortality Rate Ratios (EMRRs)
+	• Relative survival (RS) computed using the Pohar-Perme estimator
+	• Follow-up time: up to 5 years (with separate analyses at 2 years and 5 years)
+➡️ Your adaptation: Since you're doing Cox proportional hazards regression for overall survival (OS), you'll model hazard ratios instead of EMRRs, but the covariates and handling can be similar.
+
+🧷 Covariates Included in Regression
+You’ll want to include these (or their equivalents in your dataset) in your Cox model:
+Covariate	Type	Notes
+Time to chemotherapy (TTC)	Categorical	5-level factor with ≤21 days as reference
+Age group	Binary	18–70 vs >70 years
+FIGO stage	Binary	Stage IIIC vs Stage IV
+Histology	Binary	Serous vs Non-serous
+Residual disease after PDS	Binary	No residual (R0) vs residual (R>0)
+
+⚙️ Statistical Techniques
+	• Stratified analyses by residual disease status (R0 vs R>0), and by FIGO stage and both (R0 and Stage IV)
+	• Multivariable Poisson regression with robust SEs for EMRR
+	• Survival time = from diagnosis to death or censoring
+	• Missing TTC >90 days excluded to minimize data entry bias
+	• Statistical software: Stata 18, using stns and strs macros for survival and EMRRs
+
+📈 Suggested Additions for Your Cox Model
+If you’re enhancing your methodology, consider:
+	• Surgical complexity score (if available)
+	• Postoperative complication flags
+	• Performance status at time of surgery
+	• Hospital/site-level variables (if using multi-institution data)
+	• Exact days as continuous TTC variable + splines to test for nonlinearity
+
+Eisenkop et al. Gynecologic Oncology 2022 TTC PDS Single Suregon n509
+Population
+	• Size: 509 patients
+	• Setting: Community hospitals (single surgeon)
+	• Timeframe: January 2000 – December 2019
+	• Cancer Types: Stage IIIB–IVB epithelial ovarian, fallopian tube, or peritoneal cancer
+	• Treatment: All patients underwent primary cytoreductive surgery and subsequent platinum-based chemotherapy
+
+Study Design
+	• Type: Retrospective cohort study using prospectively collected data
+	• Objective: To evaluate the effect of time to chemotherapy (TTC) on progression-free survival (PFS) and overall survival (OS) following surgery
+	• Follow-up: Median follow-up was 62.2 months
+
+Definitions
+	• Time to Chemotherapy (TTC):
+Number of days from the date of primary cytoreductive surgery to the first dose of chemotherapy
+	• Progression-Free Survival (PFS):
+Time from surgery to disease progression, recurrence, or last follow-up without progression
+		○ Recurrence was confirmed via ≥50% rise in CA-125 or HE-4, additional confirmation within 1–2 weeks, and imaging (CT, MRI, or PET/CT)
+	• Overall Survival (OS):
+Time from surgery to death from any cause or last follow-up
+
+Inclusion Criteria
+	• Stage IIIB–IVB EOC
+	• Underwent primary cytoreductive surgery
+	• Received postoperative chemotherapy
+	• Known TTC interval
+Exclusion Criteria
+	• Low malignant potential tumors (n=15)
+	• Neoadjuvant chemotherapy (n=14)
+	• Refused chemotherapy (n=2)
+	• Died before chemotherapy (n=4)
+	• Lost to follow-up or relocated (n=3)
+	• Missing TTC data (n=5)
+
+Major Results
+	• Median TTC = 19 days
+	• Best survival outcomes: TTC 7–14 days
+		○ PFS: 41.7 months
+		○ OS: 132.7 months
+	• TTC >21 days was significantly associated with reduced survival
+	• TTC remained independently significant in multivariate Cox regression for both PFS and OS
+
+Statistical Models
+Step	Statistical Method	Purpose	Key Results
+1	Pearson’s χ² test	To compare baseline patient characteristics across TTC groups	- Most characteristics did not differ significantly across TTC groups (age, race, ECOG, histology)- Significant differences found in:• Ascites volume (p = 0.041)• Extent of upper abdominal disease (UAD) (p = 0.002)• Grade 2–3 complications (p = 0.043)• Maintenance therapy use (p < 0.001)
+2	Definition of TTC, PFS, OS	Define exposure and outcomes	- Median TTC: 19 days- Median PFS: 25.5 months- Median OS: 78.4 months- For R0 patients: PFS = 28.4 months, OS = 84.5 months
+3	Univariate Cox Regression	Identify individual predictors of survival	- TTC (continuous and categorical) significantly associated with worse PFS and OS (p < 0.001)- Other significant predictors for PFS and/or OS:• ECOG performance status• ACCI• Residual disease• Extent of UAD• Histology (especially mucinous and anaplastic)• Ascites volume• Tumor grade and stage (univariate only)• Route of chemotherapy (OS only)• Maintenance therapy (PFS only)
+4	Multivariate Cox Regression	Identify independent predictors of survival	✅ Significant in final multivariate model:PFS:• ECOG 3 (HR = 1.78)• Mucinous histology (HR = 2.49)• Anaplastic histology (HR = 1.41)• Extensive UAD (HR = 1.91)• Residual disease ≤5 mm (HR = 1.81), >5 mm (HR = 4.32)• TTC 22–28 days (HR = 1.65), >28 days (HR = 1.20)• Maintenance therapy (HR = 1.58)OS:• ACCI ≥4 (HR = 1.94)• ECOG 3 (HR = 1.75)• Mucinous (HR = 3.78), Anaplastic histology (HR = 2.02)• Extensive UAD (HR = 1.97)• Residual disease ≤5 mm (HR = 1.90), >5 mm (HR = 3.76)• TTC 22–28 days (HR = 1.94), ≥28 days (HR = 2.43)• Intraperitoneal chemo was protective (HR = 0.39)
+5	Kaplan-Meier Survival Curves + Log-rank test	Visualize survival across TTC groups	- Significant survival differences by TTC group (p < 0.001)• For all patients: → OS dropped from 132.7 mo (7–14 days) to 48.0 mo (>28 days) → PFS dropped from 41.7 mo to 17.9 mo• For R0 subgroup: → OS: 137.3 mo to 47.8 mo → PFS: 45.6 mo to 18.7 mo• For R0 + extensive UAD: → OS: 95.3 mo to 30.6 mo → PFS: 26.3 mo to 13.8 mo
+6	Linear and Cubic Regression (Continuous TTC)	Explore dose-response effect of TTC	- Both linear and cubic models were statistically significant- Showed a steep survival decline when TTC increased beyond 14 days- Cubic model captured slight non-linear acceleration in hazard with delay
+7	Subgroup Analyses	Test TTC effect within R0 and high-risk groups	- Even among R0 patients, longer TTC significantly worsened survival:• OS: 137.3 mo (7–14 days) → 47.8 mo (>28 days)• PFS: 45.6 mo → 18.7 mo- In R0 + extensive UAD group, TTC still had significant impact:• OS: 95.3 mo (7–14 days) → 30.6 mo (>28 days)• PFS: 26.3 mo → 13.8 mop-values for trend significant in all subgroups
+
+Covariates in Cox Models
+Covariate	Type	Encoding/Grouping
+Age	Continuous / Categorical	Dichotomized at median = 62.42 years - <62.42 vs. ≥62.42
+Age-adjusted Charlson Comorbidity Index (ACCI)	Categorical	Grouped as: 0–1, 2–3, ≥4
+ECOG Performance Status	Categorical	Grouped as: 0–1, 2, 3
+Histology	Categorical	- Reference: Serous- Others: Endometrioid/Mixed, Mucinous, Clear Cell, Anaplastic
+Tumor Grade	Categorical	Grouped as: 1–2 vs. 3
+FIGO Stage (2014)	Categorical	Grouped as: IIIB/IIIC vs. IVA/IVB
+Volume of Ascites	Categorical	Grouped as: ≤1 L vs. >1 L
+Extent of Upper Abdominal Disease (UAD)	Categorical	Grouped as: Absent, Minimal, Extensive
+Surgical Complexity Score	Categorical	Grouped as: Low (≤3), Intermediate (4–7), High (≥8)
+Residual Disease Status	Categorical	Grouped as: R0 (none), ≤5 mm, >5 mm
+Time to Chemotherapy (TTC)	Categorical + Continuous	Categorical: 7–14, 15–21, 22–28, >28 daysAlso used as a continuous variable in days
+Maintenance Therapy	Binary	Yes (e.g., bevacizumab, olaparib, niraparib) vs. No
+Route of Chemotherapy	Binary	Intravenous (IV) vs. Intraperitoneal (IP)
+Race	Categorical	Caucasian, Black, Hispanic, Asian, Native American (not retained in final models)
+
+Recommended Additions for Replication
+	• Include BRCA/HRD status if available
+	• Use restricted cubic splines to explore non-linear effects of TTC
+	• Test interaction terms (e.g., TTC × residual disease)
+	• Conduct external validation using another dataset
+
+Rocher et al. Journal of Clinical Medicine 2021 TTC PDS FRANCOGYN n233
+Study: Rocher et al., J. Clin. Med. 2021, 10, 1058
+Design: Multicenter retrospective cohort (France, 9 institutions)
+N = 233 epithelial ovarian cancer patients (31.3% early-stage [ESG], 68.7% advanced-stage [ASG])
+Time Frame: September 2006 – November 2016
+
+Study Objective
+To evaluate whether the time-to-chemotherapy (TTC) after primary complete macroscopic cytoreductive surgery (CRS) influences recurrence-free survival (RFS) and overall survival (OS) in EOC patients.
+
+Inclusion / Exclusion Criteria
+Included	Excluded
+EOC (any FIGO stage)	Neoadjuvant chemotherapy
+Primary complete macroscopic CRS	Borderline/non-epithelial tumors
+Platinum-based adjuvant chemo (6 cycles)	Incomplete resection (residual tumor)
+
+Key Findings
+Comparison	OS Impact	p-value	RFS Impact	p-value
+TTC > 8 weeks vs ≤ 8 weeks (ASG)	↓ OS (59.3 vs 70.5 mo)	0.04	No difference	0.85
+TTC > 6 weeks vs ≤ 6 weeks (ASG)	Trend toward ↓ OS (60.1 vs 77.2 mo)	0.06	No difference	0.087
+TTC > 6 or 8 weeks (ESG)	No impact	>0.5	No impact	>0.3
+Whole population (TTC 6/8 week cutoffs)	No significant impact on OS or RFS	>0.08	>0.2	
+
+
+Multivariate Cox Regression
+	• TTC was not a significant predictor of RFS after adjusting for covariates
+		○ HR = 1.03 (95% CI: 0.81–1.32), p = 0.79
+	• No clinical or demographic factors significantly predicted delayed TTC or worsened survival
+
+Covariates and Their Encoding
+Variable	Type	Encoding
+Age	Continuous	Age at diagnosis (years)
+BMI	Continuous	Body Mass Index (kg/m²)
+Parity	Continuous	Number of full-term births
+BRCA Mutation	Binary	1 = BRCA1 or BRCA2 mutation, 0 = no mutation
+Hypertension	Binary	1 = Yes, 0 = No
+Diabetes	Binary	1 = Yes, 0 = No
+Smoking	Binary	1 = Yes, 0 = No
+Histologic Type	Categorical	Serous (ref), Endometrioid, Clear Cell, Mucinous
+Grade	Ordinal	1 (low), 2 (intermediate), 3 (high)
+Lymphovascular Space Invasion (LVSI)	Binary	1 = Present, 0 = Absent
+FIGO Stage	Categorical	I, II (ESG); III, IV (ASG)
+Type of Recurrence	Categorical	Peritoneal (ref), Lymph node, Visceral metastasis
+Time to Chemotherapy (TTC)	Categorical	≤6 vs >6 weeks, ≤8 vs >8 weeks
+
+Conclusion
+	• Advanced-stage EOC patients who begin chemotherapy more than 8 weeks after CRS have significantly worse overall survival.
+	• For these patients, starting adjuvant chemotherapy within 6 to 8 weeks is strongly advised.
+	• No significant TTC impact was found in early-stage patients.
+	• Findings support early initiation of chemo post-CRS and coordination of perioperative care to minimize delays.
+
+Additions:
+	• Model TTC as a continuous variable (with splines) to capture nonlinear effects.
+	• Include interaction terms (e.g., TTC × FIGO stage) to reflect stage-specific effects.
+	• Consider competing risks or cause-specific Cox models if cancer-specific death data are available.
+	• Add: Surgical complications, performance status (ECOG), comorbidity index (CCI), and treatment center type.
+	• Capture delay reasons (clinical vs. systemic) and socioeconomic/geographic data if available.
+	• Cancer-specific survival (CSS)
+	• Time from diagnosis to surgery (TDS)
+	• Chemotherapy completion and recurrence pattern
+	• Stratify by: Histology, BRCA status, age, hospital volume, and residual disease subtype (microscopic vs. truly none).
+	• Use multiple imputation for missing data.
+	• Check proportional hazards assumptions.
+	• Use landmark or time-varying models to account for post-op events.
+
+Nasioudis et al. Int. Journal of Gynecological Cancer 2024 TTC IDS NCDB 2004-2015 n5051
+Study Type: Retrospective cohort study using the National Cancer Database (NCDB)
+Objective: Assess whether delayed interval cytoreductive surgery (DICS)—performed 13.01–26 weeks after neoadjuvant chemotherapy (NACT) initiation—is associated with worse overall survival (OS) in patients with advanced-stage epithelial ovarian cancer (EOC).
+
+📋 Inclusion & Exclusion Criteria
+Inclusion:
+	• Diagnosed 2010–2015 with:
+		○ FIGO Stage III–IV high-grade serous or endometrioid ovarian carcinoma
+		○ Received neoadjuvant chemotherapy
+		○ Underwent interval cytoreductive surgery
+		○ Had available follow-up data
+Exclusion:
+	• Prior malignancy
+	• Missing surgery or chemotherapy timing data
+	• Did not proceed to surgery
+
+👥 Sample Size
+	• Total patients: 5,051
+		○ Standard surgery group (9.00–13.00 weeks): 2,389 (47.3%)
+		○ Delayed surgery group (13.01–26.00 weeks): 2,662 (52.7%)
+
+📊 Covariates Included in Multivariate Cox Analysis
+Covariate	Encoding / Type
+Surgery Timing	Binary: Standard (9–13.0 weeks) vs Delayed (13.01–26 weeks)
+Age	Binary: <65 vs ≥65 years
+Race	Categorical: White, Black, Asian, Other
+Insurance Status	Categorical: Private, Medicaid, Medicare, Uninsured, Other
+Charlson–Deyo Index	Binary: 0 vs ≥1
+Disease Stage	Categorical: FIGO Stage III vs Stage IV
+Intra-abdominal Spread	Categorical: Confined, Regional, Distant
+Facility Type	Binary: Academic/Research vs Community/Other
+Surgery Type	Categorical: Simple, Complex, Not Otherwise Specified (NOS)
+Residual Disease Status	Categorical: Complete Gross Resection (CGR) vs Residual Disease
+
+📐 Statistical Techniques
+	• Chi-square & Mann-Whitney U tests: Compare baseline characteristics and surgical complexity
+	• Kaplan-Meier & log-rank test: Compare overall survival between standard and delayed groups
+	• Cox proportional hazards model: Adjusted for all listed covariates
+	• Stratified analyses: Conducted separately for patients with and without complete gross resection (CGR)
+	• Sensitivity analyses:
+		○ Examined survival across 2-week increments of TTC
+		○ Repeated analyses using a >15-week delay threshold
+🔎 Note: Although they performed stratified analyses, they did not model interactions (e.g., TTC × residual disease). A unified Cox model including interaction terms would allow formal testing of whether surgery timing effects differ by subgroup.
+
+🧠 Key Findings
+Outcome	Standard (n=2,389)	Delayed (n=2,662)	p-value
+Median OS	34.3 months	33.9 months	0.13
+CGR Rate	53.2%	54.5%	0.51
+30-Day Readmission	4.1%	2.6%	0.003
+90-Day Mortality	1.8%	3.2%	0.002
+	• No significant difference in overall survival after adjustment for confounders
+	• No survival difference within residual disease subgroups (CGR or residual)
+	• Sensitivity analyses confirmed findings across various definitions of delay
+
+🔬 Replication & Extension Recommendations
+Methodological Enhancements
+	• Model time-to-surgery as a continuous variable using restricted cubic splines
+	• Add landmark or time-varying Cox models to address potential immortal time bias
+	• Include progression-free survival (PFS) if available
+Covariate Additions
+	• Exact number of NACT cycles
+	• ECOG performance status or frailty indicators
+	• CA-125 response, BRCA mutation, and HRD status
+	• Detailed surgical complexity score (e.g., Aletti score)
+Analytical Improvements
+	• Include interaction terms (e.g., TTC × residual disease, TTC × comorbidity)
+	• Apply propensity score matching or inverse probability of treatment weighting (IPTW) to balance treatment groups
+	• Incorporate genomic and treatment regimen data if accessible
+
+🧾 Conclusion
+In a large national cohort of over 5,000 patients, delaying interval cytoreductive surgery beyond 13 weeks after starting neoadjuvant chemotherapy was not associated with worse overall survival. This suggests DICS may be safe for selected patients, especially those with comorbidities or surgical risk factors. However, prospective trials (e.g., CHRONO) are needed to determine optimal timing.
+
+Aletti et al. Gynecologic Oncology 2007 TTC PDS Mayo Clinic n218
+📌 Study Design
+	• Type: Retrospective cohort study
+	• Institution: Mayo Clinic
+	• Timeframe: 1994–1998
+	• Sample Size: 218 patients
+	• Population: Women with FIGO stage IIIC or IV epithelial ovarian cancer who underwent primary cytoreductive surgery followed by platinum-based chemotherapy
+
+👥 Inclusion/Exclusion Criteria
+	• Inclusion:
+		○ Primary epithelial ovarian cancer
+		○ FIGO stage IIIC or IV
+		○ Surgery performed at Mayo Clinic
+		○ Received postoperative chemotherapy
+	• Exclusion:
+		○ Prior chemotherapy
+		○ Surgery at outside institutions
+		○ Missing chemotherapy data
+		○ No chemotherapy due to death or performance status (13 patients)
+
+🔬 Covariates Analyzed
+Variable	Type / Encoding
+Time to Chemotherapy (TTC)	Continuous (days); Quartiles: ≤17, 18–26, 27–33, ≥34 days
+Age	Binary: ≤65 vs. >65 years
+ASA Grade	Binary: 1–2 vs. 3–4 (American Society of Anesthesiologists classification)
+FIGO Stage	Binary: IIIC vs. IV
+Histologic Subtype	Binary: Serous vs. Non-serous
+Histologic Grade	Binary: Grade 3 vs. Grade 1–2
+Residual Disease (RD)	Categorical: 0 (none), <1 cm, 1–2 cm, >2 cm
+Operative Time	Binary: <200 min vs. ≥200 min
+Radical Surgical Procedures	Binary: Yes vs. No for each (e.g., rectosigmoidectomy, diaphragm resection, etc.)
+Disease-Free Survival (DFS)	Continuous (months)
+Overall Survival (OS)	Continuous (months)
+
+📊 Statistical Methods
+Step	Purpose	Method Used	Dependent Variable
+Descriptive Comparison	Assess TTC distribution across groups	t-test / ANOVA	— (TTC = outcome)
+Survival Comparison	Compare OS/DFS by TTC quartiles	Kaplan-Meier + Log-rank test	OS / DFS
+Univariate Association	Check each variable’s link to OS	Univariate Cox regression	OS
+Multivariate Adjustment	Identify independent predictors of OS	Multivariate Cox regression	OS
+🔍 Key Results
+	• Median TTC: 26 days (range: 7–79)
+	• TTC Not Predictive of Survival:
+		○ OS did not differ significantly across TTC quartiles (P=0.93)
+		○ TTC as a continuous variable was not significant (HR=1.00, P=0.85)
+	• Residual Disease (RD):
+		○ Strongest independent predictor of OS
+		○ OS decreased significantly with increasing RD size
+	• Subgroup Analyses:
+		○ No survival differences by TTC among patients with RD <1 cm or ≥1 cm
+		○ No difference in 5-year DFS between TTC quartiles (P=0.74)
+
+🧠 Major Findings
+	• TTC was not an independent prognostic factor for overall or disease-free survival
+	• Residual disease was the most powerful predictor of prognosis
+	• Delays in chemotherapy did not justify less aggressive surgery
+
+💡 Implications
+	• Emphasizes the importance of maximal cytoreduction over minimizing TTC
+	• Reassures clinicians that modest delays in chemotherapy do not compromise survival, even after radical procedures
+
+🔁 Improvements
+	• Use multi-center or national datasets (e.g., NCDB, SEER) for broader generalizability.
+	• Ensure complete OS and DFS data with longer follow-up.
+	• Use recent cohorts to reflect modern chemo and surgical practices.
+	• Clinical: ECOG status, CA-125, # of NACT cycles, BRCA/HRD status
+	• Surgical: Residual disease (detailed), surgical complexity score
+	• Comorbidity: Use comprehensive indices (e.g., Elixhauser)
+	• Treatment: Chemo regimen, facility type
+	• Model TTC as continuous (e.g., splines)
+	• Add a Cox model for DFS
+	• Use time-dependent Cox or landmark analysis to avoid immortal time bias
+	• Apply propensity scores or IPTW to reduce confounding
+	• Explore interaction terms (e.g., TTC × residual disease)
+	• Include sensitivity analyses with alternate TTC thresholds
+	• Consider competing risks models for recurrence vs. death
+
+Hofstetter et al. Gynecologic Oncology 2013 TTC PDS OVCAD n191:
+🧪 Study Design and Methodologies
+	• Study Type: Prospective multicenter cohort (OVCAD study)
+	• Study Population:
+		○ n = 191 patients with FIGO III–IV serous epithelial ovarian cancer
+		○ Underwent primary cytoreductive surgery
+		○ Followed by platinum-based chemotherapy
+		○ Exclusions: neoadjuvant chemotherapy, non-serous histologies, platinum-resistant/refractory disease for subset analysis
+	• Primary Outcome: Overall Survival (OS)
+	• Secondary Outcome: Progression-Free Survival (PFS)
+
+
+Analysis Type	Method	Purpose	Details / Variables
+Descriptive Statistics	Median, range, frequencies	Summarize patient characteristics	Age, ECOG, FIGO stage, residual disease, TTC, extent of surgery
+Group Comparisons	Mann–Whitney U test	Compare TTC (continuous) across 2 groups	e.g., Age ≤57 vs >57
+		Compare TTC across >2 groups	e.g., Extent of surgery, center
+	Kruskal–Wallis H test
+Survival Analysis	Kaplan–Meier estimator	Estimate survival probabilities over time	OS and PFS stratified by TTC group (≤28 vs >28 days)
+		Compare survival curves between groups	Tests significance of survival difference by TTC group
+	Log-rank test
+Univariate Analysis	Cox proportional hazards model	Identify individual predictors of OS and PFS	Age, ECOG, FIGO stage, grading, residual disease, extent of surgery, complications, center, TTC
+Multivariate Analysis	Cox proportional hazards model	Adjust for confounders and test TTC as independent factor	Variables included: age, FIGO stage, residual disease, extent of surgery, center
+Sensitivity Analyses	Cox model with alternate cut-offs	Test TTC effect at other thresholds	Cutoffs tested: 14, 21, 35, 42, 49, 63, 84 days
+		Test linearity of TTC effect	TTC in days: HR = 1.01 per day, P = 0.077
+	TTC as continuous variable
+		Assess TTC in subset with good chemo response	Excluded platinum-resistant/refractory patients; TTC still significant (HR = 2.19, P = 0.015)
+	Subgroup analysis (chemo responders)
+📊 Main Results
+Overall Survival (OS):
+	• TTC ≤ 28 days: 3-year OS = 70%
+	• TTC > 28 days: 3-year OS = 60% (P = 0.041)
+	• TTC remained significant in multivariate model:
+		○ HR = 1.73, 95% CI: 1.08–2.78, P = 0.022
+Subgroup Findings:
+	• In patients with postoperative residual disease (n = 70):
+		○ Earlier TTC → improved OS (54% vs. 34%, P = 0.031; HR = 2.24)
+	• In patients without residual disease (n = 121):
+		○ No significant OS difference (81% vs. 72%, P = 0.157)
+	• PFS not significantly associated with TTC in any group
+Additional Findings:
+	• TTC correlated with:
+		○ Preoperative ECOG, Extent of surgery, Perioperative complications, Center
+		○ Not correlated with: age, FIGO stage, tumor grade, residual disease
+
+📋 Table: Variables and Encoding
+Variable	Type	Values / Encoding
+Time to chemotherapy (TTC)	Binary / Continuous	≤28 days = 0, >28 days = 1; also evaluated as continuous in days
+Age at diagnosis	Continuous / Binary	Age in years; Binary split at median: ≤57 = 0, >57 = 1
+ECOG Performance Score	Ordinal	0, 1, 2/3 (0 = fully active, 3 = limited self-care)
+FIGO Stage	Binary	III = 0, IV = 1
+Residual disease	Binary	Microscopic = 0, Macroscopic = 1
+Tumor grade	Binary	I/II = 0, III = 1
+Extent of surgery	Categorical	No lymphadenectomy, lymphadenectomy, bowel resection, splenectomy
+Perioperative complication score	Ordinal	0 = none, 1 = one complication, ≥2 = multiple
+Center	Categorical	Berlin, Hamburg, Innsbruck, Leuven, Vienna
+Survival outcomes (OS/PFS)	Time-to-event	Days from diagnosis (OS) or first chemo (PFS) to event/censoring
+📌 Major Findings
+	• Delaying chemotherapy beyond 28 days post-surgery is associated with reduced overall survival, especially in suboptimally debulked patients.
+	• PFS not significantly affected by timing.
+	• The timing window of 3–6 weeks post-surgery is particularly important.
+
+🧠 Discussion Points
+	• The study supports early chemotherapy, especially in patients with residual disease post-surgery.
+	• Confirms prior findings that perioperative complications, performance status, and extent of surgery influence chemotherapy timing.
+	• Highlights center-specific differences in outcomes and chemotherapy delays.
+
+✏️ Suggested Cox Model Covariates for Your Use
+	• Time from surgery to chemotherapy (binary: ≤28 vs >28 days) or use 42 days 
+	• Age
+	• FIGO stage (III vs IV)
+	• Residual disease (microscopic vs macroscopic)
+	• Extent of surgery (e.g., lymphadenectomy, bowel resection, splenectomy)
+	• Performance status (ECOG)
+	• Perioperative complications
+	• Center (site)
+
+Lydiksen et al. Gynecologic Oncology 2014 TTC PDS DGCD n650
+Study Design
+	• Type: Nationwide, retrospective, population-based cohort study
+	• Population: Danish women (N = 650) who underwent surgery for epithelial ovarian cancer (OC) between Jan 2005 – Dec 2006
+	• Data Source: Danish Gynaecological Cancer Database (DGCD) + medical records + Danish Civil Registry System
+Inclusion Criteria
+	• Women in Denmark who:
+		○ Underwent primary surgery for epithelial ovarian cancer (OC) between January 1, 2005 and December 31, 2006
+		○ Had documented initiation of adjuvant chemotherapy
+		○ Were registered in the Danish Gynaecological Cancer Database (DGCD)
+
+Exclusion Criteria
+Patients were excluded for the following reasons:
+	1. Age < 18 years (n = 4)
+	2. No surgery performed (n = 1)
+	3. No chemotherapy administered (n = 473), reasons included:
+		○ Low-stage OC (n = 57)
+		○ Borderline tumor (n = 261)
+		○ Sex-cord stromal cancer (n = 14)
+		○ Germ cell tumor (n = 3)
+		○ Poor general condition, high age, death, or patient refusal (n = 100)
+		○ Other cancer types (n = 17)
+		○ Unknown reasons (n = 21)
+	4. Missing data on chemotherapy administration (n = 12)
+	5. Neoadjuvant chemotherapy (i.e., chemotherapy before surgery) (n = 69)
+	6. Chemotherapy initiated >100 days after surgery (n = 14)
+		○ These were excluded because delays were typically due to special clinical reasons, such as severe complications or patient refusal
+
+Statistical Methodologies
+1. Exposure Definition
+	• Time to Initiation (TI): Time (in days) between surgery and start of adjuvant chemotherapy
+		○ Median TI = 32 days
+		○ Patients split into early (≤32 days) vs. late (>32 days) initiation groups
+2. Outcome
+	• All-cause mortality (not cancer-specific)
+	• Follow-up period: Up to Jan 2013
+	• Survival time: From chemotherapy start to death or end of follow-up
+📊 Analytic Approaches
+1. Descriptive Statistics
+	• Compared baseline characteristics across TI groups (≤32 vs. >32 days)
+	• Variables included: age, ECOG status, FIGO stage, grade, histology, residual tumor, ascites, chemotherapy regimen
+2. Kaplan–Meier Survival Curves
+	• Outcome: All-cause mortality from date of chemo initiation
+	• Stratified by: TI ≤ 32 days vs. TI > 32 days
+	• Compared using log-rank test (p = 0.12)
+	• No covariates included (unadjusted survival)
+3. Cox Proportional Hazards Regression
+Model Type	Exposure	Covariates Included	Result
+Unadjusted	TI > 32 vs. ≤ 32 days	None	HR = 0.85 (95% CI: 0.70–1.04), p = 0.12
+Adjusted	TI > 32 vs. ≤ 32 days	FIGO stage, Residual tumor	HR = 1.13 (95% CI: 0.92–1.39), p = 0.26
+	• Covariates selected using 10% change-in-estimate method
+	• Other variables like age, ECOG, histology, and grade were tested but not included, as they did not materially affect the HR for TI
+
+⚠️ Why 32 Days?
+	• 32 days was the observed median TI in the cohort
+	• This data-driven cut-off created balanced groups for analysis
+	• Although the Danish guideline recommends ≤28 days, many exceeded this, and using 32 allowed for statistical power
+	• They also tested TI ≤14 days vs. >14 days (results not emphasized)
+
+📉 Prognostic Model (Table 4)
+	• Separate multivariable Cox model assessing independent predictors of mortality
+	• TI was not included because it was:
+		○ Not statistically significant
+		○ The focus of a separate model (Table 3)
+	• Chemotherapy regimen (e.g., TTC) also excluded, likely due to:
+		○ Lack of prognostic power
+		○ Collinearity with ECOG/age
+		○ Small subgroup sizes
+📦 Variables included in Table 4:
+	• Age group
+	• ECOG performance status
+	• FIGO stage
+	• Residual tumor
+	• Ascites
+	• Tumor grade
+	• Histological subtype
+
+🧠 Key Takeaways
+	• No statistically significant association found between TI and survival
+	• Strongest predictors of mortality: residual tumor and FIGO stage
+	• Median 5-year survival: 42.8%
+	• The study supports that earlier chemotherapy (≤32 days) may offer a modest survival benefit, but it was not statistically significant
+
+
+Variables Used in Modeling
+Variable Type	Name	Encoding / Notes
+Exposure	Time to initiation (TI)	Binary (TI ≤ 32 days vs. TI > 32 days)
+Outcome	Mortality	Binary; time-to-event data used in Cox model
+Covariates	Residual tumor	Binary (Yes/No)
+		Ordinal (IA–IIA, IIB–IIIB, IIIC, IV)
+	FIGO stage
+		Categorical quartiles (<56, 56–63, 64–70, >70)
+	Age
+		Ordinal (Fully active → Confined to bed)
+	ECOG Performance Status
+		Ordinal (Grade 1, 2, 3)
+	Tumor grade
+		Binary (Yes/No)
+	Ascites
+		Categorical (Serous, Endometrioid, Mucinous, Others)
+	Histology
+		Categorical (TC, TTC, Carboplatin mono, others)
+	Chemotherapy regimen
+	• Confounder selection was guided by whether the inclusion changed the unadjusted HR by ≥10%.
+Suggestions for Large-Scale Replication (e.g., All of Us)
+1. Study Design Enhancements
+	• Prospective registry linkage to improve validity
+	• Include post-op performance status and reason for TI delay (hospital transfer, complications, patient preference)
+2. Statistical Considerations
+	• Use multiple imputation for missing values (e.g., ECOG status)
+	• Consider cause-specific mortality or competing risks models
+	• Apply restricted cubic splines to model TI as a continuous variable rather than binary
+3. Modeling Improvements
+	• Include interaction terms (e.g., between TI and residual tumor)
+	• Use stratified Cox models if proportional hazards assumption fails
+	• Incorporate time-varying covariates (e.g., post-op complications)
+4. Covariate Expansion
+	• Add comorbidity scores (e.g., Charlson index)
+	• Include biomarkers (if available)
+	• Capture patient-reported outcomes and surgical complications
+5. High-Performance Computing
+	• For scalability: Use parallelized survival modeling (e.g., lifelines, scikit-survival, pycox)
+	• For reproducibility: Leverage version-controlled notebooks and DAGs (e.g., with Airflow)
+
+Chan et al. Gynecologic Oncology 2016 TTC PDS GOG 95,157 n497
+🔬 Study Summary: Chan et al. (2016)
+Title: The association between timing of initiation of adjuvant therapy and the survival of early stage ovarian cancer patients
+Source: Gynecologic Oncology, 143(2016): 490–495
+
+🎯 Study Objective
+To determine whether the timing of adjuvant therapy initiation after surgery is associated with recurrence-free survival (RFS) or overall survival (OS) in patients with early-stage epithelial ovarian cancer.
+
+🏥 Study Design
+	• Type: Secondary analysis of two randomized controlled trials (GOG 95 and GOG 157)
+	• Population: 497 women with early-stage epithelial ovarian cancer (FIGO I–II)
+	• Setting: GOG protocols with standardized treatment and complete surgical staging
+	• Median TI (time to chemo): 23 days (IQR: 12–33)
+	• Exposure (TI): Categorized for illustration into:
+		○ <2 weeks
+		○ 2–4 weeks
+		○ >4 weeks
+🔹 For regression, TI was modeled as a continuous variable
+
+✅ Inclusion Criteria
+	• Stage IA/IB (grade 3), IC, II, or any Stage I/II clear cell carcinoma
+	• Surgery performed per GOG protocol by gynecologic oncologists
+	• Randomized to adjuvant chemotherapy per protocol
+	• Complete follow-up and timing data
+
+❌ Exclusion Criteria
+	• Missing or incomplete data on surgery or chemotherapy start dates
+	• Patients not meeting GOG protocol eligibility (e.g., wrong histology or stage)
+
+🧬 Treatment Arms
+Trial	Arms
+GOG 95	IV Cyclophosphamide + Cisplatin vs. IP 32P
+GOG 157	Paclitaxel + Carboplatin, 3 vs. 6 cycles
+Note: Chemotherapy regimens were controlled for in the multivariate model.
+
+📊 Analytic Approaches
+1. Descriptive Statistics
+	• Compared patient characteristics across the three TI groups
+	• Variables: age, race, stage, grade, histology, cytology, ascites, rupture, performance status, treatment regimen
+2. Kaplan–Meier Curves
+	• Estimated 5-year RFS and OS for each TI category
+	• Log-rank test used to compare groups:
+		○ RFS: p = 0.62
+		○ OS: p = 0.51
+3. Cox Proportional Hazards Models
+	• Multivariate regression model included:
+		○ TI as a continuous variable
+		○ Covariates:
+			§ Age
+			§ Performance status (0 vs. 1–2)
+			§ FIGO stage (IA/IB, IC, II)
+			§ Tumor grade (1–3)
+			§ Cytology (positive/negative)
+			§ Treatment type (chemotherapy regimen)
+	• Endpoints:
+		○ RFS: from chemo start to recurrence
+		○ OS: from chemo start to death
+	• Software: SAS 9.1
+
+📈 Main Results
+🔹 5-Year Survival Estimates by TI Group (illustrative):
+TI Group	5-Year RFS	5-Year OS
+<2 weeks	72.8%	79.4%
+2–4 weeks	73.9%	81.9%
+>4 weeks	79.5%	82.8%
+🔍 No statistically significant difference in survival across TI groups.
+🔹 Cox Model Results (Adjusted Hazard Ratios):
+TI Category	HR for RFS (95% CI)	p-value	HR for OS (95% CI)	p-value
+2–4 weeks	0.90 (0.59–1.37)	0.62	0.87 (0.58–1.31)	0.51
+>4 weeks	0.72 (0.46–1.13)	0.15	0.78 (0.51–1.19)	0.25
+Global test for timing:
+	• RFS: p = 0.33
+	• OS: p = not significant
+
+🧠 Key Takeaways
+	• Timing of adjuvant therapy initiation was not associated with survival in early-stage ovarian cancer after adjusting for key prognostic factors.
+	• Important independent predictors of survival:
+		○ Age
+		○ FIGO stage
+		○ Tumor grade
+		○ Cytology
+
+⚖️ Strengths
+	• Large dataset from prospective randomized trials
+	• Uniform surgical staging and treatment protocols
+	• Use of Cox models with clinically relevant covariates
+⚠️ Limitations
+	• Median TI was short (23 days); few patients had long delays, limiting power to detect harm from long TI
+	• One regimen (IP 32P) is outdated and not used in current practice
+	• Small sample size for survival differences in a generally good-prognosis population
+
+🧾 Summary Table of Modeling Setup
+Component	Approach Used
+Exposure	TI as continuous variable (categorical for illustration)
+Main outcomes	Recurrence-Free Survival (RFS), Overall Survival (OS)
+Regression model	Cox proportional hazards
+Covariates included	Age, performance status, FIGO stage, grade, cytology, treatment type
+Statistical software	SAS 9.1
+Significant predictors	Age, stage, grade, cytology
+TI association result	Not significant for RFS or OS
+✅ Recommended Additions for Large-Scale Study (Condensed)
+1. Flexible Modeling of Time to Chemo (TI)
+	• Use restricted cubic splines or generalized additive models (GAMs) to model TI as a continuous non-linear variable
+	• Avoid arbitrary cutoffs (like 32 days); detect inflection points
+2. Time-Dependent Covariates
+	• Consider modeling TI as a time-dependent exposure if delayed chemo is related to events (e.g., post-op complications)
+3. Subgroup Analyses
+	• Stratify by:
+		○ Histologic subtype (serous, endometrioid, clear cell)
+		○ Stage (I vs. II vs. IIIA1)
+		○ Residual disease status
+	• Explore interaction terms between TI and these subgroups
+4. Propensity Score Methods
+	• Use IPTW or matching to balance confounders between early and delayed TI groups
+	• Helps address treatment selection bias
+5. Sensitivity Analyses
+	• Vary definitions of "delay" (e.g., 28, 35, 42 days)
+	• Exclude patients with early recurrence to avoid immortal time bias
+6. Competing Risks Analysis
+	• Use Fine & Gray models for cancer-specific mortality vs. non-cancer death
+7. Missing Data Handling
+	• Apply multiple imputation to avoid bias from incomplete clinical variables
+8. Machine Learning Extensions (Optional)
+	• Use survival forests or deep Cox models to explore non-linear, high-dimensional effects (with interpretability focus)
+
+Lee et al. Gynecologic Oncology 2018 TTC IDS Single Institution n194
+
+Study Summary:
+Title: Impact of the time interval from completion of neoadjuvant chemotherapy to initiation of postoperative adjuvant chemotherapy on survival in patients with advanced ovarian cancer
+Authors: Lee YJ, Chung YS, Lee JY, et al.
+Journal: Gynecologic Oncology, 2018.
+
+Objective:
+To evaluate the relationship between the time interval from completion of neoadjuvant chemotherapy (NAC) to the initiation of postoperative adjuvant chemotherapy (POAC) and survival outcomes (PFS and OS) in patients with advanced epithelial ovarian cancer.
+
+Study Population:
+	• Setting: Yonsei Cancer Hospital, South Korea
+	• Time frame: 2006–2016
+	• N: 194 women with FIGO stage III–IV epithelial ovarian cancer who received at least one cycle of NAC and underwent interval debulking surgery (IDS) followed by POAC
+
+Inclusion Criteria:
+	• Pathologically confirmed epithelial ovarian cancer
+	• FIGO stage III or IV
+	• Received ≥1 cycle of NAC
+	• Underwent IDS and subsequent POAC at the study institution
+
+Exclusion Criteria:
+	• Still receiving POAC at time of data collection (n=9)
+	• Did not undergo IDS (n=6)
+	• Underwent treatment elsewhere with unavailable records (n=2)
+	• Lost to follow-up (n=9)
+
+. Descriptive Statistics
+	• Used to summarize patient characteristics (e.g., age, ASA score, CA-125 levels, FIGO stage, histology, surgery type)
+	• Reported as:
+		○ Median (range) for continuous variables
+		○ Frequency (%) for categorical variables
+
+2. Group Comparisons
+	• Patients were stratified based on the median time interval from end of neoadjuvant chemotherapy (NAC) to start of postoperative adjuvant chemotherapy (POAC):
+		○ ≤42 days (short interval)
+		○ >42 days (long interval)
+	• Statistical tests:
+		○ Chi-square test for categorical variables
+		○ Mann–Whitney U test for continuous variables
+→ Purpose: to check for significant differences in baseline characteristics between the two groups
+
+3. Survival Analysis
+	• Kaplan-Meier curves to estimate:
+		○ Progression-Free Survival (PFS): time from diagnosis to recurrence
+		○ Overall Survival (OS): time from diagnosis to death (all-cause)
+	• Log-rank test used to compare survival curves between:
+		○ Time interval groups (≤42 vs >42 days)
+		○ Subgroups for time to surgery and time to chemo
+		○ Quartiles of time interval (≤37, 38–42, 43–50, >50 days)
+
+4. Univariate Cox Proportional Hazards Models
+	• Conducted separately for PFS and OS
+	• Variables tested:
+		○ Age
+		○ ASA score
+		○ FIGO stage
+		○ Histology (HGSC vs non-HGSC)
+		○ Presence of residual disease
+		○ Performance of radical surgery
+		○ Time interval from NAC to POAC (binary: >42 vs ≤42 days)
+
+5. Multivariate Cox Proportional Hazards Models
+	• Adjusted for:
+		○ Age
+		○ ASA score
+		○ FIGO stage
+		○ Histology
+		○ Residual disease
+		○ Radical surgery
+		○ Time interval (main exposure)
+	• Reported as:
+		○ Hazard Ratios (HRs) with 95% Confidence Intervals (CIs)
+		○ p-values, with significance threshold: p < 0.05
+	• Conducted both as:
+		○ Binary analysis (≤42 vs >42 days)
+		○ Quartile-based trend analysis (≤37, 38–42, 43–50, >50 days) with p for trend
+
+6. Subgroup Analyses
+	• Evaluated survival impact of:
+		○ Time to surgery (NAC to IDS) using cutoff of 25 days
+		○ Time from surgery to POAC using cutoff of 16 days
+		○ Reasons for delay (e.g., toxicity, logistics, complications)
+
+Main Results:
+	• Median time interval (NAC to POAC): 42 days
+	• Longer interval (>42 days) associated with:
+		○ Worse PFS (HR 1.41; 95% CI 0.98–2.03; p=0.063, trend-level)
+		○ Worse OS (HR 2.03; 95% CI 1.16–3.54; p=0.013)
+	• Trend analysis across quartiles showed increased risk of recurrence and death with increasing interval:
+		○ PFS: P for trend = 0.006
+		○ OS: P for trend < 0.001
+	• Independent predictors of worse survival:
+		○ Residual disease
+		○ Non-HGSC histology
+		○ FIGO stage IV
+		○ Time interval >42 days (for OS)
+
+Subgroup Findings:
+	• Delays >25 days to IDS associated with worse OS (p=0.026)
+	• Delays >16 days from IDS to POAC not significantly associated with OS or PFS
+	• Delays due to organizational shortcomings had worse outcomes than medical or patient-requested delays
+
+Recommendations for NCDB Reproduction:
+Additions Needed:
+	1. Define the interval variable carefully:
+		○ Use procedure and chemo start dates to replicate time from end of NAC → IDS → POAC
+		○ Construct total interval and decompose into surgery and chemo initiation delays if possible
+	2. Identify NAC cohorts:
+		○ Use variables such as Class of Case, Sequence Number, Chemotherapy at this Facility, RX Summ--Chemo, and Systemic/Surgery Dates to determine treatment pathway
+	3. Replicate key covariates:
+		○ Age
+		○ Histology (ICD-O-3)
+		○ FIGO stage (approximate via TNM or derived stage)
+		○ Residual disease: may not be directly available; consider CS Site-Specific Factors or Surgical Margins
+		○ Comorbidity/functional status: use Charlson-Deyo score if ASA not available
+		○ Radical surgery: infer from Site-Specific Surgery Codes
+	4. Handle missing or ambiguous data:
+		○ Document assumptions made in calculating timing
+		○ Consider sensitivity analyses for incomplete or estimated data
+	5. Potential enhancements:
+		○ Use multi-level modeling to account for facility-level variability
+		○ Evaluate impact of insurance, race, region (available in NCDB)
+		○ Conduct instrumental variable analysis to account for potential unmeasured confounding
+
+Timmermans et al. Gynecologic Ongology 2018 TTC PDS n1612 IDS n2485
+Study Design:
+	• Population-based retrospective cohort study
+	• Data source: Netherlands Cancer Registry (NCR), 2008–2015
+	• Sample size: 4,097 patients with FIGO stage IIB–IV epithelial ovarian cancer
+		○ 1,612 underwent Primary Debulking Surgery (PDS)
+		○ 2,485 underwent Interval Debulking Surgery (IDS) after Neoadjuvant Chemotherapy (NACT)
+	• Included only patients with ≤1 cm residual disease and known surgery-to-chemotherapy interval
+
+Objectives:
+	1. Identify clinical and demographic predictors of prolonged time to chemotherapy (TTC)
+	2. Evaluate the impact of TTC on overall survival (OS), stratified by residual disease status and treatment type
+
+Definitions:
+	• TTC: Days from surgery to start of adjuvant chemotherapy
+		○ Categorized into:
+			§ Early (<24 days)
+			§ Intermediate (24–37 days, reference)
+			§ Prolonged (>37 days)
+	• Complete cytoreduction: No macroscopic residual disease
+	• Optimal cytoreduction: ≤1 cm residual disease
+	• Prolonged hospitalization: ≥10 days post-surgery
+	• Complicated recovery: Any postoperative complication or ICU stay >1 day
+
+Statistical Analysis Procedures:
+Descriptive Statistics:
+	• Categorical variables: Compared across TTC groups using Chi-square tests
+	• Continuous variables: Assessed using ANOVA or Mann–Whitney U tests as appropriate
+Regression Analyses:
+	• Univariable and multivariable logistic regression to identify predictors of prolonged TTC (>37 days), stratified by PDS and IDS groups
+		○ Covariates included: age, Charlson Comorbidity Index (CCI), FIGO stage, residual disease status, postoperative complications, hospital stay, and extent of surgery
+	• Survival Analysis:
+		○ Overall Survival (OS) and Progression-Free Survival (PFS) estimated using Kaplan–Meier curves
+		○ Multivariable Cox proportional hazards regression to estimate adjusted hazard ratios (HRs) for OS by TTC group
+			§ Model I: Included only patients with no residual disease
+			§ Model II: Included only patients with residual disease (≤1 cm)
+			§ Covariates for Cox models included:
+				□ Age
+				□ FIGO stage
+				□ Histologic type
+				□ Tumor grade
+				□ Performance status
+				□ Postoperative complications
+				□ Hospital stay
+				□ Chemotherapy alterations (dose modifications, delays)
+				□ IDS-specific models additionally adjusted for the interval between NACT and surgery
+	• Statistical significance: P-value < 0.05
+	• Software used: STATA/SE version 14.1 (StataCorp, Texas, USA)
+
+Key Findings:
+1. Median TTC:
+	• Overall: 29 days (IQR: 24–37)
+	• PDS: 31 days
+	• IDS: 28 days
+2. Predictors of Prolonged TTC:
+	• Age ≥65, complications, hospitalization ≥10 days, and complete debulking → significantly associated with delayed TTC
+	• Extensive surgery → associated with prolonged TTC in IDS group only
+3. Survival Outcomes:
+	• In patients with no residual disease:
+		○ Prolonged TTC (>37 days) was significantly associated with worse OS:
+			§ PDS: HR = 1.43 (95% CI: 1.09–1.88)
+			§ IDS: HR = 1.22 (95% CI: 1.02–1.47)
+	• In patients with residual disease: No significant association between TTC and OS
+	• PFS: Not significantly impacted by TTC group
+
+Conclusions:
+	• Delayed initiation (>5–6 weeks) of adjuvant chemotherapy after complete cytoreduction is an independent predictor of worse OS
+	• Starting chemotherapy earlier than 24 days does not provide additional survival benefit
+	• Recommendation: Initiate chemotherapy within 5–6 weeks post-surgery for optimal outcomes, particularly after complete cytoreduction
+
+ElNaggar et al. Gynecology Oncology 2018 Single Institution TTS PDS n540 IDS n91
+🎯 Objective
+To evaluate:
+	• Compliance with the Society of Gynecologic Oncology (SGO) quality measure recommending initiation of chemotherapy within 42 days of cytoreductive surgery.
+	• Whether this timing is associated with improved survival in women with epithelial ovarian/fallopian tube/peritoneal cancer.
+
+🧪 Methods
+	• Dataset: 631 eligible patients from a prospectively maintained institutional ovarian cancer database (2004–2013).
+	• Eligibility: Stage IA/IB grade 2–3 or stage IC and higher disease who underwent primary or interval debulking surgery and were candidates for chemotherapy.
+	• Exposure: Time to chemotherapy (TTC) categorized as:
+		○ Early: ≤42 days
+		○ Late: >42 days
+	• Statistical analyses:
+		○ Cox proportional hazards models (stratified by age and stage).
+		○ Adjusted for confounders: age, stage, race, insurance, surgical approach/outcome.
+		○ Subgroup analyses: PDS vs IDS, residual disease vs no residual.
+		○ Interaction terms tested (e.g., TTC × surgery type).
+		○ Logistic regression explored predictors of delayed chemotherapy.
+
+📊 Key Results
+	• 59.1% received chemotherapy ≤42 days after surgery.
+	• No significant survival benefit associated with early chemotherapy:
+		○ Adjusted HR: 0.77 (95% CI: 0.59–1.01)
+	• Findings persisted across:
+		○ Surgery type: PDS (aHR: 0.93), IDS (aHR: 0.79)
+		○ Residual disease status: No strong interaction detected (p = 0.213)
+	• Factors associated with delayed chemotherapy:
+		○ Presence of residual disease
+		○ Higher stage
+		○ Surgical approach (open vs minimally invasive — only marginal in final model)
+
+🧠 Conclusions
+	• At this NCI-designated cancer center, chemotherapy within 42 days was not associated with significantly improved overall survival.
+	• The utility of the 42-day benchmark as a quality indicator is questionable.
+	• Authors urge further validation of time-based quality measures before widespread implementation.
+
+📌 Notable Strengths
+	• High-quality, prospectively collected institutional dataset.
+	• Rich clinical detail (e.g., residual disease, surgical approach, exact chemo dates).
+	• Multiple adjusted models and stratified analyses.
+
+⚠️ Limitations
+	• Single-institution study — limited generalizability.
+	• Retrospective analysis of a prospective registry.
+	• No standardization of chemotherapy regimens.
+	• Unmeasured confounding (e.g., postoperative recovery factors).
+
+
+Tewari et al. Annals of Oncology 2016 TTC PDS GOG n1718
+📄 Study Summary:
+Title: Early initiation of chemotherapy following complete resection of advanced ovarian cancer associated with improved survival: NRG Oncology/Gynecologic Oncology Group study
+Authors: K.S. Tewari, J.J. Java, R.N. Eskander, B.J. Monk, R.A. Burger
+Journal: Annals of Oncology, Volume 27, Pages 114–121, 2016
+DOI: 10.1093/annonc/mdv500
+
+🎯 Objective:
+To evaluate whether time from surgery to initiation of chemotherapy (TSIC) impacts overall survival (OS) in women with advanced ovarian cancer, particularly among those with microscopic residual disease (R0) after primary debulking surgery.
+
+👥 Study Design & Population:
+	• Design: Post hoc exploratory analysis of GOG-0218, a phase III randomized, double-blind, placebo-controlled trial
+	• Population: 1718 women with newly diagnosed stage III or IV epithelial ovarian, fallopian tube, or peritoneal carcinoma
+		○ Stage IV R0 (microscopic residual) patients (n=81) were the focus for this analysis
+		○ Stage III R0 patients were excluded by design
+
+Primary Exposure
+	• TSIC: Time (in days) from date of surgery to initiation of chemotherapy
+		○ Treated as:
+			§ A continuous variable (log-transformed)
+			§ Categorical cutoffs: 25 days and 40 days
+			§ Interaction term with residual disease
+
+Primary Outcome
+	• Overall Survival (OS): Time from surgery to death from any cause
+
+Covariates
+	• Age (continuous)
+	• Race/ethnicity (White, Asian, Black, Hispanic, Other)
+	• FIGO stage (III vs IV)
+	• Tumor grade (1, 2, 3)
+	• Histology (serous vs others)
+	• Residual disease status (microscopic, ≤1 cm, >1 cm)
+	• Performance status (0, 1, 2)
+	• Presence of ascites (yes/no)
+	• CA-125 (log-transformed)
+	• Randomization arm (standard chemo, concurrent bevacizumab, extended bevacizumab)
+
+Statistical Methods
+1. Descriptive Analyses
+	• Categorical variables: Compared using Pearson's chi-squared test
+	• Continuous variables: Compared using Wilcoxon–Mann–Whitney or Kruskal–Wallis test depending on number of groups
+2. Survival Analyses
+	• Kaplan–Meier curves: Used to visualize unadjusted OS by TSIC categories and residual disease strata
+	• Multivariable Cox proportional hazards model:
+		○ Included all covariates listed above
+		○ TSIC modeled as:
+			§ Log-transformed continuous variable
+			§ Modeled nonlinearly using restricted cubic splines (RCS) to explore the shape of the association
+		○ Adjusted survival curves generated using representative covariate values
+3. Interaction Effects
+	• Two key interactions were tested:
+		○ TSIC × residual disease
+		○ TSIC × race/ethnicity
+	• Purpose: To determine if the effect of TSIC on OS differs by tumor burden and ethnicity
+	• Interaction plots generated to illustrate hazard ratios across subgroups (see Figure 1B in paper)
+
+Model Validation and Interpretation
+	• Nonlinearity of TSIC was assessed using restricted cubic splines (validated by Molinari’s threshold selection method)
+	• Statistical significance set at p < 0.05, two-tailed
+	• Adjusted hazard ratios with 95% confidence intervals reported
+	• Software used: R statistical computing environment
+
+🧠 Major Findings:
+	• TSIC >25 days was associated with worse OS, especially in stage IV patients with microscopic residual disease
+	• For this group, each 10% increase in TSIC after 25 days led to an approximate 27% increased risk of death
+	• The effect of TSIC was:
+		○ Strongest in patients with no gross residual disease (R0)
+		○ Minimal in those with residual disease >1 cm
+	• A significant TSIC × race interaction suggested Asian patients were more susceptible to delayed chemotherapy effects regardless of residual status
+	• TSIC had no effect on PFS
+
+🔍 Interpretation:
+	• The findings are consistent with Gompertzian tumor kinetics and biologic models where micrometastases proliferate rapidly after surgery
+	• Patients with R0 resections may benefit most from early chemotherapy initiation to suppress residual microscopic disease
+	• Results emphasize the importance of avoiding delays post-surgery, especially in stage IV completely resected patients
+
+⚠️ Limitations:
+	• Retrospective, exploratory post-trial analysis (not pre-specified)
+	• Reasons for delayed chemotherapy (>25 days) not collected
+	• Only stage IV R0 patients included; not generalizable to all early-stage or incompletely resected patients
+
+🛠️ Implications for Future Research / NCDB Reproduction:
+If replicating in the NCDB:
+	• Define TSIC precisely using surgery and chemotherapy start dates
+	• Focus on stage IV patients with R0 resections if possible
+	• Stratify by residual disease (may need proxy indicators)
+	• Consider modeling nonlinear effects of TSIC and interactions with race/ethnicity
+	• Track clinical/systemic causes of delays (if available)
+
+
+
+
 
