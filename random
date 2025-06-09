@@ -13,3 +13,13 @@ If tdan_dx_grp == 2 (Uterine CA), then site_p, site_p2, and site_p3 (if filled) 
 If tdan_dx_grp == 5 (Vaginal CA), then site_p, site_p2, and site_p3 (if filled) must all be 6 (Vaginal).
 If tdan_dx_grp == 4 (Vulvar CA), then site_p, site_p2, and site_p3 (if filled) must all be 7 (Vulvar).
 If tdan_dx_grp == 12 (Benign), site_p must NOT be 8 (Non-Gyn) or 11 (Concurrent), and celltype_p must be in {36–49}.
+
+
+today = datetime.datetime.today().strftime("%Y-%m-%d")
+def move_and_rename(path, suffix):
+    base = os.path.splitext(os.path.basename(path))[0]
+    new_name = f"{today}_{base}.csv"
+    new_path = os.path.join(input_folder, new_name)
+    shutil.move(path, new_path)
+    print(f"Moved {suffix} to: {new_path}")
+    return new_path
