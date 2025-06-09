@@ -1,12 +1,10 @@
-	00 = No surgery
-	17 = Local tumor destruction, NOS
-	25 = Total removal of tumor or single ovary, NOS
-	26 = Resection of ovary; unknown if hysterectomy was done
-	27 = Resection of ovary; without hysterectomy
-	28 = Resection of ovary; with hysterectomy
-	35 = Unilateral salpingo-oophorectomy; unknown if hysterectomy was done
-	36 = Unilateral salpingo-oophorectomy; without hysterectomy
-	37 = Unilateral salpingo-oophorectomy; with hysterectomy
-	50 = Bilateral salpingo-oophorectomy; unknown if hysterectomy was done
-	51 = Bilateral salpingo-oophorectomy; without hysterectomy
-	52 = Bilateral salpingo-oophorectomy; with hysterectomy
+	DX_CHEMO_STARTED_DAYS: Days from diagnosis to chemotherapy start 
+	DX_DEFSURG_STARTED_DAYS: Days from diagnosis to definitive surgery
+	PDS: DX_DEFSURG_STARTED_DAYS < DX_CHEMO_STARTED_DAYS 
+o	Pt received surgery before chemotherapy, PDS
+	NACT / IDS: DX_DEFSURG_STARTED_DAYS > DX_CHEMO_STARTED_DAYS
+o	Pt received chemotherapy before surgery, NACT / IDS
+	TTC: DX_CHEMO_STARTED_DAYS - DX_DEFSURG_STARTED_DAYS
+o	Number of days from surgery to chemotherapy start date
+
+•	Available data on TTC, defined as the numbers of days between PDS and the first cycle of chemotherapy and then also examine days from diagnosis to chemotherapy initiation 
