@@ -1,1 +1,37 @@
-https://www.naaccr.org/wp-content/uploads/2021/01/SSDI-Manual_v-2.0.pdf 
+def run_all_qc_flags(df):
+    violations = []
+
+    # List of all your flag functions with names
+    flag_functions = {
+        'tdan_dx_grp_mullerian_ca_new': tdan_dx_grp_mullerian_ca_new,
+        'tdan_dx_grp_cervical_ca' : tdan_dx_grp_cervical_ca,
+        'tdan_dx_grp_concurrentgyncca_nongynca': tdan_dx_grp_concurrentgyncca_nongynca,
+        'tdan_dx_grp_concurrent_gyncas_new': tdan_dx_grp_concurrent_gyncas_new, 
+        'tdan_dx_grp_nongynca': tdan_dx_grp_nongynca, 
+        'tdan_dx_grp_ovarian_ca_new': tdan_dx_grp_ovarian_ca_new, 
+        'tdan_dx_grp_ovarian_lmp': tdan_dx_grp_ovarian_lmp,
+        'tdan_dx_grp_priorgynca': tdan_dx_grp_priorgynca, 
+        'tdan_dx_grp_uterine_ca': tdan_dx_grp_uterine_ca,
+        ' tdan_dx_grp_vaginal_ca':  tdan_dx_grp_vaginal_ca,
+        'tdan_dx_grp_vulvar_ca': tdan_dx_grp_vulvar_ca,
+        'tdan_dx_grp_benigndx': tdan_dx_grp_benigndx,
+        'tdan_dx_summary_missing': tdan_dx_missing
+        # Add more flags here as you define them
+    }
+
+    for name, func in flag_functions.items():
+        try:
+            result = func(df)
+            if not result.empty:
+                result = result.copy()
+                result['violation_flag'] = name
+                violations.append(result)
+        except KeyError:
+            # Skip flag if required columns are missing
+            continue
+
+    if violations:
+        return pd.concat(violations, ignore_index=True)
+    else:
+        print("✅ No violations found.")
+        return pd.DataFrame()
