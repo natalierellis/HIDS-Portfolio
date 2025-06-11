@@ -1,22 +1,49 @@
-	1. FINAL TDAN DIAGNOSIS
-		a. Double ID: More than one TDAN Surgery, put into more than one ID -> so they reconsolidated double ID cases into one ID case (first one)
-			i. Use first ID in REDCap
-		b. Check CRFs that are used in this report:
-			i. You will probably just need to change flag
-			ii. So tdan surgery 1 -> first id -> path report 1 (Path1)
-			iii. Tdan surgery 2 -> second id -> path report 2 (Path2)
-			iv. BUT any path report before surg1 date goes into preop disease (Path0) and same for surgeries 
-			v. Look at date of histologically confirm dx = date of surgery for CRFs
-			vi. Look at tumor location on Path CRF
-			vii. Prior Gyn CA had a dx before TDAN surgery and then at TDAN Sx had nothing, all in Pre Op Dx, so then in Path1, Benign 
-			viii. Offset calculations:
-				1) Lowest form status of the whole case, like incomplete or unverified
-			ix. Site of disease -> linked to cell type -> whatever it says on path report for this site
-			x. Tumor grade -> not applicable
-			xi. Staging from pathology report needs to be changed
-			xii. No commas or parantheses 
-			xiii. Even if biopsy, if its diagnosed, it is a prior dx 
-			xiv. Current distant metastasis
-			xv. If changed stage -> current FIGO stage
-		c. Need to go into docs 
-		d. Anything that changes, go to offset calculations
+1. 📁 Handling Double IDs
+If a patient has multiple TDAN surgeries and was mistakenly assigned multiple REDCap IDs:
+
+Retain the earliest REDCap ID as the consolidated record.
+
+Merge information from both IDs into the first ID.
+
+Update all associated CRFs under the retained ID, ensuring no loss of data.
+
+2. 🧪 Pathology Reports and Timing
+Path Report 1 must correspond with the date of TDAN Surgery 1.
+
+Path Report 2 must correspond with the date of TDAN Surgery 2 (if applicable).
+
+Pathology reports prior to TDAN Surgery 1:
+
+These reports should be documented under Pre-Operative Disease.
+
+Especially relevant in Prior Gyn Cancer cases where the tumor was removed via biopsy before surgery.
+
+3. 🧬 Prior Gynecologic Cancer Cases
+If the patient had a diagnosis of gynecologic cancer prior to TDAN surgery, and:
+
+The TDAN surgery revealed no residual malignancy (e.g., benign tissue or normal findings):
+
+All prior cancer information belongs in Pre-Op Disease.
+
+Path 1:
+
+Tumor Grade = GX or Not Applicable
+
+Cell Type = "Other benign conditions" or "Normal tissue" depending on path report content
+
+Site of Disease Diagnosis = original cancer site
+
+Update the Stage and Current Distant Metastasis fields accordingly.
+
+If stage is changed, update Current FIGO Stage.
+
+4. 🧾 Required Actions When Any Data Is Changed
+Recalculate Offset Calculations.
+
+Update the CRT Tracker (Case Review Tracker).
+
+Set the lowest form status for the entire case (e.g., Incomplete, Unverified).
+
+Make changes in source documentation, not just derived reports (i.e., update in REDCap and underlying documents).
+
+Remove commas and parentheses from any updated text fields to prevent system processing issues.
