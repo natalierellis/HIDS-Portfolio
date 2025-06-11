@@ -1,15 +1,22 @@
-#check missingness for TDAN Summary Dx
-def tdan_dx_missing(raw):
-    violation_mask = (
-        raw['tdandiagnosis_dx'].isna() |
-        raw['tdan_dx_grp'].isna() |
-        raw['site_p'].isna() |
-        raw['tdan_hist_grp'].isna() |
-        raw['grade_p'].isna() |
-        raw['celltype_p'].isna() 
-    )
-
-        # Get rows that violate the rule
-    violations = raw[violation_mask]
-
-    return(violations)
+	1. FINAL TDAN DIAGNOSIS
+		a. Double ID: More than one TDAN Surgery, put into more than one ID -> so they reconsolidated double ID cases into one ID case (first one)
+			i. Use first ID in REDCap
+		b. Check CRFs that are used in this report:
+			i. You will probably just need to change flag
+			ii. So tdan surgery 1 -> first id -> path report 1 (Path1)
+			iii. Tdan surgery 2 -> second id -> path report 2 (Path2)
+			iv. BUT any path report before surg1 date goes into preop disease (Path0) and same for surgeries 
+			v. Look at date of histologically confirm dx = date of surgery for CRFs
+			vi. Look at tumor location on Path CRF
+			vii. Prior Gyn CA had a dx before TDAN surgery and then at TDAN Sx had nothing, all in Pre Op Dx, so then in Path1, Benign 
+			viii. Offset calculations:
+				1) Lowest form status of the whole case, like incomplete or unverified
+			ix. Site of disease -> linked to cell type -> whatever it says on path report for this site
+			x. Tumor grade -> not applicable
+			xi. Staging from pathology report needs to be changed
+			xii. No commas or parantheses 
+			xiii. Even if biopsy, if its diagnosed, it is a prior dx 
+			xiv. Current distant metastasis
+			xv. If changed stage -> current FIGO stage
+		c. Need to go into docs 
+		d. Anything that changes, go to offset calculations
