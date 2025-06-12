@@ -1,49 +1,20 @@
-1. 📁 Handling Double IDs
-If a patient has multiple TDAN surgeries and was mistakenly assigned multiple REDCap IDs:
-
-Retain the earliest REDCap ID as the consolidated record.
-
-Merge information from both IDs into the first ID.
-
-Update all associated CRFs under the retained ID, ensuring no loss of data.
-
-2. 🧪 Pathology Reports and Timing
-Path Report 1 must correspond with the date of TDAN Surgery 1.
-
-Path Report 2 must correspond with the date of TDAN Surgery 2 (if applicable).
-
-Pathology reports prior to TDAN Surgery 1:
-
-These reports should be documented under Pre-Operative Disease.
-
-Especially relevant in Prior Gyn Cancer cases where the tumor was removed via biopsy before surgery.
-
-3. 🧬 Prior Gynecologic Cancer Cases
-If the patient had a diagnosis of gynecologic cancer prior to TDAN surgery, and:
-
-The TDAN surgery revealed no residual malignancy (e.g., benign tissue or normal findings):
-
-All prior cancer information belongs in Pre-Op Disease.
-
-Path 1:
-
-Tumor Grade = GX or Not Applicable
-
-Cell Type = "Other benign conditions" or "Normal tissue" depending on path report content
-
-Site of Disease Diagnosis = original cancer site
-
-Update the Stage and Current Distant Metastasis fields accordingly.
-
-If stage is changed, update Current FIGO Stage.
-
-4. 🧾 Required Actions When Any Data Is Changed
-Recalculate Offset Calculations.
-
-Update the CRT Tracker (Case Review Tracker).
-
-Set the lowest form status for the entire case (e.g., Incomplete, Unverified).
-
-Make changes in source documentation, not just derived reports (i.e., update in REDCap and underlying documents).
-
-Remove commas and parentheses from any updated text fields to prevent system processing issues.
+Covariates:
+•	GRADE or Grade_Path or Grade_Clin
+o	GRADE: For patients diagnosed 2017 or before:
+	1 = Grade 1
+	2 = Grade 2
+	3 = Grade 3
+	4 = Grade 4
+	9 = Unknown
+o	Grade_Path or Grade_Clin (if Grade_Path is missing): For patients diagnosed 2018 or after: 
+	1 = G1: Well-differentiated
+	2 = G2: Moderately differentiated
+	3 = G3: Poorly differentiated, undifferentiated
+	8 = Not applicable
+	9 = Unknown
+	A = Well-differentiated
+	B = Moderately differentiated
+	C = Poorly differentiated
+	D = Undifferentiated and anaplastic
+	H = High grade
+	L = Low grade
