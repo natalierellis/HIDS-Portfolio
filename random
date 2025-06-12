@@ -1,20 +1,15 @@
-Covariates:
-•	GRADE or Grade_Path or Grade_Clin
-o	GRADE: For patients diagnosed 2017 or before:
-	1 = Grade 1
-	2 = Grade 2
-	3 = Grade 3
-	4 = Grade 4
-	9 = Unknown
-o	Grade_Path or Grade_Clin (if Grade_Path is missing): For patients diagnosed 2018 or after: 
-	1 = G1: Well-differentiated
-	2 = G2: Moderately differentiated
-	3 = G3: Poorly differentiated, undifferentiated
-	8 = Not applicable
-	9 = Unknown
-	A = Well-differentiated
-	B = Moderately differentiated
-	C = Poorly differentiated
-	D = Undifferentiated and anaplastic
-	H = High grade
-	L = Low grade
+| Raw Code | Meaning (as given)            | Serous? → Group   | Non-Serous? → Group |
+| -------- | ----------------------------- | ----------------- | ------------------- |
+| 1        | Grade 1 / Well differentiated | Low-grade         | Grade 1             |
+| 2        | Grade 2 / Moderately diff     | High or Ambiguous | Grade 2             |
+| 3        | Grade 3 / Poorly diff         | High-grade        | Grade 3             |
+| 4        | Grade 4 / Undiff/anaplastic   | High-grade        | Grade 3             |
+| 8        | Not applicable                | Unknown           | Unknown             |
+| 9        | Unknown                       | Unknown           | Unknown             |
+| A        | Well differentiated           | Low-grade         | Grade 1             |
+| B        | Moderately differentiated     | High or Ambiguous | Grade 2             |
+| C        | Poorly differentiated         | High-grade        | Grade 3             |
+| D        | Undiff / anaplastic           | High-grade        | Grade 3             |
+| H        | High-grade                    | High-grade        | Grade 3             |
+| L        | Low-grade                     | Low-grade         | Grade 1             |
+
