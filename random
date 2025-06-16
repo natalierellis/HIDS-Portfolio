@@ -1,15 +1,8 @@
-| Raw Code | Meaning (as given)            | Serous? → Group   | Non-Serous? → Group |
-| -------- | ----------------------------- | ----------------- | ------------------- |
-| 1        | Grade 1 / Well differentiated | Low-grade         | Grade 1             |
-| 2        | Grade 2 / Moderately diff     | High or Ambiguous | Grade 2             |
-| 3        | Grade 3 / Poorly diff         | High-grade        | Grade 3             |
-| 4        | Grade 4 / Undiff/anaplastic   | High-grade        | Grade 3             |
-| 8        | Not applicable                | Unknown           | Unknown             |
-| 9        | Unknown                       | Unknown           | Unknown             |
-| A        | Well differentiated           | Low-grade         | Grade 1             |
-| B        | Moderately differentiated     | High or Ambiguous | Grade 2             |
-| C        | Poorly differentiated         | High-grade        | Grade 3             |
-| D        | Undiff / anaplastic           | High-grade        | Grade 3             |
-| H        | High-grade                    | High-grade        | Grade 3             |
-| L        | Low-grade                     | Low-grade         | Grade 1             |
+library(ggplot2)
 
+ggplot(df, aes(x = dx_defsurg_started_days)) +
+  geom_histogram(binwidth = 1, fill = "steelblue") +
+  geom_vline(xintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Distribution of Days from Diagnosis to Definitive Surgery",
+       x = "Days from Diagnosis to Surgery",
+       y = "Count")
