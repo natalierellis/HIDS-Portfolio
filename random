@@ -1,13 +1,14 @@
 Good afternoon Ch,
 
-Thank you for this feedback. I very much appreciate it.
+Thank you for your feedback — I truly appreciate it.
 
-I wanted to clarify the finding I had made about 46 cases dying the same day of chemotherapy initiation. I had flagged these 46 cases because DX_LASTCONTACT_DEATH_MONTHS, which I converted to DX_LASTCONTACT_DEATH_DAYS, was almost the same as DX_CHEMO_STARTED_DAYS. I had multiplied DX_LASTCONTACT_DEATH_MONTHS by 30 but I am realizing now that 30.417 might be the better number to use for this conversion given that months usually alternate between 28, 29, 30, or 31 days. 
+I wanted to clarify my earlier note about the 46 cases where the date of last contact appeared to coincide with chemotherapy initiation. Initially, I flagged these based on DX_LASTCONTACT_DEATH_MONTHS, which I converted to days by multiplying by 30. However, I now realize that using 30.417 as the conversion factor may provide a more accurate estimate, since calendar months vary in length.
 
-In addition, these 46 cases did not all die - they either were lost to follow up or died around the same time chemotherapy initiated. 
+Upon reviewing these cases more closely, I found that not all of the patients died; some were lost to follow-up shortly after chemotherapy began, while others may have died around the same time.
 
-After multiplying DX_LASTCONTACT_DEATH_MONTHS by 30.417 to receive DX_LASTCONTACT_DEATH_DAYS, what should be the exclusion interval when comparing DX_LASTCONTACT_DEATH_DAYS to DX_CHEMO_STARTED_DAYS? For example, if DX_LASTCONTACT_DEATH_DAYS is within 30 days of DX_CHEMO_STARTED_DAYS, should these patients be excluded? 
+Would you recommend excluding patients whose DX_LASTCONTACT_DEATH_DAYS falls within a certain interval of DX_CHEMO_STARTED_DAYS? For example, should we exclude patients if this interval is ≤30 days, due to limited follow-up?
 
-Regards,
+Looking forward to your guidance.
 
+Best regards,
 Natalie
