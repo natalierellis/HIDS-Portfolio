@@ -1,8 +1,7 @@
-library(ggplot2)
-
-ggplot(df, aes(x = dx_defsurg_started_days)) +
-  geom_histogram(binwidth = 1, fill = "steelblue") +
-  geom_vline(xintercept = 0, color = "red", linetype = "dashed") +
-  labs(title = "Distribution of Days from Diagnosis to Definitive Surgery",
-       x = "Days from Diagnosis to Surgery",
-       y = "Count")
+ggplot(df, aes(x = dx_defsurg_started_days, y = dx_chemo_started_days)) +
+  geom_point(alpha = 0.4) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
+  labs(title = "Surgery Timing vs Chemotherapy Initiation",
+       x = "Days from Diagnosis to Definitive Surgery",
+       y = "Days from Diagnosis to Chemotherapy") +
+  theme_minimal()
