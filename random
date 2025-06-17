@@ -1,7 +1,10 @@
-Thank you for this. From my understanding the NCDB does not directly capture the full duration of chemotherapy treatment. As you mentioned, it includes a start date; however, the NCDB lacks variables that correspond to end dates or number of cycles, so duration cannot be calculated precisely. 
+Hi [Boss’s Name],
 
-I did look into other studies, such as the one by Nasioudis et al., which also use NCDB. They mention that there is no data on the composition of the chemotherapy regimen administered or the exact number of chemotherapy cycles administered. Another study that used NCDB for studying non-small cell lung cancer indicates that NCDB does not record completion of chemotherapy date. 
+Thank you for your note. From my understanding, the NCDB does not directly capture the full duration of chemotherapy treatment. While it includes a start date (as days from diagnosis), it lacks variables that capture the end date of chemotherapy or the number of cycles administered, so duration cannot be calculated precisely.
 
-Regards,
+I looked into other studies that used NCDB, such as the one by Nasioudis et al., which specifically notes that there is no data on the composition of the chemotherapy regimen or the exact number of cycles. Similarly, a study using NCDB for non-small cell lung cancer also indicated that the completion date of chemotherapy is not recorded.
 
+Please let me know if you'd like me to explore any proxy measures or alternative approaches using the available variables.
+
+Best regards,
 Natalie
