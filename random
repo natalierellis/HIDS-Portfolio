@@ -1,10 +1,3 @@
-Hi [Boss’s Name],
-
-Thank you for your note. From my understanding, the NCDB does not directly capture the full duration of chemotherapy treatment. While it includes a start date (as days from diagnosis), it lacks variables that capture the end date of chemotherapy or the number of cycles administered, so duration cannot be calculated precisely.
-
-I looked into other studies that used NCDB, such as the one by Nasioudis et al., which specifically notes that there is no data on the composition of the chemotherapy regimen or the exact number of cycles. Similarly, a study using NCDB for non-small cell lung cancer also indicated that the completion date of chemotherapy is not recorded.
-
-Please let me know if you'd like me to explore any proxy measures or alternative approaches using the available variables.
-
-Best regards,
-Natalie
+library(rms)
+dd <- datadist(df); options(datadist = "dd")
+cox_model <- cph(Surv(surv_time, event) ~ rcs(TTC_days, 4), data = df)
