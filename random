@@ -1,3 +1,25 @@
+library(partykit)
+library(survival)
+
+# Basic conditional inference tree
+ctree_model <- ctree(Surv(surv_time, event) ~ TTC_days, data = df)
+
+# Plot the tree
+plot(ctree_model)
+
+# Extract split thresholds (optional)
+node_party <- partykit::as.party(ctree_model)
+node_party
+
 library(rms)
-dd <- datadist(df); options(datadist = "dd")
+
+dd <- datadist(df)     # Needed by rms to manage variable distributions
+options(datadist = "dd")
+
+# Fit Cox model with restricted cubic spline for TTC
 cox_model <- cph(Surv(surv_time, event) ~ rcs(TTC_days, 4), data = df)
+
+# Plot the hazard function over TTC
+plot(Predict(cox_model, TTC_days), 
+     xlab = "TTC (days)", ylab = "Relative Hazard",
+     main = "Hazard Ratio vs. Time to Chemotherapy")
