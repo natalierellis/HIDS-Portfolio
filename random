@@ -1,9 +1,53 @@
-library(rms)
+def run_all_qc_flags(df):
+    violations = []
 
-dd <- datadist(df); options(datadist = "dd")
+    # List of all your flag functions with names
+    flag_functions = {
+        'tdan_dx_grp_mullerian_ca_new': tdan_dx_grp_mullerian_ca_new,
+        'tdan_dx_grp_cervical_ca' : tdan_dx_grp_cervical_ca,
+        'tdan_dx_grp_concurrentgyncca_nongynca': tdan_dx_grp_concurrentgyncca_nongynca,
+        'tdan_dx_grp_concurrent_gyncas_new': tdan_dx_grp_concurrent_gyncas_new, 
+        'tdan_dx_grp_nongynca': tdan_dx_grp_nongynca, 
+        'tdan_dx_grp_ovarian_ca_new': tdan_dx_grp_ovarian_ca_new, 
+        'tdan_dx_grp_ovarian_lmp': tdan_dx_grp_ovarian_lmp,
+        'tdan_dx_grp_priorgynca': tdan_dx_grp_priorgynca, 
+        'tdan_dx_grp_uterine_ca': tdan_dx_grp_uterine_ca,
+        'tdan_dx_grp_vaginal_ca':  tdan_dx_grp_vaginal_ca,
+        'tdan_dx_grp_vulvar_ca': tdan_dx_grp_vulvar_ca,
+        'tdan_dx_grp_benigndx': tdan_dx_grp_benigndx,
+        'tdan_dx_summary_missing': tdan_dx_missing,
+        'tdan_hist_grp_adeno' : tdan_hist_grp_adeno,
+        'tdan_hist_grp_carcino': tdan_hist_grp_carcino,
+        'tdan_hist_grp_cc': tdan_hist_grp_cc,
+        'tdan_hist_grp_endo': tdan_hist_grp_endo,
+        'tdan_hist_grp_HG_endo': tdan_hist_grp_HG_endo,
+        'tdan_hist_grp_LG_endo': tdan_hist_grp_LG_endo,
+        'tdan_hist_grp_LG_serous_ovarian': tdan_hist_grp_LG_serous_ovarian,
+        'tdan_hist_grp_LG_serous_uterine': tdan_hist_grp_LG_serous_uterine,
+        'tdan_hist_grp_HG_serous_ovarian': tdan_hist_grp_HG_serous_ovarian,
+        'tdan_hist_grp_HG_serous_uterine': tdan_hist_grp_HG_serous_uterine,
+        'tdan_hist_grp_serous': tdan_hist_grp_serous,
+        'tdan_hist_grp_mixed_epi': tdan_hist_grp_mixed_epi,
+        'tdan_hist_grp_mucinous': tdan_hist_grp_mucinous,
+        'tdan_hist_grp_undifferentiated': tdan_hist_grp_undifferentiated,
+        'tdan_hist_grp_leiomyosarcoma': tdan_hist_grp_leiomyosarcoma,
+        'tdan_hist_grp_other': tdan_hist_grp_other
+        # Add more flags here as you define them
+    }
 
-cox_model <- cph(Surv(surv_time, event) ~ rcs(TTC_days, 4), data = df)
+    for name, func in flag_functions.items():
+        try:
+            result = func(df)
+            if not result.empty:
+                result = result.copy()
+                result['violation_flag'] = name
+                violations.append(result)
+        except KeyError:
+            # Skip flag if required columns are missing
+            continue
 
-plot(Predict(cox_model, TTC_days), conf.int = TRUE,
-     xlab = "TTC (days)", ylab = "Relative Hazard",
-     main = "Hazard Ratio vs. Time to Chemotherapy")
+    if violations:
+        return pd.concat(violations, ignore_index=True)
+    else:
+        print("✅ No violations found.")
+        return pd.DataFrame()
