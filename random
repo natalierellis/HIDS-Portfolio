@@ -1,18 +1,47 @@
-library(dplyr)
-
-df <- df %>%
+NCDB_model <- NCDB_model %>%
   mutate(
-    histology = case_when(
-      histology == "serous" & final_grade == "Grade 1" ~ "low-grade serous",
-      histology == "serous" & final_grade %in% c("Grade 2", "Grade 3") ~ "high-grade serous",
-      histology == "serous" & final_grade == "NOS" ~ "NOS serous",
-      TRUE ~ histology  # leave others unchanged
-    ),
-    final_grade = case_when(
-      histology == "low-grade serous" ~ "low-grade",
-      histology == "high-grade serous" ~ "high-grade",
-      histology == "NOS serous" ~ "NOS",
-      TRUE ~ final_grade  # leave others unchanged
+    raw_grade = coalesce(GRADE, GRADE_PATH, GRADE_CLIN),
+    FINAL_GRADE = case_when(
+      raw_grade %in% c("1", "A", "L") ~ "Grade 1",
+      raw_grade %in% c("2", "B") ~ "Grade 2",
+      raw_grade %in% c("3", "4", "C", "D", "H") ~ "Grade 3",
+      raw_grade %in% c("8", "9") | is.na(raw_grade) ~ "NOS",
+      TRUE ~ "Unknown"
+      )
+    )
+
+#Histology:
+NCDB_model <- NCDB_model %>%
+  mutate(
+    HISTOLOGY = case_when (
+      HISTOLOGY == 8140 ~ "Adenocarcinoma NOS",
+      HISTOLOGY %in% c(8380, 8382, 8381, 8383) ~ "Endometrioid",
+      HISTOLOGY %in% c(8310, 8313) ~ "Clear Cell",
+      HISTOLOGY %in% c(8010, 8020, 8440) ~ "Other",
+      HISTOLOGY %in% c(8480, 8470, 8481, 8482, 8471) ~ "Mucinous",
+      HISTOLOGY %in% c(8980, 8981) ~ "Carcinosarcoma",
+      HISTOLOGY == 8323 ~ "Mixed",
+      HISTOLOGY %in% c(8441,8460,8461,8050,8450,8260) ~ "Serous",
+      TRUE ~ "Unknown"
     )
   )
+#Grade x Histology:
+library(dplyr)
 
+NCDB_model <- NCDB_model %>%
+  mutate(
+    HISTOLOGY = case_when(
+      HISTOLOGY == "Serous" & FINAL_GRADE == "Grade 1" ~ "Low Grade Serous",
+      HISTOLOGY == "Serous" & FINAL_GRADE %in% c("Grade 2", "Grade 3") ~ "High Grade Serous",
+      HISTOLOGY == "Serous" & FINAL_GRADE == "NOS" ~ "NOS Serous",
+      TRUE ~ HISTOLOGY  # leave others unchanged
+    ),
+    FINAL_GRADE = case_when(
+      HISTOLOGY == "Low Grade Serous" ~ "Low Grade",
+      HISTOLOGY == "High Grade Serous" ~ "High Grade",
+      HISTOLOGY == "NOS Serous" ~ "NOS",
+      TRUE ~ FINAL_GRADE  # leave others unchanged
+    )
+  )
+table(NCDB_model$HISTOLOGY)
+table(NCDB_model$FINAL_GRADE)
