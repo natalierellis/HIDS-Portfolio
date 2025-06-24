@@ -1,5 +1,12 @@
-# Define desired order
-month_order <- month.abb  # gives: "Jan", "Feb", ..., "Dec"
+# Desired column order
+desired_order <- c(
+  "year", "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+  "Total", "Withdrawn"
+)
 
-# Reorder columns
-monthly_totals <- monthly_totals[, c("year", month_order[month_order %in% names(monthly_totals)])]
+# Only keep columns that actually exist
+existing_order <- intersect(desired_order, names(monthly_totals))
+
+# Reorder safely
+monthly_totals <- monthly_totals[, existing_order]
