@@ -1,52 +1,13 @@
-library(dplyr)
+library(flextable)
 
-# 1. Define RAW_GRADE using coalesce
-NCDB_model <- NCDB_model %>%
-  mutate(
-    RAW_GRADE = coalesce(GRADE, GRADE_PATH, GRADE_CLIN)
-  )
+ft <- flextable(head(mtcars)) %>%
+  set_header_labels(mpg = "Miles/Gallon", hp = "Horsepower") %>%
+  fontsize(size = 12, part = "all") %>%
+  font(fontname = "Calibri", part = "all") %>%
+  color(color = "white", part = "header") %>%
+  bg(bg = "#4F81BD", part = "header") %>%
+  align(align = "center", part = "all") %>%
+  width(j = 1:5, width = 1.2) %>%
+  autofit()
 
-# 2. Assign FINAL_GRADE based on RAW_GRADE, regardless of histology
-NCDB_model <- NCDB_model %>%
-  mutate(
-    FINAL_GRADE = case_when(
-      RAW_GRADE %in% c("1", "A", "L") ~ "Grade 1",
-      RAW_GRADE %in% c("2", "B") ~ "Grade 2",
-      RAW_GRADE %in% c("3", "4", "C", "D", "H") ~ "Grade 3",
-      RAW_GRADE %in% c("8", "9") | is.na(RAW_GRADE) ~ "NOS",
-      TRUE ~ "Unknown"
-    )
-  )
-
-# 3. Assign descriptive HISTOLOGY labels
-NCDB_model <- NCDB_model %>%
-  mutate(
-    HISTOLOGY = case_when (
-      HISTOLOGY == 8140 ~ "Adenocarcinoma NOS",
-      HISTOLOGY %in% c(8380, 8382, 8381, 8383) ~ "Endometrioid",
-      HISTOLOGY %in% c(8310, 8313) ~ "Clear Cell",
-      HISTOLOGY %in% c(8010, 8020, 8440) ~ "Other",
-      HISTOLOGY %in% c(8480, 8470, 8481, 8482, 8471) ~ "Mucinous",
-      HISTOLOGY %in% c(8980, 8981) ~ "Carcinosarcoma",
-      HISTOLOGY == 8323 ~ "Mixed",
-      HISTOLOGY %in% c(8441, 8460, 8461, 8050, 8450, 8260) ~ "Serous",
-      TRUE ~ "Unknown"
-    )
-  )
-
-# 4. Reclassify Serous HISTOLOGY + modify FINAL_GRADE for Serous only
-NCDB_model <- NCDB_model %>%
-  mutate(
-    HISTOLOGY = case_when(
-      HISTOLOGY == "Serous" & FINAL_GRADE == "Grade 1" ~ "Low Grade Serous",
-      HISTOLOGY == "Serous" & FINAL_GRADE %in% c("Grade 2", "Grade 3") ~ "High Grade Serous",
-      HISTOLOGY == "Serous" & FINAL_GRADE == "NOS" ~ "NOS Serous",
-      TRUE ~ HISTOLOGY
-    ),
-    FINAL_GRADE = case_when(
-      HISTOLOGY == "Low Grade Serous" ~ "Low Grade",
-      HISTOLOGY == "High Grade Serous" ~ "High Grade",
-      HISTOLOGY == "NOS Serous" ~ "NOS",
-      TRUE ~ FINAL_GRADE
-    )
-  )
+ft
