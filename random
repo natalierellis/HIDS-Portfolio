@@ -1,13 +1,5 @@
-library(flextable)
+# Define desired order
+month_order <- month.abb  # gives: "Jan", "Feb", ..., "Dec"
 
-ft <- flextable(head(mtcars)) %>%
-  set_header_labels(mpg = "Miles/Gallon", hp = "Horsepower") %>%
-  fontsize(size = 12, part = "all") %>%
-  font(fontname = "Calibri", part = "all") %>%
-  color(color = "white", part = "header") %>%
-  bg(bg = "#4F81BD", part = "header") %>%
-  align(align = "center", part = "all") %>%
-  width(j = 1:5, width = 1.2) %>%
-  autofit()
-
-ft
+# Reorder columns
+monthly_totals <- monthly_totals[, c("year", month_order[month_order %in% names(monthly_totals)])]
