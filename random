@@ -1,16 +1,24 @@
+library(dplyr)
+
+# 1. Define RAW_GRADE using coalesce
 NCDB_model <- NCDB_model %>%
   mutate(
-    raw_grade = coalesce(GRADE, GRADE_PATH, GRADE_CLIN),
-    FINAL_GRADE = case_when(
-      raw_grade %in% c("1", "A", "L") ~ "Grade 1",
-      raw_grade %in% c("2", "B") ~ "Grade 2",
-      raw_grade %in% c("3", "4", "C", "D", "H") ~ "Grade 3",
-      raw_grade %in% c("8", "9") | is.na(raw_grade) ~ "NOS",
-      TRUE ~ "Unknown"
-      )
-    )
+    RAW_GRADE = coalesce(GRADE, GRADE_PATH, GRADE_CLIN)
+  )
 
-#Histology:
+# 2. Assign FINAL_GRADE based on RAW_GRADE, regardless of histology
+NCDB_model <- NCDB_model %>%
+  mutate(
+    FINAL_GRADE = case_when(
+      RAW_GRADE %in% c("1", "A", "L") ~ "Grade 1",
+      RAW_GRADE %in% c("2", "B") ~ "Grade 2",
+      RAW_GRADE %in% c("3", "4", "C", "D", "H") ~ "Grade 3",
+      RAW_GRADE %in% c("8", "9") | is.na(RAW_GRADE) ~ "NOS",
+      TRUE ~ "Unknown"
+    )
+  )
+
+# 3. Assign descriptive HISTOLOGY labels
 NCDB_model <- NCDB_model %>%
   mutate(
     HISTOLOGY = case_when (
@@ -21,44 +29,24 @@ NCDB_model <- NCDB_model %>%
       HISTOLOGY %in% c(8480, 8470, 8481, 8482, 8471) ~ "Mucinous",
       HISTOLOGY %in% c(8980, 8981) ~ "Carcinosarcoma",
       HISTOLOGY == 8323 ~ "Mixed",
-      HISTOLOGY %in% c(8441,8460,8461,8050,8450,8260) ~ "Serous",
+      HISTOLOGY %in% c(8441, 8460, 8461, 8050, 8450, 8260) ~ "Serous",
       TRUE ~ "Unknown"
     )
   )
-#Grade x Histology:
-library(dplyr)
 
+# 4. Reclassify Serous HISTOLOGY + modify FINAL_GRADE for Serous only
 NCDB_model <- NCDB_model %>%
   mutate(
     HISTOLOGY = case_when(
       HISTOLOGY == "Serous" & FINAL_GRADE == "Grade 1" ~ "Low Grade Serous",
       HISTOLOGY == "Serous" & FINAL_GRADE %in% c("Grade 2", "Grade 3") ~ "High Grade Serous",
       HISTOLOGY == "Serous" & FINAL_GRADE == "NOS" ~ "NOS Serous",
-      TRUE ~ HISTOLOGY  # leave others unchanged
+      TRUE ~ HISTOLOGY
     ),
     FINAL_GRADE = case_when(
       HISTOLOGY == "Low Grade Serous" ~ "Low Grade",
       HISTOLOGY == "High Grade Serous" ~ "High Grade",
       HISTOLOGY == "NOS Serous" ~ "NOS",
-      TRUE ~ FINAL_GRADE  # leave others unchanged
+      TRUE ~ FINAL_GRADE
     )
   )
-table(NCDB_model$HISTOLOGY)
-table(NCDB_model$FINAL_GRADE)
-
-Raw Code in either GRADE or GRADE_PATH (or GRADE_CLIN)	Description	If Serous → Group	Non-Serous → Group
-1	Grade 1 / Well differentiated	Low-grade	Grade 1
-2	Grade 2 / Moderately differentiated	High-grade	Grade 2
-3	Grade 3 / Poorly differentiated	High-grade	Grade 3
-4	Grade 4 / Undifferentiated	High-grade	Grade 3
-8	Not applicable	NOS	NOS
-9	Unknown	NOS	NOS
-A	Well differentiated	Low-grade	Grade 1
-B	Moderately differentiated	High-grade	Grade 2
-C	Poorly differentiated	High-grade	Grade 3
-D	Undifferentiated/ anaplastic	High-grade	Grade 3
-H	High-grade	High-grade	Grade 3
-L	Low-grade	Low-grade	Grade 1
-NA	Missing	NOS	NOS
-
-
