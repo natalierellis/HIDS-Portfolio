@@ -53,3 +53,16 @@ for (j in 2:(ncol(FIGURE1) - 2)) {  # skip year, Total, Withdrawn
       bg(i = last_row, j = j, bg = navy)
   }
 }
+
+cols_to_check <- setdiff(names(FIGURE1), c("YEAR", "Total", "Withdrawn"))
+
+for (col in cols_to_check) {
+  cell_val <- FIGURE1[[col]][last_row]
+  
+  if (is.na(cell_val)) {
+    ft <- ft %>%
+      compose(i = last_row, j = col, value = as_paragraph(""), part = "body") %>%
+      bg(i = last_row, j = col, bg = navy)
+  }
+}
+
