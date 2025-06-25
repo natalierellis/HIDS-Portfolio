@@ -1,12 +1,27 @@
-# Desired column order
-desired_order <- c(
-  "year", "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-  "Total", "Withdrawn"
-)
+library(flextable)
+library(dplyr)
 
-# Only keep columns that actually exist
-existing_order <- intersect(desired_order, names(monthly_totals))
+# Define colors
+navy <- "#000080"
+light_blue <- "#ADD8E6"
 
-# Reorder safely
-monthly_totals <- monthly_totals[, existing_order]
+# Create flextable
+ft <- flextable(final_table) %>%
+  # Header formatting
+  theme_box() %>%
+  set_header_df(mapping = NULL, key = "col_keys") %>%
+  bg(part = "header", bg = navy) %>%
+  color(part = "header", color = "white") %>%
+  bold(part = "header") %>%
+  
+  # Set font and border for body
+  color(part = "body", color = navy) %>%
+  font(fontname = "Calibri", part = "all") %>%
+  border_outer(part = "all") %>%
+  border_inner(part = "all") %>%
+  
+  # Light blue fill for year column
+  bg(j = "year", bg = light_blue, part = "body") %>%
+  
+  # Autofit
+  autofit()
