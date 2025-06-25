@@ -1,3 +1,7 @@
+library(flextable)
+library(officer)
+
+# Define colors
 navy <- "#0E2841"
 light_blue <- "#71AAE0"
 
@@ -5,11 +9,10 @@ bold_line <- fp_border(color = navy, width = 2)
 regular_line <- fp_border(color = navy, width = 1)
 
 # Ensure 'year' is text to prevent thousands separator
-final_table <- FIGURE1 %>%
+FIGURE1 <- FIGURE1 %>%
   mutate(year = as.character(YEAR))
-
-# Create flextable
 last_row <- nrow(FIGURE1)
+# Create flextable
 ft <- flextable(FIGURE1) %>%
   # General styling
   font(fontname = "Calibri", part = "all") %>%
@@ -29,7 +32,6 @@ ft <- flextable(FIGURE1) %>%
   
   # Year column: light blue background
   bg(j = "YEAR", bg = light_blue, part = "body") %>%
-  bg(i = last_row, j = "YEAR", bg = navy) %>%
   # Thicker grid lines for Total and Withdrawn columns
   border(j = "Total", part = "body", border.left = bold_line, border.right = bold_line) %>%
   border(j = "Withdrawn", part = "body", border.left = bold_line, border.right = bold_line) %>%
@@ -38,16 +40,16 @@ ft <- flextable(FIGURE1) %>%
   autofit()
 print(ft)
 # Get the number of rows
-n_rows <- nrow(final_table)
+
 
 # Identify NA cells in bottom row and color them navy
-for (j in 2:(ncol(final_table) - 2)) {  # skip year, Total, Withdrawn
-  if (is.na(final_table[n_rows, j])) {
+for (j in 2:(ncol(FIGURE1) - 2)) {  # skip year, Total, Withdrawn
+  if (is.na(FIGURE1[last_row, j])) {
     ft <- compose(
-      ft, i = n_rows, j = j,
+      ft, i = last_row, j = j,
       value = as_paragraph(""),
       part = "body"
     ) %>%
-      bg(i = n_rows, j = j, bg = navy)
+      bg(i = last_row, j = j, bg = navy)
   }
 }
