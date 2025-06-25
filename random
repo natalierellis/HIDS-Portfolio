@@ -14,14 +14,16 @@ ft4.1 <- flextable(figure4.1) %>%
   bg(i = 1, part = "header", bg = white) %>%
   
   # Alternate row background colors
-  bg(i = seq(1, nrow(df), by = 2), part = "body", bg = white) %>%
-  bg(i = seq(2, nrow(df), by = 2), part = "body", bg = light_blue) %>%
+  bg(i = seq(1, nrow(figure4.1), by = 2), part = "body", bg = light_blue) %>%
+  bg(i = seq(2, nrow(figure4.1), by = 2), part = "body", bg = white) %>%
   
   # General styling
-  color(part = "body", color = navy) %>%
+  color(part = "all", color = navy) %>%
   font(fontname = "Aptos", part = "all") %>%
-  fontsize(size = 12, part = "all") %>%
-  align(part = "all", align = "center") %>%
-  set_table_properties(width = 1, layout = "autofit")
+  fontsize(size = 16, part = "all") %>%
+  align(part = "body", align = "left") %>%
+  align(part = "header", align = "center") %>%
+  set_table_properties(width = 1, layout = "autofit") %>%
+  border_outer(part = "all", border = regular_line)
 
 print(ft4.1)
