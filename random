@@ -1,7 +1,66 @@
-ft <- ft %>%
+library(flextable)
+library(officer)
+
+# Define colors
+navy <- "#0E2841"
+light_blue <- "#71AAE0"
+
+bold_line <- fp_border(color = navy, width = 2)
+regular_line <- fp_border(color = navy, width = 1)
+
+# Ensure 'year' is text to prevent thousands separator
+FIGURE1 <- FIGURE1 %>%
+  mutate(YEAR = as.character(YEAR))
+last_row <- nrow(FIGURE1)
+bold_line <- fp_border(color = navy, width = 3)
+# Create flextable
+ft <- flextable(FIGURE1) %>%
+  # General styling
+  font(fontname = "Aptos", part = "all") %>%
+  fontsize(size = 14, part = "all") %>%
+  bold(part = "header") %>%  # Slightly thicker font
+  align(align = "center", part = "all") %>%
+  valign(valign = "center", part = "all") %>%
+  padding(part = "all", padding.top = 2, padding.bottom = 2) %>%
+  
+  # Header: navy bg, white text, NO borders
+  bg(part = "header", bg = navy) %>%
+  color(part = "header", color = "white") %>%
+  border(part = "header", border = fp_border(width = 0)) %>%
+  
+  # Body text and borders
+  color(part = "body", color = navy) %>%
+  border_outer(part = "body", border = regular_line) %>%
+  border_inner(part = "body", border = regular_line) %>%
+  
+  # Year column: light blue background
+  bg(j = "YEAR", bg = light_blue, part = "body") %>%
+  # Resize to fit
+  set_table_properties(width = 1, layout = "autofit") %>%
+  autofit() %>%
   border(j = "Total", part = "body", border.left = bold_line, border.right = bold_line) %>%
   border(j = "Withdrawn", part = "body", border.left = bold_line, border.right = bold_line) %>%
   border(i = last_row, j = "Total", border.top = bold_line, border.bottom = bold_line,
-                                     border.left = bold_line, border.right = bold_line) %>%
+         border.left = bold_line, border.right = bold_line) %>%
   border(i = last_row, j = "Withdrawn", border.top = bold_line, border.bottom = bold_line,
-                                        border.left = bold_line, border.right = bold_line)
+         border.left = bold_line, border.right = bold_line)
+
+
+cols_to_check <- setdiff(names(FIGURE1), c("Total", "Withdrawn"))
+
+for (col in cols_to_check) {
+  cell_val <- FIGURE1[[col]][last_row]
+  
+  if (is.na(cell_val)) {
+    ft <- ft %>%
+      compose(i = last_row, j = col, value = as_paragraph(""), part = "body") %>%
+      bg(i = last_row, j = col, bg = navy)
+  }
+}
+print(ft)
+
+#Insert it into ppt
+ppt <- read_pptx("2025-05-28 .pptx")
+ppt <- on_slide(ppt, index = 16)
+ppt <- ph_with(ppt, value = ft, location = ph_location_type(type = "body"))
+print(ppt, target = "UPDATED_2025-05-28 .pptx")
