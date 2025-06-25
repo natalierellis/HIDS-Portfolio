@@ -1,19 +1,24 @@
+# Number of columns in your table
+n_cols <- ncol(figure4.1)
+
 ft4.1 <- flextable(figure4.1) %>%
   delete_part(part = "header") %>%
   
-  # Custom single header row
+  # Add custom full-width header
   add_header_row(
     values = "Stage",
-    colwidths = ncol(figure4.1)
+    colwidths = n_cols
   ) %>%
   
   align(i = 1, part = "header", align = "center") %>%
   bold(i = 1, part = "header") %>%
   color(i = 1, part = "header", color = navy) %>%
   bg(i = 1, part = "header", bg = white) %>%
-  border(i = 1, part = "header", border.bottom = fp_border(color = navy, width = 2)) %>%  # Full-width bottom border for header
   
-  # Alternate body row background colors
+  # ✅ Apply bottom border to each column in the merged header row
+  border(i = 1, j = 1:n_cols, part = "header", border.bottom = fp_border(color = navy, width = 2)) %>%
+  
+  # Alternate row background colors
   bg(i = seq(1, nrow(figure4.1), by = 2), part = "body", bg = light_blue) %>%
   bg(i = seq(2, nrow(figure4.1), by = 2), part = "body", bg = white) %>%
   
@@ -24,7 +29,8 @@ ft4.1 <- flextable(figure4.1) %>%
   align(part = "body", align = "left") %>%
   align(part = "header", align = "center") %>%
   set_table_properties(width = 1, layout = "autofit") %>%
-  border_outer(part = "body", border = regular_line)  # Only apply outer border to the body
+  border_outer(part = "body", border = regular_line)
 
 print(ft4.1)
+
 
