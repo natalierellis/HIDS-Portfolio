@@ -1,8 +1,7 @@
-white <- "#FFFFFF"
 ft4.1 <- flextable(figure4.1) %>%
   delete_part(part = "header") %>%
   
-  # Header: navy bg, white text, NO borders
+  # Custom single header row
   add_header_row(
     values = "Stage",
     colwidths = ncol(figure4.1)
@@ -12,8 +11,9 @@ ft4.1 <- flextable(figure4.1) %>%
   bold(i = 1, part = "header") %>%
   color(i = 1, part = "header", color = navy) %>%
   bg(i = 1, part = "header", bg = white) %>%
+  border(i = 1, part = "header", border.bottom = fp_border(color = navy, width = 2)) %>%  # Full-width bottom border for header
   
-  # Alternate row background colors
+  # Alternate body row background colors
   bg(i = seq(1, nrow(figure4.1), by = 2), part = "body", bg = light_blue) %>%
   bg(i = seq(2, nrow(figure4.1), by = 2), part = "body", bg = white) %>%
   
@@ -24,6 +24,7 @@ ft4.1 <- flextable(figure4.1) %>%
   align(part = "body", align = "left") %>%
   align(part = "header", align = "center") %>%
   set_table_properties(width = 1, layout = "autofit") %>%
-  border_outer(part = "all", border = regular_line)
+  border_outer(part = "body", border = regular_line)  # Only apply outer border to the body
 
 print(ft4.1)
+
