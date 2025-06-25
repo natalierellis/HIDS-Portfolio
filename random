@@ -1,28 +1,26 @@
-library(flextable)
-library(dplyr)
+navy <- "#0E2841"
+light_blue <- "#71AAE0"
 
-# Define colors and line weight
-navy <- "#000080"
-light_blue <- "#ADD8E6"
 bold_line <- fp_border(color = navy, width = 2)
 regular_line <- fp_border(color = navy, width = 1)
 
 # Ensure 'year' is text to prevent thousands separator
-final_table <- final_table %>%
-  mutate(year = as.character(year))
+final_table <- FIGURE1 %>%
+  mutate(year = as.character(YEAR))
 
 # Create flextable
-ft <- flextable(final_table) %>%
+last_row <- nrow(FIGURE1)
+ft <- flextable(FIGURE1) %>%
   # General styling
   font(fontname = "Calibri", part = "all") %>%
-  bold(part = "all") %>%  # Slightly thicker font
+  bold(part = "header") %>%  # Slightly thicker font
   align(align = "center", part = "all") %>%
   valign(valign = "center", part = "all") %>%
   
   # Header: navy bg, white text, NO borders
   bg(part = "header", bg = navy) %>%
   color(part = "header", color = "white") %>%
-  border_remove(part = "header") %>%
+  border(part = "header", border = fp_border(width = 0)) %>%
   
   # Body text and borders
   color(part = "body", color = navy) %>%
@@ -30,12 +28,26 @@ ft <- flextable(final_table) %>%
   border_inner(part = "body", border = regular_line) %>%
   
   # Year column: light blue background
-  bg(j = "year", bg = light_blue, part = "body") %>%
-  
+  bg(j = "YEAR", bg = light_blue, part = "body") %>%
+  bg(i = last_row, j = "YEAR", bg = navy) %>%
   # Thicker grid lines for Total and Withdrawn columns
   border(j = "Total", part = "body", border.left = bold_line, border.right = bold_line) %>%
   border(j = "Withdrawn", part = "body", border.left = bold_line, border.right = bold_line) %>%
   
   # Resize to fit
   autofit()
+print(ft)
+# Get the number of rows
+n_rows <- nrow(final_table)
 
+# Identify NA cells in bottom row and color them navy
+for (j in 2:(ncol(final_table) - 2)) {  # skip year, Total, Withdrawn
+  if (is.na(final_table[n_rows, j])) {
+    ft <- compose(
+      ft, i = n_rows, j = j,
+      value = as_paragraph(""),
+      part = "body"
+    ) %>%
+      bg(i = n_rows, j = j, bg = navy)
+  }
+}
