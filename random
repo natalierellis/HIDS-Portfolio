@@ -1,5 +1,14 @@
-
-align(i = 1, part = "header", align = "center") %>%
+white <- "#FFFFFF"
+ft4.1 <- flextable(figure4.1) %>%
+  delete_part(part = "header") %>%
+  
+  # Header: navy bg, white text, NO borders
+  add_header_row(
+    values = "Stage",
+    colwidths = ncol(figure4.1)
+  ) %>%
+  
+  align(i = 1, part = "header", align = "center") %>%
   bold(i = 1, part = "header") %>%
   color(i = 1, part = "header", color = navy) %>%
   bg(i = 1, part = "header", bg = white) %>%
@@ -15,4 +24,4 @@ align(i = 1, part = "header", align = "center") %>%
   align(part = "all", align = "center") %>%
   set_table_properties(width = 1, layout = "autofit")
 
-print(ft)
+print(ft4.1)
