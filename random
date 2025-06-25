@@ -25,3 +25,18 @@ ft <- flextable(final_table) %>%
   
   # Autofit
   autofit()
+
+# Get the number of rows
+n_rows <- nrow(final_table)
+
+# Identify NA cells in bottom row and color them navy
+for (j in 2:(ncol(final_table) - 2)) {  # skip year, Total, Withdrawn
+  if (is.na(final_table[n_rows, j])) {
+    ft <- compose(
+      ft, i = n_rows, j = j,
+      value = as_paragraph(""),
+      part = "body"
+    ) %>%
+    bg(i = n_rows, j = j, bg = navy)
+  }
+}
