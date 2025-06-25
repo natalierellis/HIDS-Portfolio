@@ -1,68 +1,7 @@
-library(flextable)
-library(officer)
-
-# Define colors
-navy <- "#0E2841"
-light_blue <- "#71AAE0"
-
-bold_line <- fp_border(color = navy, width = 2)
-regular_line <- fp_border(color = navy, width = 1)
-
-# Ensure 'year' is text to prevent thousands separator
-FIGURE1 <- FIGURE1 %>%
-  mutate(year = as.character(YEAR))
-last_row <- nrow(FIGURE1)
-# Create flextable
-ft <- flextable(FIGURE1) %>%
-  # General styling
-  font(fontname = "Calibri", part = "all") %>%
-  bold(part = "header") %>%  # Slightly thicker font
-  align(align = "center", part = "all") %>%
-  valign(valign = "center", part = "all") %>%
-  
-  # Header: navy bg, white text, NO borders
-  bg(part = "header", bg = navy) %>%
-  color(part = "header", color = "white") %>%
-  border(part = "header", border = fp_border(width = 0)) %>%
-  
-  # Body text and borders
-  color(part = "body", color = navy) %>%
-  border_outer(part = "body", border = regular_line) %>%
-  border_inner(part = "body", border = regular_line) %>%
-  
-  # Year column: light blue background
-  bg(j = "YEAR", bg = light_blue, part = "body") %>%
-  # Thicker grid lines for Total and Withdrawn columns
+ft <- ft %>%
   border(j = "Total", part = "body", border.left = bold_line, border.right = bold_line) %>%
   border(j = "Withdrawn", part = "body", border.left = bold_line, border.right = bold_line) %>%
-  
-  # Resize to fit
-  autofit()
-print(ft)
-# Get the number of rows
-
-
-# Identify NA cells in bottom row and color them navy
-for (j in 2:(ncol(FIGURE1) - 2)) {  # skip year, Total, Withdrawn
-  if (is.na(FIGURE1[last_row, j])) {
-    ft <- compose(
-      ft, i = last_row, j = j,
-      value = as_paragraph(""),
-      part = "body"
-    ) %>%
-      bg(i = last_row, j = j, bg = navy)
-  }
-}
-
-cols_to_check <- setdiff(names(FIGURE1), c("YEAR", "Total", "Withdrawn"))
-
-for (col in cols_to_check) {
-  cell_val <- FIGURE1[[col]][last_row]
-  
-  if (is.na(cell_val)) {
-    ft <- ft %>%
-      compose(i = last_row, j = col, value = as_paragraph(""), part = "body") %>%
-      bg(i = last_row, j = col, bg = navy)
-  }
-}
-
+  border(i = last_row, j = "Total", border.top = bold_line, border.bottom = bold_line,
+                                     border.left = bold_line, border.right = bold_line) %>%
+  border(i = last_row, j = "Withdrawn", border.top = bold_line, border.bottom = bold_line,
+                                        border.left = bold_line, border.right = bold_line)
