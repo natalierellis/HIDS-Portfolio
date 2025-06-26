@@ -1,26 +1,28 @@
-library(ggplot2)
+#Encode TTC Groups
+library(dplyr)
+NCDB <- NCDB %>%
+  mutate(TTC_GROUP = case_when(
+    TTC_weeks <= 3 ~ "3 Weeks or Less",
+    TTC_weeks <= 5 ~ "3 to 5 Weeks",
+    TTC_weeks <= 7 ~ "5 to 7 Weeks",
+    TTC_weeks <= 12 ~ "7 to 12 Weeks",
+    TTC_weeks > 12 ~ "More than 12 Weeks",
+    
+    TRUE ~ NA_character_  # handles missing or unexpected values
+  ))
 
-ggplot(NCDB, aes(x = TTC)) +
-  geom_histogram(binwidth = 1, fill = "steelblue", color = "white", boundary = 0) +
-  scale_x_continuous(
-    breaks = 1:6,
-    labels = paste0("Week ", 1:6),
-    limits = c(0.5, 6.5)
-  ) +
-  labs(
-    title = "Time to Chemotherapy by Week",
-    x = "Weeks from Surgery to Chemotherapy",
-    y = "Patient Count"
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    text = element_text(family = "Arial"),
-    axis.title = element_text(face = "bold", size = 13),  # <–– Bold axis labels
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.background = element_blank(),
-    plot.background = element_blank(),
-    axis.line = element_line(color = "black"),
-    axis.ticks = element_line(color = "black")
-  )
 
+#Step 7: Plot KM Stratified by TTC & Run Log Rank
+install.packages("viridis")
+library(viridis)
+palette = viridis(4)
+NCDB$TTC_GROUP <- factor(NCDB$TTC_GROUP, levels = c("3 to 5 Weeks",22 - 42 Days", "43 - 70 Days","71+ Days"?"))
+surv_object <- Surv(time = NCDB$DX_LASTCONTACT_DEATH_YEARS, event = NCDB$EVENT)
+KM <- survfit(surv_object ~ NCDB$TTC_GROUP)
+ggsurvplot(KM, data = NCDB, 
+           xlab = "Months from Diagnosis",
+           ylab = "Overall Survival Probability",
+           legend.title = "TTC Group",
+           palette = palette,
+           conf.int = TRUE,
+           censor = TRUE)
