@@ -1,15 +1,14 @@
-library(dplyr)
-library(tibble)
-
-NCDB %>%
-  summarise(
-    N = sum(!is.na(TTC)),
-    Mean = mean(TTC, na.rm = TRUE),
-    SD = sd(TTC, na.rm = TRUE),
-    Median = median(TTC, na.rm = TRUE),
-    Q1 = quantile(TTC, 0.25, na.rm = TRUE),
-    Q3 = quantile(TTC, 0.75, na.rm = TRUE),
-    Min = min(TTC, na.rm = TRUE),
-    Max = max(TTC, na.rm = TRUE)
+ttc_summary %>%
+  gt() %>%
+  tab_header(
+    title = "Descriptive Statistics for Time to Chemotherapy (TTC)"
   ) %>%
-  pivot_longer(cols = everything(), names_to = "Statistic", values_to = "TTC")  # one stat per row
+  fmt_number(
+    columns = TTC,
+    decimals = 2
+  ) %>%
+  cols_label(
+    Statistic = "Statistic",
+    TTC = "Value"
+  ) %>%
+  opt_table_outline()
