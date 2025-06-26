@@ -1,14 +1,24 @@
-ttc_summary %>%
-  gt() %>%
-  tab_header(
-    title = "Descriptive Statistics for Time to Chemotherapy (TTC)"
-  ) %>%
-  fmt_number(
-    columns = TTC,
-    decimals = 2
-  ) %>%
-  cols_label(
-    Statistic = "Statistic",
-    TTC = "Value"
-  ) %>%
-  opt_table_outline()
+library(ggplot2)
+
+ggplot(NCDB, aes(x = TTC)) +
+  geom_histogram(binwidth = 7, fill = "steelblue", color = "white", boundary = 0) +
+  scale_x_continuous(
+    breaks = seq(7, 42, by = 7),  # tick marks for weeks 1–6
+    labels = paste0("Week ", 1:6),
+    limits = c(0, 45)
+  ) +
+  labs(
+    title = "Time to Chemotherapy by Week",
+    x = "Time to Chemotherapy (by week)",
+    y = "Patient Count"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    plot.background = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black")
+  )
+
