@@ -2,7 +2,7 @@
 km_summary_3yr <- summary(KM, times = 3)
 km_summary_5yr <- summary(KM, times = 5)
 
-# Combine both into one table
+# Combine survival info
 five_year_surv <- data.frame(
   group = gsub("TTC_GROUP=", "", km_summary_5yr$strata),
   surv_5yr = round(100 * km_summary_5yr$surv, 1),
@@ -13,27 +13,27 @@ five_year_surv <- data.frame(
   upper_3yr = round(100 * km_summary_3yr$upper, 1)
 )
 
-# Format the CIs
+# Format survival columns and add line color column
 five_year_surv <- five_year_surv %>%
   mutate(
-    `3-Year Survival` = paste0(surv_3yr, "% (", lower_3yr, "–", upper_3yr, "%)"),
-    `5-Year Survival` = paste0(surv_5yr, "% (", lower_5yr, "–", upper_5yr, "%)"),
-    `Line Color` = ""  # Placeholder to be manually filled
+    `3-Year Survival (95% CI)` = paste0(surv_3yr, "% (", lower_3yr, "–", upper_3yr, "%)"),
+    `5-Year Survival (95% CI)` = paste0(surv_5yr, "% (", lower_5yr, "–", upper_5yr, "%)"),
+    `Line Color` = ""
   )
 
-# Factor and reorder groups
+# Set custom TTC group order
 five_year_surv$group <- factor(
   five_year_surv$group,
   levels = c("3–5 Weeks", "≤3 Weeks", "5–7 Weeks", "7–12 Weeks", ">12 Weeks")
 )
 
-# Format the gt table
+# Create the formatted gt table
 five_year_surv %>%
   arrange(group) %>%
-  select(`TTC Group` = group, `Line Color`, `3-Year Survival`, `5-Year Survival`) %>%
+  select(`TTC Group` = group, `Line Color`, `3-Year Survival (95% CI)`, `5-Year Survival (95% CI)`) %>%
   gt() %>%
   
-  # Make all text black
+  # Set all text to black
   tab_style(
     style = cell_text(color = "black"),
     locations = list(
@@ -42,19 +42,19 @@ five_year_surv %>%
     )
   ) %>%
   
-  # Center survival columns
+  # Center survival estimate columns
   tab_style(
     style = cell_text(align = "center"),
     locations = list(
-      cells_column_labels(columns = c("3-Year Survival", "5-Year Survival")),
-      cells_body(columns = c("3-Year Survival", "5-Year Survival"))
+      cells_column_labels(columns = c("3-Year Survival (95% CI)", "5-Year Survival (95% CI)")),
+      cells_body(columns = c("3-Year Survival (95% CI)", "5-Year Survival (95% CI)"))
     )
   ) %>%
   
-  # Add outer black border
+  # Add black outer border
   opt_table_outline(color = "black", width = px(1.5)) %>%
   
-  # Set all internal grid lines to black
+  # Set internal line colors to black
   tab_options(
     table.border.top.color = "black",
     table.border.bottom.color = "black",
