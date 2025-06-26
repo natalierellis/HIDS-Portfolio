@@ -1,26 +1,22 @@
-KM <- survfit(Surv(DX_LASTCONTACT_DEATH_YEARS, EVENT) ~ TTC_GROUP, data = NCDB)
-km_summary <- summary(KM, times = 5)
+library(ggplot2)
 
-five_year_surv <- data.frame(
-  group = gsub("TTC_GROUP=", "", km_summary$strata),
-  survival = round(100 * km_summary$surv, 1),
-  lower_CI = round(100 * km_summary$lower, 1),
-  upper_CI = round(100 * km_summary$upper, 1)
-)
+# Prepare data for plotting
+table_data <- five_year_surv %>%
+  arrange(group) %>%
+  mutate(`TTC Group` = group,
+         `5-Year Survival` = survival_ci,
+         y = rev(seq_along(group)))  # for vertical spacing
 
-five_year_surv <- five_year_surv %>%
-  mutate(
-    survival_ci = paste0(survival, "% (", lower_CI, "–", upper_CI, "%)")
-  )
+# Plot as a text table
+ggplot(table_data) +
+  geom_text(aes(x = 1, y = y, label = `TTC Group`), hjust = 0, fontface = "bold") +
+  geom_text(aes(x = 2, y = y, label = `5-Year Survival`), hjust = 0) +
+  geom_text(aes(x = 3, y = y, label = ""), hjust = 0) +  # for manual color swatch column if desired
+  xlim(0.9, 3.5) +
+  theme_void() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.margin = margin(10, 20, 10, 20)
+  ) +
+  ggtitle("5-Year Survival by TTC Group")
 
-five_year_surv$group <- factor(
-  five_year_surv$group,
-  levels = c("3–5 Weeks", "≤3 Weeks", "5–7 Weeks", "7–12 Weeks", ">12 Weeks")
-)
-
-five_year_surv %>%
-  arrange(group) %>%  # sorts the rows based on your custom factor order
-  mutate(`Line Color` = "") %>%
-  select(`TTC Group` = group, `5-Year Survival` = survival_ci, `Line Color`) %>%
-  gt() %>%
-  tab_header(title = "5-Year Survival by TTC Group")
