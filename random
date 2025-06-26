@@ -19,31 +19,15 @@ five_year_surv <- five_year_surv %>%
     survival_ci = paste0(survival, "% (", lower_CI, "–", upper_CI, "%)")
   )
 
-# Reorder to match the KM plot
-five_year_surv$group <- factor(five_year_surv$group,
-  levels = c("≤3 Weeks", "3–5 Weeks", "5–7 Weeks", "7–12 Weeks", ">12 Weeks")
-)
-
-# Add viridis colors (this matches the order in your plot)
-viridis_colors <- viridis(5)
-five_year_surv$color <- viridis_colors[as.numeric(five_year_surv$group)]
-
 five_year_surv %>%
-  select(`TTC Group` = group, `5-Year Survival` = survival_ci, LineColor = color) %>%
+  select(`TTC Group` = group, `5-Year Survival` = survival_ci) %>%
+  mutate(`Line Color` = "") %>%  # add a blank column for manual insertion
   gt() %>%
-  text_transform(
-    locations = cells_body(columns = c(LineColor)),
-    fn = function(x) {
-      map(x, ~ htmltools::div(style = paste0(
-        "background-color:", .x, "; width:20px; height:20px; border-radius:4px;"
-      )))
-    }
-  ) %>%
   cols_label(
-    LineColor = "Line Color"
+    `TTC Group` = "TTC Group",
+    `5-Year Survival` = "5-Year Survival Estimate",
+    `Line Color` = "Line Color"
   ) %>%
-  cols_width(LineColor ~ px(30)) %>%  # optional: fix width of color column
   tab_header(
-    title = "5-Year Survival by TTC Group with Line Color Legend"
+    title = "5-Year Survival by TTC Group"
   )
-
