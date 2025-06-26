@@ -1,37 +1,9 @@
-library(dplyr)
-library(survival)
-library(survminer)
-library(viridis)
-
-# Recode factor with consistent group names and order
-NCDB <- NCDB %>%
-  mutate(TTC_GROUP = case_when(
-    TTC_weeks <= 3 ~ "≤3 Weeks",
-    TTC_weeks <= 5 ~ "3–5 Weeks",
-    TTC_weeks <= 7 ~ "5–7 Weeks",
-    TTC_weeks <= 12 ~ "7–12 Weeks",
-    TTC_weeks > 12 ~ ">12 Weeks",
-    TRUE ~ NA_character_
-  )) %>%
-  mutate(TTC_GROUP = factor(TTC_GROUP, levels = c("3–5 Weeks", "≤3 Weeks", "5–7 Weeks", "7–12 Weeks", ">12 Weeks")))
-
-# Create survival object
-surv_object <- Surv(time = NCDB$DX_LASTCONTACT_DEATH_YEARS, event = NCDB$EVENT)
-
-# Fit KM model
-KM <- survfit(surv_object ~ TTC_GROUP, data = NCDB)
-
-# Plot KM curves
-ggsurvplot(
-  KM,
-  data = NCDB,
-  xlab = "Time from Diagnosis (Years)",
-  ylab = "Overall Survival Probability",
-  legend.title = "TTC Group",
-  palette = viridis(5),
-  conf.int = TRUE,
-  censor = TRUE,
-  risk.table = TRUE,
-  pval = TRUE
+Assign custom colors by order of factor levels
+custom_colors <- c(
+  "3–5 Weeks" = "#1f77b4",  # blue (reference)
+  "≤3 Weeks" = "#9467bd",   # purple
+  "5–7 Weeks" = "#2ca02c",  # green
+  "7–12 Weeks" = "#ff7f0e", # orange
+  ">12 Weeks" = "#d62728"   # red
 )
 
