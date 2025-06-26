@@ -1,34 +1,44 @@
-library(gt)
-library(dplyr)
-
 five_year_surv %>%
   arrange(group) %>%
   mutate(`Line Color` = "") %>%
   select(`TTC Group` = group, `5-Year Survival` = survival_ci, `Line Color`) %>%
   gt() %>%
   tab_header(title = "5-Year Survival by TTC Group") %>%
-
+  
   # Make all text black
   tab_style(
     style = cell_text(color = "black"),
-    locations = cells_body()
+    locations = list(
+      cells_body(),
+      cells_column_labels()
+    )
   ) %>%
-  tab_style(
-    style = cell_text(color = "black"),
-    locations = cells_column_labels(everything())
-  ) %>%
-
-  # Center the "5-Year Survival" column header
-  tab_style(
-    style = cell_text(align = "center"),
-    locations = cells_column_labels(columns = "5-Year Survival")
-  ) %>%
+  
+  # Center "5-Year Survival" column header and content
   tab_style(
     style = cell_text(align = "center"),
-    locations = cells_body(columns = "5-Year Survival")
+    locations = list(
+      cells_column_labels(columns = "5-Year Survival"),
+      cells_body(columns = "5-Year Survival")
+    )
   ) %>%
 
-  # Add clean border around table
-  opt_table_outline()
+  # Add outer box border
+  opt_table_outline(color = "black", width = px(1.5)) %>%
+
+  # Make all internal lines black too
+  tab_options(
+    table.border.top.color = "black",
+    table.border.bottom.color = "black",
+    heading.border.bottom.color = "black",
+    column_labels.border.top.color = "black",
+    column_labels.border.bottom.color = "black",
+    row.striping.background_color = "white",
+    table_body.border.top.color = "black",
+    table_body.border.bottom.color = "black",
+    table_body.hlines.color = "black",
+    table_body.vlines.color = "black"
+  )
+
 
 
