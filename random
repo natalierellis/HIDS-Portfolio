@@ -20,10 +20,16 @@ hr_df <- data.frame(
     )
   )
 # Step 3: KM survival summaries at 3 and 5 years
+# Extract 3-year and 5-year survival summaries
 km_summary_3yr <- summary(KM, times = 3)
 km_summary_5yr <- summary(KM, times = 5)
 
-five_year_surv <- five_year_surv %>%
+# Create survival summary table
+five_year_surv <- data.frame(
+  group = gsub("TTC_GROUP=", "", km_summary_5yr$strata),
+  surv_3yr = round(100 * km_summary_3yr$surv, 1),
+  surv_5yr = round(100 * km_summary_5yr$surv, 1)
+) %>%
   mutate(
     `3-Year Survival` = paste0(surv_3yr, "%"),
     `5-Year Survival` = paste0(surv_5yr, "%"),
