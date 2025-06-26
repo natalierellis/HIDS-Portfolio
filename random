@@ -29,15 +29,21 @@ viridis_colors <- viridis(5)
 five_year_surv$color <- viridis_colors[as.numeric(five_year_surv$group)]
 
 five_year_surv %>%
-  select(`TTC Group` = group, `5-Year Survival` = survival_ci, color) %>%
+  select(`TTC Group` = group, `5-Year Survival` = survival_ci, LineColor = color) %>%
   gt() %>%
   text_transform(
-    locations = cells_body(vars(color)),
+    locations = cells_body(columns = c(LineColor)),
     fn = function(x) {
-      map(x, ~ htmltools::div(style = paste0("background-color:", .x, "; width:20px; height:20px;")))
+      map(x, ~ htmltools::div(style = paste0(
+        "background-color:", .x, "; width:20px; height:20px; border-radius:4px;"
+      )))
     }
   ) %>%
   cols_label(
-    color = "Line Color"
+    LineColor = "Line Color"
   ) %>%
-  tab_header(title = "5-Year Survival by TTC Group with Color Legend")
+  cols_width(LineColor ~ px(30)) %>%  # optional: fix width of color column
+  tab_header(
+    title = "5-Year Survival by TTC Group with Line Color Legend"
+  )
+
