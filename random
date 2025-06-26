@@ -1,28 +1,37 @@
-#Encode TTC Groups
 library(dplyr)
+library(survival)
+library(survminer)
+library(viridis)
+
+# Recode factor with consistent group names and order
 NCDB <- NCDB %>%
   mutate(TTC_GROUP = case_when(
-    TTC_weeks <= 3 ~ "3 Weeks or Less",
-    TTC_weeks <= 5 ~ "3 to 5 Weeks",
-    TTC_weeks <= 7 ~ "5 to 7 Weeks",
-    TTC_weeks <= 12 ~ "7 to 12 Weeks",
-    TTC_weeks > 12 ~ "More than 12 Weeks",
-    
-    TRUE ~ NA_character_  # handles missing or unexpected values
-  ))
+    TTC_weeks <= 3 ~ "≤3 Weeks",
+    TTC_weeks <= 5 ~ "3–5 Weeks",
+    TTC_weeks <= 7 ~ "5–7 Weeks",
+    TTC_weeks <= 12 ~ "7–12 Weeks",
+    TTC_weeks > 12 ~ ">12 Weeks",
+    TRUE ~ NA_character_
+  )) %>%
+  mutate(TTC_GROUP = factor(TTC_GROUP, levels = c("3–5 Weeks", "≤3 Weeks", "5–7 Weeks", "7–12 Weeks", ">12 Weeks")))
 
-
-#Step 7: Plot KM Stratified by TTC & Run Log Rank
-install.packages("viridis")
-library(viridis)
-palette = viridis(4)
-NCDB$TTC_GROUP <- factor(NCDB$TTC_GROUP, levels = c("3 to 5 Weeks",22 - 42 Days", "43 - 70 Days","71+ Days"?"))
+# Create survival object
 surv_object <- Surv(time = NCDB$DX_LASTCONTACT_DEATH_YEARS, event = NCDB$EVENT)
-KM <- survfit(surv_object ~ NCDB$TTC_GROUP)
-ggsurvplot(KM, data = NCDB, 
-           xlab = "Months from Diagnosis",
-           ylab = "Overall Survival Probability",
-           legend.title = "TTC Group",
-           palette = palette,
-           conf.int = TRUE,
-           censor = TRUE)
+
+# Fit KM model
+KM <- survfit(surv_object ~ TTC_GROUP, data = NCDB)
+
+# Plot KM curves
+ggsurvplot(
+  KM,
+  data = NCDB,
+  xlab = "Time from Diagnosis (Years)",
+  ylab = "Overall Survival Probability",
+  legend.title = "TTC Group",
+  palette = viridis(5),
+  conf.int = TRUE,
+  censor = TRUE,
+  risk.table = TRUE,
+  pval = TRUE
+)
+
