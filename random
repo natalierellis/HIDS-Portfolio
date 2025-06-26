@@ -1,11 +1,15 @@
-library(gtsummary)
+library(dplyr)
+library(tibble)
 
 NCDB %>%
-  select(TTC) %>%
-  tbl_summary(
-    statistic = list(
-      all_continuous() ~ "{mean} ({sd})\nMedian = {median}\nQ1 = {p25}, Q3 = {p75}\nMin = {min}, Max = {max}"
-    ),
-    missing = "no"  # or "ifany"
+  summarise(
+    N = sum(!is.na(TTC)),
+    Mean = mean(TTC, na.rm = TRUE),
+    SD = sd(TTC, na.rm = TRUE),
+    Median = median(TTC, na.rm = TRUE),
+    Q1 = quantile(TTC, 0.25, na.rm = TRUE),
+    Q3 = quantile(TTC, 0.75, na.rm = TRUE),
+    Min = min(TTC, na.rm = TRUE),
+    Max = max(TTC, na.rm = TRUE)
   ) %>%
-  as_gt()
+  pivot_longer(cols = everything(), names_to = "Statistic", values_to = "TTC")  # one stat per row
