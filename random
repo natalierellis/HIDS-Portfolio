@@ -6,12 +6,20 @@ library(gt)
 cox_model <- coxph(Surv(DX_LASTCONTACT_DEATH_YEARS, EVENT) ~ relevel(TTC_GROUP, ref = "3–5 Weeks"), data = NCDB)
 summary_cox <- summary(cox_model)
 
-# Step 2: Create HR table
+# Step 2: Create clean HR table
+cox_summary <- summary(cox_model)
+
+# Extract names like "relevel(TTC_GROUP, ref = "3–5 Weeks")≤3 Weeks"
+raw_names <- rownames(cox_summary$coefficients)
+
+# Clean up group names: extract just the label (e.g., "≤3 Weeks")
+clean_group_names <- gsub(".*\\)", "", raw_names)  # removes everything up to the last )
+
 hr_df <- data.frame(
-  group = c("3–5 Weeks", rownames(summary_cox$coefficients)),
-  HR = c(1, exp(summary_cox$coefficients[, "coef"])),
-  lower_CI = c(NA, exp(summary_cox$conf.int[, "lower .95"])),
-  upper_CI = c(NA, exp(summary_cox$conf.int[, "upper .95"]))
+  group = c("3–5 Weeks", clean_group_names),
+  HR = c(1, exp(cox_summary$coefficients[, "coef"])),
+  lower_CI = c(NA, exp(cox_summary$conf.int[, "lower .95"])),
+  upper_CI = c(NA, exp(cox_summary$conf.int[, "upper .95"]))
 ) %>%
   mutate(
     `Hazard Ratio (95% CI)` = ifelse(
