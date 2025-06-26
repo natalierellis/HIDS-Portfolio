@@ -1,22 +1,34 @@
-library(ggplot2)
+library(gt)
+library(dplyr)
 
-# Prepare data for plotting
-table_data <- five_year_surv %>%
+five_year_surv %>%
   arrange(group) %>%
-  mutate(`TTC Group` = group,
-         `5-Year Survival` = survival_ci,
-         y = rev(seq_along(group)))  # for vertical spacing
+  mutate(`Line Color` = "") %>%
+  select(`TTC Group` = group, `5-Year Survival` = survival_ci, `Line Color`) %>%
+  gt() %>%
+  tab_header(title = "5-Year Survival by TTC Group") %>%
 
-# Plot as a text table
-ggplot(table_data) +
-  geom_text(aes(x = 1, y = y, label = `TTC Group`), hjust = 0, fontface = "bold") +
-  geom_text(aes(x = 2, y = y, label = `5-Year Survival`), hjust = 0) +
-  geom_text(aes(x = 3, y = y, label = ""), hjust = 0) +  # for manual color swatch column if desired
-  xlim(0.9, 3.5) +
-  theme_void() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-    plot.margin = margin(10, 20, 10, 20)
-  ) +
-  ggtitle("5-Year Survival by TTC Group")
+  # Make all text black
+  tab_style(
+    style = cell_text(color = "black"),
+    locations = cells_body()
+  ) %>%
+  tab_style(
+    style = cell_text(color = "black"),
+    locations = cells_column_labels(everything())
+  ) %>%
+
+  # Center the "5-Year Survival" column header
+  tab_style(
+    style = cell_text(align = "center"),
+    locations = cells_column_labels(columns = "5-Year Survival")
+  ) %>%
+  tab_style(
+    style = cell_text(align = "center"),
+    locations = cells_body(columns = "5-Year Survival")
+  ) %>%
+
+  # Add clean border around table
+  opt_table_outline()
+
 
