@@ -1,17 +1,43 @@
-# Reshape and clean
+library(tidyverse)
+
+# Define time interval order
+ordered_levels <- c("<=3 Weeks", "3-5 Weeks", "5-7 Weeks", "7-12 Weeks", "> 12 Weeks")
+
+# Clean and reshape
 df_long <- SigHRSubgroupAnalysis %>%
   pivot_longer(cols = -1,
                names_to = "TimeInterval",
                values_to = "HR") %>%
   rename(Subgroup = 1) %>%
   filter(!is.na(HR)) %>%
-  mutate(TimeInterval = factor(TimeInterval, levels = ordered_levels))
+  mutate(
+    TimeInterval = factor(TimeInterval, levels = ordered_levels),
+    TimeNumeric = as.numeric(TimeInterval),  # Needed for curve
+    PointColor = if_else(Subgroup == "R0", "Reference", Subgroup)
+  )
 
-# Plot using color aesthetic mapped to PointColor
-ggplot(df_long, aes(x = TimeInterval, y = HR)) +
-  geom_point(position = size = 2.5) +
+# Plot: scatter + smooth line that goes through "3-5 Weeks"
+ggplot(df_long, aes(x = TimeNumeric, y = HR, group = Subgroup)) +
+  # Points: color reference black, others by subgroup
+  geom_point(aes(color = PointColor), size = 2.5) +
+  
+  # Smooth lines per subgroup (loess will curve, not linear)
+  geom_smooth(aes(color = PointColor), method = "loess", se = FALSE, span = 1) +
+
+  # Set x-axis back to original labels
+  scale_x_continuous(
+    breaks = 1:5,
+    labels = ordered_levels
+  ) +
+  
+  # Manual color scale for reference
+  scale_color_manual(values = c("Reference" = "black")) +
+
   theme_minimal() +
-  labs(title = "Hazard Ratios by Time Interval and Subgroup",
-       x = "Time Interval", y = "Hazard Ratio",
-       color = "Subgroup") +
+  labs(
+    title = "Hazard Ratios by Time Interval and Subgroup",
+    x = "Time Interval",
+    y = "Hazard Ratio",
+    color = "Subgroup"
+  ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
