@@ -1,14 +1,12 @@
-library(tidyverse)
-
-# Pivot to long format
-df_long <- df %>%
+df_long <- SigHRSubgroupAnalysis %>%
   pivot_longer(
     cols = -1,
     names_to = "TimeInterval",
     values_to = "HR"
   ) %>%
   rename(Subgroup = 1) %>%
-  filter(!is.na(HR))
+  filter(!is.na(HR)) %>%
+  mutate(TimeInterval = factor(TimeInterval, levels = c("<=3 Weeks", "3-5 Weeks", "5-7 Weeks", "7-12 Weeks", "> 12 Weeks")))
 
 # Create plot
 ggplot(df_long, aes(x = TimeInterval, y = HR, color = Subgroup)) +
