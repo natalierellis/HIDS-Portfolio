@@ -1,4 +1,9 @@
+library(tidyverse)
+
+# Define levels once and reuse
 ordered_levels <- c("<=3 Weeks", "3-5 Weeks", "5-7 Weeks", "7-12 Weeks", "> 12 Weeks")
+
+# Pivot and clean data
 df_long <- SigHRSubgroupAnalysis %>%
   pivot_longer(
     cols = -1,
@@ -7,16 +12,21 @@ df_long <- SigHRSubgroupAnalysis %>%
   ) %>%
   rename(Subgroup = 1) %>%
   filter(!is.na(HR)) %>%
-  mutate(TimeInterval = factor(TimeInterval, levels = c("<=3 Weeks", "3-5 Weeks", "5-7 Weeks", "7-12 Weeks", "> 12 Weeks")))
+  mutate(TimeInterval = factor(TimeInterval, levels = ordered_levels))
 
-# Create plot
+# Create black dot as a separate tibble with same factor levels
+black_dot <- tibble(
+  TimeInterval = factor("3-5 Weeks", levels = ordered_levels),
+  HR = 1
+)
+
+# Plot
 ggplot(df_long, aes(x = TimeInterval, y = HR, color = Subgroup)) +
   geom_point(position = position_jitter(width = 0.1), size = 2.5) +
-  geom_point(data = tibble(TimeInterval = factor("3-5 Weeks", 
-                                                 levels = c("<=3 Weeks", "3-5 Weeks", "5-7 Weeks", "7-12 Weeks", "> 12 Weeks")),
-                           HR = 1), 
-             aes(x = TimeInterval, y = HR), 
-             inherit.aes = FALSE, color = "black", size = 3) +
+  geom_point(data = black_dot,
+             aes(x = TimeInterval, y = HR),
+             inherit.aes = FALSE,
+             color = "black", size = 3) +
   theme_minimal() +
   labs(title = "Hazard Ratios by Time Interval and Subgroup",
        x = "Time Interval", y = "Hazard Ratio") +
