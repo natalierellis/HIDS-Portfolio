@@ -1,26 +1,39 @@
-library(tidyverse)
+import pandas as pd
+from presidio_analyzer import AnalyzerEngine
 
-# Define the order of time intervals
-ordered_levels <- c("<=3 Weeks", "3-5 Weeks", "5-7 Weeks", "7-12 Weeks", "> 12 Weeks")
+# Load your REDCap CSV export
+df = pd.read_csv("redcap_report.csv")
 
-# Reshape and prepare data
-df_long <- SigHRSubgroupAnalysis %>%
-  pivot_longer(cols = -1, names_to = "TimeInterval", values_to = "HR") %>%
-  rename(Subgroup = 1) %>%
-  filter(!is.na(HR)) %>%
-  mutate(
-    TimeInterval = factor(TimeInterval, levels = ordered_levels),
-    PointColor = if_else(Subgroup == "R0", "Reference", Subgroup)
-  )
+# Initialize analyzer
+analyzer = AnalyzerEngine()
 
-# Plot just the points
-ggplot(df_long, aes(x = TimeInterval, y = HR, color = PointColor)) +
-  geom_point(size = 2.5) +
-  scale_color_manual(values = c("Reference" = "black")) +
-  theme_minimal() +
-  labs(
-    title = "Hazard Ratios by Time Interval and Subgroup",
-    x = "Time Interval", y = "Hazard Ratio",
-    color = "Subgroup"
-  ) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# Identify character columns (text fields)
+char_cols = df.select_dtypes(include='object').columns
+
+# Store findings in a list
+findings = []
+
+# Loop over rows and columns to scan text
+for idx, row in df.iterrows():
+    for col in char_cols:
+        cell = str(row[col])
+        results = analyzer.analyze(text=cell, language='en')
+
+        for res in results:
+            findings.append({
+                "Row": idx,
+                "Column": col,
+                "Text": cell,
+                "Entity": res.entity_type,         # e.g., PERSON, DATE, PHONE_NUMBER
+                "Start": res.start,
+                "End": res.end,
+                "Matched Text": cell[res.start:res.end],
+                "Score": res.score                 # Confidence score from 0 to 1
+            })
+
+# Convert findings to DataFrame
+findings_df = pd.DataFrame(findings)
+
+# Save or view
+findings_df.to_csv("phi_flags_report.csv", index=False)
+findings_df.head()
