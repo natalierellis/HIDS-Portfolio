@@ -1,8 +1,3 @@
-library(tidyverse)
-
-# Set factor order
-ordered_levels <- c("<=3 Weeks", "3-5 Weeks", "5-7 Weeks", "7-12 Weeks", "> 12 Weeks")
-
 # Reshape and clean
 df_long <- SigHRSubgroupAnalysis %>%
   pivot_longer(cols = -1,
@@ -10,13 +5,11 @@ df_long <- SigHRSubgroupAnalysis %>%
                values_to = "HR") %>%
   rename(Subgroup = 1) %>%
   filter(!is.na(HR)) %>%
-  mutate(TimeInterval = factor(TimeInterval, levels = ordered_levels),
-         PointColor = if_else(TimeInterval == "3-5 Weeks", "Reference", as.character(Subgroup)))
+  mutate(TimeInterval = factor(TimeInterval, levels = ordered_levels))
 
 # Plot using color aesthetic mapped to PointColor
-ggplot(df_long, aes(x = TimeInterval, y = HR, color = PointColor)) +
-  geom_point(position = position_jitter(width = 0.1), size = 2.5) +
-  scale_color_manual(values = c("Reference" = "black")) +
+ggplot(df_long, aes(x = TimeInterval, y = HR)) +
+  geom_point(position = size = 2.5) +
   theme_minimal() +
   labs(title = "Hazard Ratios by Time Interval and Subgroup",
        x = "Time Interval", y = "Hazard Ratio",
