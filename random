@@ -1,94 +1,22 @@
-# Step 1: Fit Cox model with TTC_GROUP as a factor
-cox_model <- coxph(Surv(DX_LASTCONTACT_DEATH_YEARS, EVENT) ~ relevel(TTC_GROUP, ref = "3–5 Weeks"), data = NCDB)
-summary_cox <- summary(cox_model)
-print(summary_cox)
-# Step 2: Create accurate HR + CI table
-cox_summary <- summary(cox_model)
-ci_info <- cox_summary$conf.int
+library(tidyverse)
 
-hr_df <- data.frame(
-  group = c("3–5 Weeks", gsub(".*\\)", "", rownames(ci_info))),
-  HR = c(1, round(ci_info[, "exp(coef)"], 2)),
-  lower_CI = c(NA, round(ci_info[, "lower .95"], 2)),
-  upper_CI = c(NA, round(ci_info[, "upper .95"], 2))
-) %>%
-  mutate(
-    `Hazard Ratio (95% CI)` = ifelse(
-      is.na(lower_CI),
-      "Reference",
-      paste0(HR, " (", lower_CI, "–", upper_CI, ")")
-    )
-  )
-# Step 3: KM survival summaries at 3 and 5 years
-# Extract 3-year and 5-year survival summaries
-km_summary_3yr <- summary(KM, times = 3)
-km_summary_5yr <- summary(KM, times = 5)
-
-# Create survival summary table
-five_year_surv <- data.frame(
-  group = gsub("TTC_GROUP=", "", km_summary_5yr$strata),
-  surv_3yr = round(100 * km_summary_3yr$surv, 1),
-  surv_5yr = round(100 * km_summary_5yr$surv, 1)
-) %>%
-  mutate(
-    `3-Year Survival` = paste0(surv_3yr, "%"),
-    `5-Year Survival` = paste0(surv_5yr, "%"),
-    `Line Color` = ""
-  )
-
-# Step 4: Merge with HRs
-final_table <- five_year_surv %>%
-  left_join(hr_df %>% select(group, `Hazard Ratio (95% CI)`), by = "group")
-
-# Reorder factor levels
-final_table$group <- factor(
-  final_table$group,
-  levels = c("3–5 Weeks", "≤3 Weeks", "5–7 Weeks", "7–12 Weeks", ">12 Weeks")
-)
-
-# Step 5: Format final GT table
-final_table %>%
-  arrange(group) %>%
-  select(
-    `TTC Group` = group,
-    `Line Color`,
-    `3-Year Survival`,
-    `5-Year Survival`,
-    `Hazard Ratio (95% CI)`
+# Pivot to long format
+df_long <- df %>%
+  pivot_longer(
+    cols = -1,
+    names_to = "TimeInterval",
+    values_to = "HR"
   ) %>%
-  gt() %>%
-  
-  # Make all text black
-  tab_style(
-    style = cell_text(color = "black"),
-    locations = list(
-      cells_body(),
-      cells_column_labels()
-    )
-  ) %>%
-  
-  # Center survival and HR columns
-  tab_style(
-    style = cell_text(align = "center"),
-    locations = list(
-      cells_column_labels(columns = c("3-Year Survival", "5-Year Survival", "Hazard Ratio (95% CI)")),
-      cells_body(columns = c("3-Year Survival", "5-Year Survival", "Hazard Ratio (95% CI)"))
-    )
-  ) %>%
-  
-  # Add black outer border
-  opt_table_outline(color = "black", width = px(1.5)) %>%
-  
-  # Set internal lines to black
-  tab_options(
-    table.border.top.color = "black",
-    table.border.bottom.color = "black",
-    heading.border.bottom.color = "black",
-    column_labels.border.top.color = "black",
-    column_labels.border.bottom.color = "black",
-    table_body.border.top.color = "black",
-    table_body.border.bottom.color = "black",
-    table_body.hlines.color = "black",
-    table_body.vlines.color = "black",
-    row.striping.background_color = "white"
-  )
+  rename(Subgroup = 1) %>%
+  filter(!is.na(HR))
+
+# Create plot
+ggplot(df_long, aes(x = TimeInterval, y = HR, color = Subgroup)) +
+  geom_point(position = position_jitter(width = 0.1), size = 2.5) +
+  geom_point(data = tibble(TimeInterval = "3–5 weeks", HR = 1), 
+             aes(x = TimeInterval, y = HR), 
+             inherit.aes = FALSE, color = "black", size = 3) +
+  theme_minimal() +
+  labs(title = "Hazard Ratios by Time Interval and Subgroup",
+       x = "Time Interval", y = "Hazard Ratio") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
