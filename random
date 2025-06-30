@@ -332,10 +332,10 @@ class TransformersRecognizer(EntityRecognizer):
         return entity
 
 BERT_DEID_CONFIGURATION = {
-    "presidio_supported_entities": [
+    "PRESIDIO_SUPPORTED_ENTITIES": [
         "PERSON", "LOCATION", "DATE_TIME", "AGE", "ID"
     ],
-    "model_to_presidio_entity_mapping": {
+    "MODEL_TO_PRESIDIO_MAPPING": {
         "B-PATIENT": "PERSON",
         "I-PATIENT": "PERSON",
         "B-DOCTOR": "PERSON",
@@ -349,16 +349,15 @@ BERT_DEID_CONFIGURATION = {
         "B-ID": "ID",
         "I-ID": "ID"
     },
-    "dataset_to_presidio_mapping": {},
-    "sub_word_aggregation": "simple",
-    "chunk_overlap_size": 40,
-    "chunk_size": 600,
-    "labels_to_ignore": ["O"],
-    "default_explanation": "Identified as {} by Deid Model",
-    "id_entity_name": "ID",
-    "id_score_reduction": 0.6
+    "DATASET_TO_PRESIDIO_MAPPING": {},
+    "SUB_WORD_AGGREGATION": "simple",
+    "CHUNK_OVERLAP_SIZE": 40,
+    "CHUNK_SIZE": 600,
+    "LABELS_TO_IGNORE": ["O"],
+    "DEFAULT_EXPLANATION": "Identified as {} by Deid Model",
+    "ID_ENTITY_NAME": "ID",
+    "ID_SCORE_REDUCTION": 0.6
 }
-
 if __name__ == "__main__":
 
     from presidio_analyzer import AnalyzerEngine, RecognizerRegistry
