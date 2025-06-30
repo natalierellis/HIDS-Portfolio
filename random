@@ -1,29 +1,65 @@
-import os
-from huggingface_hub import snapshot_download
-from transformers import AutoTokenizer, AutoModelForTokenClassification
+import pandas as pd
+from presidio_analyzer import AnalyzerEngine
+from presidio_analyzer.nlp_engine import TransformersNlpEngine
+from presidio_analyzer.nlp_engine.transformers_ner_model_configuration import NerModelConfiguration
 
-# Define model name and local cache directory
-transformers_model = "obi/deid_roberta_i2b2"
-local_dir = "./hf_model_cache"
+# Step 1: Define transformer and spaCy model config
+model_config = [
+    {
+        "lang_code": "en",
+        "model_name": {
+            "spacy": "en_core_web_sm",  # Tokenization and lemmatization
+            "transformers": "obi/deid_roberta_i2b2"  # or "StanfordAIMI/stanford-deidentifier-base"
+        }
+    }
+]
 
-# This is the path where Hugging Face will store the snapshot
-snapshot_subdir = os.path.join(local_dir, f"models--{transformers_model.replace('/', '--')}")
+# Step 2: Map NER model labels to Presidio entities
+mapping = dict(
+    PER="PERSON",
+    LOC="LOCATION",
+    ORG="ORGANIZATION",
+    AGE="AGE",
+    ID="ID",
+    EMAIL="EMAIL",
+    DATE="DATE_TIME",
+    PHONE="PHONE_NUMBER",
+    PERSON="PERSON",
+    LOCATION="LOCATION",
+    GPE="LOCATION",
+    ORGANIZATION="ORGANIZATION",
+    NORP="NRP",
+    PATIENT="PERSON",
+    STAFF="PERSON",
+    HOSP="LOCATION",
+    PATORG="ORGANIZATION",
+    TIME="DATE_TIME",
+    HCW="PERSON",
+    HOSPITAL="LOCATION",
+    FACILITY="LOCATION",
+    VENDOR="ORGANIZATION",
+)
 
-# Step 1: Check if snapshot folder exists
-if not os.path.exists(snapshot_subdir):
-    print("Model not found locally. Downloading...")
-    local_model_path = snapshot_download(repo_id=transformers_model, cache_dir=local_dir)
-else:
-    print("Model already downloaded. Using local copy.")
-    # Get latest snapshot folder inside that directory
-    snapshots = os.listdir(os.path.join(snapshot_subdir, "snapshots"))
-    if snapshots:
-        local_model_path = os.path.join(snapshot_subdir, "snapshots", snapshots[0])
-    else:
-        raise ValueError("Snapshot folder found, but no snapshot contents available.")
+# Step 3: Set up model behavior
+labels_to_ignore = ["O"]
+ner_model_configuration = NerModelConfiguration(
+    model_to_presidio_entity_mapping=mapping,
+    alignment_mode="expand",          # expands model span to match PHI
+    aggregation_strategy="max",       # max score across tokens
+    labels_to_ignore=labels_to_ignore
+)
 
-# Step 2: Load model/tokenizer from local path
-tokenizer = AutoTokenizer.from_pretrained(local_model_path)
-model = AutoModelForTokenClassification.from_pretrained(local_model_path)
+# Step 4: Create the NLP engine
+transformers_nlp_engine = TransformersNlpEngine(
+    models=model_config,
+    ner_model_configuration=ner_model_configuration
+)
+
+# Step 5: Build the analyzer using the custom NLP engine
+analyzer = AnalyzerEngine(
+    nlp_engine=transformers_nlp_engine,
+    supported_languages=["en"]
+)
+
 
 
