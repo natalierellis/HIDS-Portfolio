@@ -400,7 +400,7 @@ if __name__ == "__main__":
 
     analyzer = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
 
-    sample = "My name is John and I live in NY"
+    sample = "Martha Stewart is from Baton Route and has HG Serous Carcinoma"
     results = analyzer.analyze(sample, language="en",
                                return_decision_process=True,
                                )
