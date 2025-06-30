@@ -437,3 +437,49 @@ if __name__ == "__main__":
     # Found the following entities:
     # type: PERSON, start: 11, end: 15, score: 1.0 ---- John
     # type: LOCATION, start: 30, end: 32, score: 1.0 ---- NY
+import pandas as pd
+from presidio_analyzer import AnalyzerEngine
+
+# Initialize analyzer
+analyzer = AnalyzerEngine()
+
+# Identify text columns, excluding 'cid'
+char_cols = df.select_dtypes(include='object').columns
+char_cols = [col for col in char_cols if col.lower() != "cid"]
+
+# Store findings in a list
+findings = []
+
+# Loop over rows and columns to scan text
+for _, row in df.iterrows():
+    cid = row["cid"]  # Use cid as unique identifier
+
+    for col in char_cols:
+        cell = str(row[col])
+        results = analyzer.analyze(
+            text=cell, 
+            language='en', 
+            entities = ["PERSON"])
+        for res in results:
+            matched_text = cell[res.start:res.end].lower()
+            if matched_text in suppression_terms:
+                continue
+            findings.append({
+                "CID": cid,
+                "Column": col,
+                "Text": cell,
+                "Entity": res.entity_type,
+                "Matched Text": cell[res.start:res.end],
+                "Score": res.score
+            })
+
+# Convert findings to DataFrame
+findings_df = pd.DataFrame(findings)
+
+# Save or view
+findings_df
+
+
+
+
+
