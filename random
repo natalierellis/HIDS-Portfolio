@@ -346,37 +346,37 @@ BERT_DEID_CONFIGURATION = {
     ],
     "MODEL_TO_PRESIDIO_MAPPING": {
     # AGE
-    "B-AGE": "AGE", "I-AGE": "AGE", "L-AGE": "AGE", "U-AGE": "AGE",
+    "B-AGE": "AGE", "I-AGE": "AGE", "L-AGE": "AGE", "U-AGE": "AGE", "AGE": "AGE",
 
     # DATE
-    "B-DATE": "DATE_TIME", "I-DATE": "DATE_TIME", "L-DATE": "DATE_TIME", "U-DATE": "DATE_TIME",
+    "B-DATE": "DATE_TIME", "I-DATE": "DATE_TIME", "L-DATE": "DATE_TIME", "U-DATE": "DATE_TIME", "DATE": "DATE_TIME",
 
     # EMAIL
-    "B-EMAIL": "EMAIL", "I-EMAIL": "EMAIL", "L-EMAIL": "EMAIL", "U-EMAIL": "EMAIL",
+    "B-EMAIL": "EMAIL", "I-EMAIL": "EMAIL", "L-EMAIL": "EMAIL", "U-EMAIL": "EMAIL", "EMAIL": "EMAIL",
 
     # HOSPITAL
-    "B-HOSP": "LOCATION", "I-HOSP": "LOCATION", "L-HOSP": "LOCATION", "U-HOSP": "LOCATION",
+    "B-HOSP": "LOCATION", "I-HOSP": "LOCATION", "L-HOSP": "LOCATION", "U-HOSP": "LOCATION", "HOSP": "LOCATION",
 
     # ID
-    "B-ID": "ID", "I-ID": "ID", "L-ID": "ID", "U-ID": "ID",
+    "B-ID": "ID", "I-ID": "ID", "L-ID": "ID", "U-ID": "ID", "ID": "ID",
 
     # LOCATION
-    "B-LOC": "LOCATION", "I-LOC": "LOCATION", "L-LOC": "LOCATION", "U-LOC": "LOCATION",
+    "B-LOC": "LOCATION", "I-LOC": "LOCATION", "L-LOC": "LOCATION", "U-LOC": "LOCATION", "LOC": "LOCATION",
 
     # OTHER PHI — you can map to a custom label or skip
-    "B-OTHERPHI": "OTHER", "I-OTHERPHI": "OTHER", "L-OTHERPHI": "OTHER", "U-OTHERPHI": "OTHER",
+    "B-OTHERPHI": "OTHER", "I-OTHERPHI": "OTHER", "L-OTHERPHI": "OTHER", "U-OTHERPHI": "OTHER", "OTHERPHI": "OTHER",
 
     # PATIENT
-    "B-PATIENT": "PERSON", "I-PATIENT": "PERSON", "L-PATIENT": "PERSON", "U-PATIENT": "PERSON",
+    "B-PATIENT": "PERSON", "I-PATIENT": "PERSON", "L-PATIENT": "PERSON", "U-PATIENT": "PERSON", "PATIENT": "PERSON",
 
     # PATIENT ORGANIZATION — mapped to ORGANIZATION
-    "B-PATORG": "ORGANIZATION", "I-PATORG": "ORGANIZATION", "L-PATORG": "ORGANIZATION", "U-PATORG": "ORGANIZATION",
+    "B-PATORG": "ORGANIZATION", "I-PATORG": "ORGANIZATION", "L-PATORG": "ORGANIZATION", "U-PATORG": "ORGANIZATION", "PATORG": "ORGANIZATION",
 
     # PHONE
-    "B-PHONE": "PHONE_NUMBER", "I-PHONE": "PHONE_NUMBER", "L-PHONE": "PHONE_NUMBER", "U-PHONE": "PHONE_NUMBER",
+    "B-PHONE": "PHONE_NUMBER", "I-PHONE": "PHONE_NUMBER", "L-PHONE": "PHONE_NUMBER", "U-PHONE": "PHONE_NUMBER", "PHONE": "PHONE_NUMBER",
 
     # STAFF (e.g., Doctor names) — mapped to PERSON
-    "B-STAFF": "PERSON", "I-STAFF": "PERSON", "L-STAFF": "PERSON", "U-STAFF": "PERSON"
+    "B-STAFF": "PERSON", "I-STAFF": "PERSON", "L-STAFF": "PERSON", "U-STAFF": "PERSON", "STAFF": "PERSON"
 },
     "DATASET_TO_PRESIDIO_MAPPING": {},
     "SUB_WORD_AGGREGATION": "simple",
@@ -401,7 +401,6 @@ if __name__ == "__main__":
 
     # This would download a large (~500Mb) model on the first run
     transformers_recognizer.load_transformer(**BERT_DEID_CONFIGURATION)
-    print("Mapped labels:", transformers_recognizer.model_to_presidio_mapping)
 
     # Add transformers model to the registry
     registry = RecognizerRegistry()
@@ -421,7 +420,7 @@ if __name__ == "__main__":
 
     analyzer = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
 
-    sample = "Martha Stewart is from Baton Route and has HG Serous Carcinoma"
+    sample = "Stage IIIC HG Serous Carcinoma of the Fallopian Tube pre-NACT NHW."
     results = analyzer.analyze(sample, language="en",
                                return_decision_process=True,
                                )
