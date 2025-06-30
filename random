@@ -337,19 +337,26 @@ BERT_DEID_CONFIGURATION = {
         "PERSON", "LOCATION", "DATE_TIME", "AGE", "ID"
     ],
     "MODEL_TO_PRESIDIO_MAPPING": {
-        "B-PATIENT": "PERSON",
-        "I-PATIENT": "PERSON",
-        "B-DOCTOR": "PERSON",
-        "I-DOCTOR": "PERSON",
-        "B-HOSP": "LOCATION",
-        "I-HOSP": "LOCATION",
-        "B-DATE": "DATE_TIME",
-        "I-DATE": "DATE_TIME",
-        "B-AGE": "AGE",
-        "I-AGE": "AGE",
-        "B-ID": "ID",
-        "I-ID": "ID"
-    },
+    "B-PATIENT": "PERSON",
+    "I-PATIENT": "PERSON",
+    "PATIENT": "PERSON",  # Add this
+    "B-DOCTOR": "PERSON",
+    "I-DOCTOR": "PERSON",
+    "DOCTOR": "PERSON",   # Add this
+    "B-HOSP": "LOCATION",
+    "I-HOSP": "LOCATION",
+    "HOSP": "LOCATION",   # Add this
+    "LOC": "LOCATION",    # Add this
+    "B-DATE": "DATE_TIME",
+    "I-DATE": "DATE_TIME",
+    "DATE": "DATE_TIME",  # Add this
+    "B-AGE": "AGE",
+    "I-AGE": "AGE",
+    "AGE": "AGE",         # Add this
+    "B-ID": "ID",
+    "I-ID": "ID",
+    "ID": "ID"            # Add this
+},
     "DATASET_TO_PRESIDIO_MAPPING": {},
     "SUB_WORD_AGGREGATION": "simple",
     "CHUNK_OVERLAP_SIZE": 40,
