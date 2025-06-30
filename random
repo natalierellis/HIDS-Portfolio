@@ -332,7 +332,7 @@ class TransformersRecognizer(EntityRecognizer):
         return entity
 
 BERT_DEID_CONFIGURATION = {
-    "PRESIDIO_SUPPORTED_ENTITIES": [
+    "presidio_supported_entities": [
         "PERSON", "LOCATION", "DATE_TIME", "AGE", "ID"
     ],
     "model_to_presidio_entity_mapping": {
@@ -350,13 +350,13 @@ BERT_DEID_CONFIGURATION = {
         "I-ID": "ID"
     },
     "dataset_to_presidio_mapping": {},
-    "sub_word_aggregration": "simple",
-    "CHUNK_OVERLAP_SIZE": 40,
-    "CHUNK_SIZE": 600,
-    "LABELS_TO_IGNORE": ["O"],
-    "DEFAULT_EXPLANATION": "Identified as {} by Deid Model",
-    "ID_ENTITY_NAME": "ID",
-    "ID_SCORE_REDUCTION": 0.6
+    "sub_word_aggregation": "simple",
+    "chunk_overlap_size": 40,
+    "chunk_size": 600,
+    "labels_to_ignore": ["O"],
+    "default_explanation": "Identified as {} by Deid Model",
+    "id_entity_name": "ID",
+    "id_score_reduction": 0.6
 }
 
 if __name__ == "__main__":
@@ -367,7 +367,7 @@ if __name__ == "__main__":
 
     model_path = "obi/deid_roberta_i2b2"
     supported_entities = BERT_DEID_CONFIGURATION.get(
-        "PRESIDIO_SUPPORTED_ENTITIES")
+        "presidio_supported_entities")
     transformers_recognizer = TransformersRecognizer(model_path=model_path,
                                                      supported_entities=supported_entities)
 
