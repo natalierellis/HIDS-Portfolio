@@ -7,28 +7,31 @@ df = pd.read_csv("redcap_report.csv")
 # Initialize analyzer
 analyzer = AnalyzerEngine()
 
-# Identify character columns (text fields)
+# Identify text columns, excluding 'cid'
 char_cols = df.select_dtypes(include='object').columns
+char_cols = [col for col in char_cols if col.lower() != "cid"]
 
 # Store findings in a list
 findings = []
 
 # Loop over rows and columns to scan text
-for idx, row in df.iterrows():
+for _, row in df.iterrows():
+    cid = row["cid"]  # Use cid as unique identifier
+
     for col in char_cols:
         cell = str(row[col])
         results = analyzer.analyze(text=cell, language='en')
 
         for res in results:
             findings.append({
-                "Row": idx,
+                "CID": cid,
                 "Column": col,
                 "Text": cell,
-                "Entity": res.entity_type,         # e.g., PERSON, DATE, PHONE_NUMBER
+                "Entity": res.entity_type,
                 "Start": res.start,
                 "End": res.end,
                 "Matched Text": cell[res.start:res.end],
-                "Score": res.score                 # Confidence score from 0 to 1
+                "Score": res.score
             })
 
 # Convert findings to DataFrame
