@@ -10,8 +10,6 @@ from presidio_analyzer import (
 )
 from presidio_analyzer.nlp_engine import NlpArtifacts
 
-from .configuration import BERT_DEID_CONFIGURATION
-
 
 logger = logging.getLogger("presidio-analyzer")
 
@@ -333,6 +331,33 @@ class TransformersRecognizer(EntityRecognizer):
             return entity
         return entity
 
+BERT_DEID_CONFIGURATION = {
+    "PRESIDIO_SUPPORTED_ENTITIES": [
+        "PERSON", "LOCATION", "DATE_TIME", "AGE", "ID"
+    ],
+    "MODEL_TO_PRESIDIO_MAPPING": {
+        "B-PATIENT": "PERSON",
+        "I-PATIENT": "PERSON",
+        "B-DOCTOR": "PERSON",
+        "I-DOCTOR": "PERSON",
+        "B-HOSP": "LOCATION",
+        "I-HOSP": "LOCATION",
+        "B-DATE": "DATE_TIME",
+        "I-DATE": "DATE_TIME",
+        "B-AGE": "AGE",
+        "I-AGE": "AGE",
+        "B-ID": "ID",
+        "I-ID": "ID"
+    },
+    "DATASET_TO_PRESIDIO_MAPPING": {},
+    "SUB_WORD_AGGREGATION": "simple",
+    "CHUNK_OVERLAP_SIZE": 40,
+    "CHUNK_SIZE": 600,
+    "LABELS_TO_IGNORE": ["O"],
+    "DEFAULT_EXPLANATION": "Identified as {} by Deid Model",
+    "ID_ENTITY_NAME": "ID",
+    "ID_SCORE_REDUCTION": 0.6
+}
 
 if __name__ == "__main__":
 
