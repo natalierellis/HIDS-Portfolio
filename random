@@ -136,8 +136,8 @@ class TransformersRecognizer(EntityRecognizer):
         device = 0 if torch.cuda.is_available() else -1
         self.pipeline = pipeline(
             "ner",
-            model=AutoModelForTokenClassification.from_pretrained(self.model_path),
-            tokenizer=AutoTokenizer.from_pretrained(self.model_path),
+            model=AutoModelForTokenClassification.from_pretrained(self.model_path, cache_dir = "./hf_model_cache"),
+            tokenizer=AutoTokenizer.from_pretrained(self.model_path, cache_dir = "./hf_model_cache"),
             # Will attempt to group sub-entities to word level
             aggregation_strategy=self.aggregation_mechanism,
             device=device,
@@ -378,4 +378,3 @@ if __name__ == "__main__":
     # Found the following entities:
     # type: PERSON, start: 11, end: 15, score: 1.0 ---- John
     # type: LOCATION, start: 30, end: 32, score: 1.0 ---- NY
-
