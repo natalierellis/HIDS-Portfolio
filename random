@@ -1,53 +1,58 @@
-from presidio_analyzer import AnalyzerEngine, RecognizerRegistry
-from presidio_analyzer.nlp_engine import NlpEngineProvider
-from presidio_analyzer.predefined_recognizers import TransformersRecognizer
-import spacy
-import os
+from presidio_analyzer import AnalyzerEngine
+from presidio_analyzer.nlp_engine import TransformersNlpEngine
+from presidio_analyzer.nlp_engine.transformers_ner_model_configuration import NerModelConfiguration
 
-# Step 1: Use the path to your downloaded snapshot
-model_path = local_model_path  # e.g., './hf_model_cache/models--obi--deid_roberta_i2b2/snapshots/<snapshot_id>'
+# If you've already used snapshot_download and have this:
+local_model_path = "./hf_model_cache/models--obi--deid_roberta_i2b2/snapshots/<your_snapshot_id>"
 
-# Step 2: Set up config (optional — can customize based on your needs)
-BERT_DEID_CONFIGURATION = {
-    "PRESIDIO_SUPPORTED_ENTITIES": ["PERSON", "LOCATION", "DATE_TIME", "AGE", "ID", "PHONE_NUMBER"],
-    "aggregation_strategy": "simple",     # how to combine token scores
-    "alignment_mode": "expand"            # how to align entities to tokens
+# Define transformer config using local path
+model_config = [
+    {
+        "lang_code": "en",
+        "model_name": {
+            "spacy": "en_core_web_sm",
+            "transformers": local_model_path
+        }
+    }
+]
+
+# Map model labels to Presidio entity types
+mapping = {
+    "PATIENT": "PERSON",
+    "DOCTOR": "PERSON",
+    "HOSPITAL": "LOCATION",
+    "DATE": "DATE_TIME",
+    "AGE": "AGE",
+    "ID": "ID"
+    # add more as needed
 }
 
-# Step 3: Create transformer recognizer
-transformers_recognizer = TransformersRecognizer(
-    model_path=model_path,
-    supported_entities=BERT_DEID_CONFIGURATION["PRESIDIO_SUPPORTED_ENTITIES"]
+# Set up the NER model configuration
+ner_config = NerModelConfiguration(
+    model_to_presidio_entity_mapping=mapping,
+    alignment_mode="expand",
+    aggregation_strategy="max",
+    labels_to_ignore=["O"]
 )
-transformers_recognizer.load_transformer(**BERT_DEID_CONFIGURATION)
 
-# Step 4: Register it and remove spaCy recognizer
-registry = RecognizerRegistry()
-registry.add_recognizer(transformers_recognizer)
-registry.remove_recognizer("SpacyRecognizer")  # optional but recommended
+# Create NLP engine with transformer + config
+nlp_engine = TransformersNlpEngine(
+    models=model_config,
+    ner_model_configuration=ner_config
+)
 
-# Step 5: Set up spaCy for tokenization (not NER)
-if not spacy.util.is_package("en_core_web_sm"):
-    import spacy.cli
-    spacy.cli.download("en_core_web_sm")
+# Initialize the analyzer
+analyzer = AnalyzerEngine(
+    nlp_engine=nlp_engine,
+    supported_languages=["en"]
+)
 
-nlp_configuration = {
-    "nlp_engine_name": "spacy",
-    "models": [{"lang_code": "en", "model_name": "en_core_web_sm"}],
-}
-nlp_engine = NlpEngineProvider(nlp_configuration=nlp_configuration).create_engine()
+# Try it out
+text = "Patient Jane Doe was admitted to NY Hospital on 04/01/2022."
+results = analyzer.analyze(text=text, language="en")
 
-# Step 6: Create analyzer engine with your custom NLP pipeline
-analyzer = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
-
-# Step 7: Run on sample text
-sample = "Patient Jane Doe was admitted to New York Hospital on 04/05/2022."
-results = analyzer.analyze(text=sample, language="en", return_decision_process=True)
-
-# Step 8: Print results
-for result in results:
-    print(result, "->", sample[result.start:result.end])
-
+for r in results:
+    print(f"{r.entity_type} -> '{text[r.start:r.end]}' (score: {r.score:.2f})")
 
 
 
