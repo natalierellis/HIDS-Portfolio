@@ -2,21 +2,26 @@ from presidio_analyzer import AnalyzerEngine, RecognizerRegistry
 from presidio_analyzer.nlp_engine import NlpEngineProvider
 import spacy
 
-model_path = "obi/deid_roberta_i2b2"
-supported_entities = BERT_DEID_CONFIGURATION.get(
-    "PRESIDIO_SUPPORTED_ENTITIES")
-transformers_recognizer = TransformersRecognizer(model_path=model_path,
-                                                 supported_entities=supported_entities)
+# Custom local path where model is cached
+model_path = "./hf_model_cache/obi_deid_roberta_i2b2"
 
-# This would download a large (~500Mb) model on the first run
+# Pull supported entities from configuration
+supported_entities = BERT_DEID_CONFIGURATION.get("PRESIDIO_SUPPORTED_ENTITIES")
+
+# Use the local model path here
+transformers_recognizer = TransformersRecognizer(
+    model_path=model_path,
+    supported_entities=supported_entities
+)
+
+# Load transformer model with config
 transformers_recognizer.load_transformer(**BERT_DEID_CONFIGURATION)
 
-# Add transformers model to the registry
+# Set up Presidio analyzer engine
 registry = RecognizerRegistry()
 registry.add_recognizer(transformers_recognizer)
 registry.remove_recognizer("SpacyRecognizer")
 
-# Use small spacy model, for faster inference.
 if not spacy.util.is_package("en_core_web_sm"):
     spacy.cli.download("en_core_web_sm")
 
@@ -29,12 +34,13 @@ nlp_engine = NlpEngineProvider(nlp_configuration=nlp_configuration).create_engin
 
 analyzer = AnalyzerEngine(registry=registry, nlp_engine=nlp_engine)
 
+# Test it
 sample = "My name is John and I live in NY"
-results = analyzer.analyze(sample, language="en",
-                           return_decision_process=True,
-                           )
+results = analyzer.analyze(sample, language="en", return_decision_process=True)
+
 print("Found the following entities:")
 for result in results:
     print(result, '----', sample[result.start:result.end])
+
 
 
