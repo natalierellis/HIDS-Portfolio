@@ -336,7 +336,7 @@ BERT_DEID_CONFIGURATION = {
     "PRESIDIO_SUPPORTED_ENTITIES": [
         "PERSON", "LOCATION", "DATE_TIME", "AGE", "ID"
     ],
-    "MODEL_TO_PRESIDIO_MAPPING": {
+    "model_to_presidio_entity_mapping": {
         "B-PATIENT": "PERSON",
         "I-PATIENT": "PERSON",
         "B-DOCTOR": "PERSON",
@@ -350,8 +350,8 @@ BERT_DEID_CONFIGURATION = {
         "B-ID": "ID",
         "I-ID": "ID"
     },
-    "DATASET_TO_PRESIDIO_MAPPING": {},
-    "SUB_WORD_AGGREGATION": "simple",
+    "dataset_to_presidio_mapping": {},
+    "sub_word_aggregration": "simple",
     "CHUNK_OVERLAP_SIZE": 40,
     "CHUNK_SIZE": 600,
     "LABELS_TO_IGNORE": ["O"],
@@ -374,6 +374,7 @@ if __name__ == "__main__":
 
     # This would download a large (~500Mb) model on the first run
     transformers_recognizer.load_transformer(**BERT_DEID_CONFIGURATION)
+    print("Mapped labels:", transformers_recognizer.model_to_presidio_mapping)
 
     # Add transformers model to the registry
     registry = RecognizerRegistry()
