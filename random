@@ -1,5 +1,4 @@
 
-NLP\hf_model_cache\models--obi--deid_roberta_i2b2\snapshots\78f2152eb93ddd817290ce8dbe46f1a6685e09fc
 import os
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 os.environ["HF_HUB_OFFLINE"] = "1"
