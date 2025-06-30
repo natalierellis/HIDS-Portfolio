@@ -400,7 +400,7 @@ if __name__ == "__main__":
     from presidio_analyzer.nlp_engine import NlpEngineProvider
     import spacy
 
-    model_path = "./hf_model_cache/obi_deid_roberta_i2b2"
+    model_path = r".\hf_model_cache\models--obi--deid_roberta_i2b2\snapshots\78f2152eb93ddd817290ce8dbe46f1a6685e09fc"
     supported_entities = BERT_DEID_CONFIGURATION.get(
         "PRESIDIO_SUPPORTED_ENTITIES")
     transformers_recognizer = TransformersRecognizer(model_path=model_path,
