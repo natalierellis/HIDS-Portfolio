@@ -1,4 +1,5 @@
-
+import os
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
 model_name = "obi/deid_roberta_i2b2"
 local_dir = "./hf_model_cache/obi_deid_roberta_i2b2"
@@ -400,7 +401,7 @@ if __name__ == "__main__":
     from presidio_analyzer.nlp_engine import NlpEngineProvider
     import spacy
 
-    model_path = "obi/deid_roberta_i2b2"
+    model_path = "./hf_model_cache/obi_deid_roberta_i2b2""
     supported_entities = BERT_DEID_CONFIGURATION.get(
         "presidio_supported_entities")
     transformers_recognizer = TransformersRecognizer(model_path=model_path,
