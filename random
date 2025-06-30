@@ -1,42 +1,46 @@
-import pandas as pd
-from presidio_analyzer import AnalyzerEngine
+pip install presidio-analyzer transformers torch
 
-# Load your REDCap CSV export
-df = pd.read_csv("redcap_report.csv")
+from presidio_analyzer import AnalyzerEngine, RecognizerRegistry
+from presidio_analyzer.nlp_engine import NlpEngineProvider
+from presidio_analyzer.predefined_recognizers import TransformersRecognizer
 
-# Initialize analyzer
-analyzer = AnalyzerEngine()
+# Step 1: Create a Transformers-based PHI recognizer
+transformer_recognizer = TransformersRecognizer(
+    model_path="obi/deid_roberta_i2b2",  # PHI-trained model
+    supported_entities=None  # Use default PHI mappings
+)
+transformer_recognizer.load_transformer()
 
-# Identify text columns, excluding 'cid'
-char_cols = df.select_dtypes(include='object').columns
-char_cols = [col for col in char_cols if col.lower() != "cid"]
+# Step 2: Create a fresh recognizer registry and add only the transformer-based recognizer
+registry = RecognizerRegistry()
+registry.add_recognizer(transformer_recognizer)
 
-# Store findings in a list
-findings = []
+# Step 3: Use a minimal spaCy model only for tokenization (not for NER)
+import spacy
+try:
+    spacy.load("en_core_web_sm")
+except OSError:
+    import spacy.cli
+    spacy.cli.download("en_core_web_sm")
 
-# Loop over rows and columns to scan text
-for _, row in df.iterrows():
-    cid = row["cid"]  # Use cid as unique identifier
+nlp_configuration = {
+    "nlp_engine_name": "spacy",
+    "models": [{"lang_code": "en", "model_name": "en_core_web_sm"}],
+}
+nlp_engine = NlpEngineProvider(nlp_configuration=nlp_configuration).create_engine()
 
-    for col in char_cols:
-        cell = str(row[col])
-        results = analyzer.analyze(text=cell, language='en')
+# Step 4: Initialize AnalyzerEngine with transformer recognizer
+analyzer = AnalyzerEngine(
+    registry=registry,
+    nlp_engine=nlp_engine,
+    supported_languages=["en"]
+)
 
-        for res in results:
-            findings.append({
-                "CID": cid,
-                "Column": col,
-                "Text": cell,
-                "Entity": res.entity_type,
-                "Start": res.start,
-                "End": res.end,
-                "Matched Text": cell[res.start:res.end],
-                "Score": res.score
-            })
+# Step 5: Test the setup on a sample clinical sentence
+sample_text = "Patient John Doe was admitted to New York Hospital on 05/14/2020 with MRN 1234567."
 
-# Convert findings to DataFrame
-findings_df = pd.DataFrame(findings)
+results = analyzer.analyze(text=sample_text, language="en")
 
-# Save or view
-findings_df.to_csv("phi_flags_report.csv", index=False)
-findings_df.head()
+# Step 6: Print detected PHI entities
+for r in results:
+    print(f"Entity: {r.entity_type}, Text: '{sample_text[r.start:r.end]}', Score: {round(r.score, 2)}")
