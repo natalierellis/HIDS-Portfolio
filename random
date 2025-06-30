@@ -1,11 +1,8 @@
 import os
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
+os.environ["HF_HUB_OFFLINE"] = "1"
 
-model_name = "obi/deid_roberta_i2b2"
-local_dir = "./hf_model_cache/obi_deid_roberta_i2b2"
-
-AutoModelForTokenClassification.from_pretrained(model_name, cache_dir=local_dir)
-AutoTokenizer.from_pretrained(model_name, cache_dir=local_dir)
+from transformers import AutoTokenizer, AutoModelForTokenClassification
 
 import copy
 import logging
