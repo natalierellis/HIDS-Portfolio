@@ -1,31 +1,19 @@
-import pandas as pd
-import re
+import transformers
+from huggingface_hub import snapshot_download
+from transformers import AutoTokenizer, AutoModelForTokenClassification
 
-# Load your REDCap data dictionary
-data_dict = pd.read_csv("data_dictionary.csv")
+# Use the model you want
+transformers_model = "obi/deid_roberta_i2b2"
 
-# Identify relevant column(s)
-choice_columns = ["Choices, Calculations, OR Slider Labels"]
-choice_columns = [col for col in choice_columns if col in data_dict.columns]
+# Optional: specify a custom cache directory (in current folder, so no admin issues)
+local_dir = "./hf_model_cache"
 
-# Set to store suppression terms
-suppression_terms = set()
+# Download model snapshot locally
+local_model_path = snapshot_download(repo_id=transformers_model, cache_dir=local_dir)
 
-for col in choice_columns:
-    for raw_entry in data_dict[col].dropna():
-        # Split full choice string on '|'
-        choices = [entry.strip() for entry in str(raw_entry).split("|")]
+# Force load to ensure it's cached and won't download again at runtime
+tokenizer = AutoTokenizer.from_pretrained(local_model_path)
+model = AutoModelForTokenClassification.from_pretrained(local_model_path)
 
-        for choice in choices:
-            parts = choice.split(",", 1)
-            if len(parts) == 2:
-                value = parts[1].strip().lower()
-
-                # Add the full value
-                suppression_terms.add(value)
-
-                # Split value into individual words, add each with trailing space
-                for word in value.split():
-                    suppression_terms.add(word + " ")  # helps suppress matches like "Stage III"
 
 
