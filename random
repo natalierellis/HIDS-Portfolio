@@ -1,43 +1,26 @@
 import pandas as pd
-from presidio_analyzer import AnalyzerEngine
+import re
 
-# Load your REDCap CSV export
-df = pd.read_csv("redcap_report.csv")
+# Load your REDCap data dictionary
+data_dict = pd.read_csv("data_dictionary.csv")
 
-# Initialize analyzer
-analyzer = AnalyzerEngine()
+# Combine relevant columns (REDCap uses inconsistent naming sometimes)
+choice_columns = ["Choices, Calculations, OR Slider Labels"]
+choice_columns = [col for col in choice_columns if col in data_dict.columns]
 
-# Identify text columns, excluding 'cid'
-char_cols = df.select_dtypes(include='object').columns
-char_cols = [col for col in char_cols if col.lower() != "cid"]
+# Set to store unique suppression values
+suppression_terms = set()
 
-# Store findings in a list
-findings = []
+for col in choice_columns:
+    for raw_entry in data_dict[col].dropna():
+        # Example: "1, Low grade | 2, High grade | 3, Unknown"
+        # Split on pipe
+        choices = [entry.strip() for entry in str(raw_entry).split("|")]
 
-# Loop over rows and columns to scan text
-for _, row in df.iterrows():
-    cid = row["cid"]  # Use cid as unique identifier
-
-    for col in char_cols:
-        cell = str(row[col])
-        results = analyzer.analyze(text=cell, language='en')
-
-        for res in results:
-            findings.append({
-                "CID": cid,
-                "Column": col,
-                "Text": cell,
-                "Entity": res.entity_type,
-                "Start": res.start,
-                "End": res.end,
-                "Matched Text": cell[res.start:res.end],
-                "Score": res.score
-            })
-
-# Convert findings to DataFrame
-findings_df = pd.DataFrame(findings)
-
-# Save or view
-findings_df.to_csv("phi_flags_report.csv", index=False)
-findings_df.head()
+        for choice in choices:
+            # Extract value after the first comma
+            parts = choice.split(",", 1)
+            if len(parts) == 2:
+                value = parts[1].strip().lower()
+                suppression_terms.add(value)
 
