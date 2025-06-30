@@ -1,4 +1,11 @@
 
+
+model_name = "obi/deid_roberta_i2b2"
+local_dir = "./hf_model_cache/obi_deid_roberta_i2b2"
+
+AutoModelForTokenClassification.from_pretrained(model_name, cache_dir=local_dir)
+AutoTokenizer.from_pretrained(model_name, cache_dir=local_dir)
+
 import copy
 import logging
 from typing import Optional, List
