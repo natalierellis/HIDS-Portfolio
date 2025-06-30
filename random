@@ -1,19 +1,29 @@
-import transformers
+import os
 from huggingface_hub import snapshot_download
 from transformers import AutoTokenizer, AutoModelForTokenClassification
 
-# Use the model you want
+# Define model name and local cache directory
 transformers_model = "obi/deid_roberta_i2b2"
-
-# Optional: specify a custom cache directory (in current folder, so no admin issues)
 local_dir = "./hf_model_cache"
 
-# Download model snapshot locally
-local_model_path = snapshot_download(repo_id=transformers_model, cache_dir=local_dir)
+# This is the path where Hugging Face will store the snapshot
+snapshot_subdir = os.path.join(local_dir, f"models--{transformers_model.replace('/', '--')}")
 
-# Force load to ensure it's cached and won't download again at runtime
+# Step 1: Check if snapshot folder exists
+if not os.path.exists(snapshot_subdir):
+    print("Model not found locally. Downloading...")
+    local_model_path = snapshot_download(repo_id=transformers_model, cache_dir=local_dir)
+else:
+    print("Model already downloaded. Using local copy.")
+    # Get latest snapshot folder inside that directory
+    snapshots = os.listdir(os.path.join(snapshot_subdir, "snapshots"))
+    if snapshots:
+        local_model_path = os.path.join(snapshot_subdir, "snapshots", snapshots[0])
+    else:
+        raise ValueError("Snapshot folder found, but no snapshot contents available.")
+
+# Step 2: Load model/tokenizer from local path
 tokenizer = AutoTokenizer.from_pretrained(local_model_path)
 model = AutoModelForTokenClassification.from_pretrained(local_model_path)
-
 
 
