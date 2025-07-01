@@ -1,6 +1,9 @@
 import pandas as pd
 from presidio_analyzer import AnalyzerEngine
-from tqdm import tqdm
+from tqdm.auto import tqdm
+
+# Make sure tqdm auto works in your environment
+tqdm.pandas()
 
 # Set batch size
 batch_size = 100
@@ -15,44 +18,41 @@ findings = []
 # Calculate total number of batches
 num_batches = (len(df) + batch_size - 1) // batch_size
 
-# Outer progress bar for batches
-for batch_num in tqdm(range(num_batches), desc="Overall progress", ncols=100):
+# Outer loop with batch-level progress
+for batch_num in tqdm(range(num_batches), desc="🔄 Overall batches", ncols=100):
     start_idx = batch_num * batch_size
     end_idx = min((batch_num + 1) * batch_size, len(df))
     batch = df.iloc[start_idx:end_idx]
 
-    # Inner progress bar for rows within batch
-    with tqdm(total=len(batch), desc=f"Batch {batch_num + 1}/{num_batches}", leave=False, ncols=100) as batch_bar:
-        for _, row in batch.iterrows():
-            cid = row["cid"]
-            for col in char_cols:
-                text = row[col]
+    # Inner progress bar for rows in this batch
+    for i, (_, row) in enumerate(tqdm(batch.iterrows(), total=len(batch),
+                                      desc=f"📦 Batch {batch_num + 1}/{num_batches}", 
+                                      leave=False, ncols=100)):
+        cid = row["cid"]
+        for col in char_cols:
+            text = row[col]
+            if pd.isna(text):
+                continue
+            text = str(text).strip()
+            if len(text) < 5:
+                continue
 
-                if pd.isna(text):
-                    continue
-                text = str(text).strip()
-                if len(text) < 5:
-                    continue
+            results = analyzer.analyze(
+                text=text,
+                language="en",
+                entities=["PERSON"]
+            )
 
-                results = analyzer.analyze(
-                    text=text,
-                    language="en",
-                    entities=["PERSON"]
-                )
+            for res in results:
+                findings.append({
+                    "CID": cid,
+                    "Column": col,
+                    "Text": text,
+                    "Entity": res.entity_type,
+                    "Matched Text": text[res.start:res.end],
+                    "Score": res.score
+                })
 
-                for res in results:
-                    findings.append({
-                        "CID": cid,
-                        "Column": col,
-                        "Text": text,
-                        "Entity": res.entity_type,
-                        "Matched Text": text[res.start:res.end],
-                        "Score": res.score
-                    })
-
-            # ✅ Update once per row
-            batch_bar.update(1)
-
-# Create DataFrame
+# Output results
 findings_df = pd.DataFrame(findings)
 print("✅ Done. Total findings:", len(findings_df))
