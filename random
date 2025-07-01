@@ -1,2 +1,14 @@
-cox_splines <- coxph(Surv(DX_LASTCONTACT_DEATH_YEARS, EVENT) ~ rcs(log_TTC, 4), data = NCDB_model)
-summary(cox_splines)
+library(ggplot2)
+
+pred <- Predict(cox_model, "log_TTC", fun = exp)
+pred_df <- as.data.frame(pred)
+
+pred_df$TTC_WEEKS <- (exp(pred_df$log_TTC) - 1) / 7
+
+ggplot(pred_df, aes(x = TTC_WEEKS, y = yhat)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+  labs(x = "Time to Chemotherapy (Weeks)",
+       y = "Hazard Ratio",
+       title = "Adjusted Hazard Ratio vs. TTC (modeled on log scale)") +
+  theme_minimal()
