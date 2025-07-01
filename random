@@ -50,6 +50,7 @@ for batch_num in tqdm(range(num_batches), desc="Overall progress", ncols=100):
                         "Score": res.score
                     })
 
+            # ✅ Update once per row
             batch_bar.update(1)
 
 # Create DataFrame
