@@ -11,7 +11,7 @@ findings = []
 
 # Total iterations = rows x columns
 total_iterations = len(df) * len(char_cols)
-progress = tqdm(total = total_iterations, desc = "Scanning text for PHI")
+progress = tqdm(total = total_iterations, desc = "Scanning text for PHI", ncols = 100, dynamic_ncols = True, mininterval=0.1)
 
 # Loop over each row and text column
 for _, row in df.iterrows():
