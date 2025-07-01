@@ -2,58 +2,62 @@ import pandas as pd
 from presidio_analyzer import AnalyzerEngine
 from tqdm import tqdm
 
+# Set batch size
+batch_size = 100
+
 # Identify character/text columns, excluding 'cid'
 char_cols = df.select_dtypes(include='object').columns
 char_cols = [col for col in char_cols if col.lower() != "cid"]
 
-#Set back size
-batch_size = 100
-
 # Collect findings
 findings = []
 
-# Total iterations = rows x columns
+# Calculate total iterations for progress bar
 total_iterations = len(df) * len(char_cols)
-progress = tqdm(total = total_iterations, desc = "Scanning text for PHI", ncols = 100, dynamic_ncols = True, mininterval=0.1)
+progress = tqdm(total=total_iterations, desc="Scanning text for PHI", ncols=100, dynamic_ncols=True, mininterval=0.1)
 
-# Loop over each row and text column
-for _, row in df.iterrows():
-    cid = row["cid"]
-    for col in char_cols:
-        text = row[col]
+# Split df into batches of 100 rows
+num_batches = (len(df) + batch_size - 1) // batch_size  # Ceiling division
 
-        #Skip NaNs and short strings
-        if pd.isna(text):
+for batch_idx in range(num_batches):
+    start = batch_idx * batch_size
+    end = min((batch_idx + 1) * batch_size, len(df))
+    batch = df.iloc[start:end]
+
+    for _, row in batch.iterrows():
+        cid = row["cid"]
+        for col in char_cols:
+            text = row[col]
+
+            # Skip NaNs and short strings
+            if pd.isna(text):
+                progress.update(1)
+                continue
+            text = str(text).strip()
+            if len(text) < 5:
+                progress.update(1)
+                continue
+
+            results = analyzer.analyze(
+                text=text,
+                language="en",
+                entities=["PERSON"]
+            )
+
+            for res in results:
+                findings.append({
+                    "CID": cid,
+                    "Column": col,
+                    "Text": text,
+                    "Entity": res.entity_type,
+                    "Matched Text": text[res.start:res.end],
+                    "Score": res.score
+                })
+
             progress.update(1)
-            continue
-        text = str(text).strip()
-        if len(text) < 5:
-            progress.update(1)
-            continue
-
-
-        results = analyzer.analyze(
-            text=text,
-            language="en",
-            entities=[
-                "PERSON"
-            ]
-        )
-
-        for res in results:
-            findings.append({
-                "CID": cid,
-                "Column": col,
-                "Text": text,
-                "Entity": res.entity_type,
-                "Matched Text": text[res.start:res.end],
-                "Score": res.score
-            })
-
-        progress.update(1)
 
 progress.close()
 
 # Output to DataFrame
 findings_df = pd.DataFrame(findings)
-print("Done. Total findings:", len(findings_df))
+print("✅ Done. Total findings:", len(findings_df))
