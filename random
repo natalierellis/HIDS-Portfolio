@@ -2,55 +2,55 @@ import pandas as pd
 from presidio_analyzer import AnalyzerEngine
 from tqdm import tqdm
 
+# Set batch size
+batch_size = 100
+
 # Identify character/text columns, excluding 'cid'
 char_cols = df.select_dtypes(include='object').columns
 char_cols = [col for col in char_cols if col.lower() != "cid"]
 
-# Collect findings
+# Initialize findings list
 findings = []
 
-# Total iterations = rows x columns
-total_iterations = len(df) * len(char_cols)
-progress = tqdm(total = total_iterations, desc = "Scanning text for PHI", ncols = 100, dynamic_ncols = True, mininterval=0.1)
+# Calculate total number of batches
+num_batches = (len(df) + batch_size - 1) // batch_size
 
-# Loop over each row and text column
-for _, row in df.iterrows():
-    cid = row["cid"]
-    for col in char_cols:
-        text = row[col]
+# Loop through DataFrame in chunks
+for batch_num in tqdm(range(num_batches), desc="Overall progress", ncols=100):
+    start_idx = batch_num * batch_size
+    end_idx = min((batch_num + 1) * batch_size, len(df))
+    batch = df.iloc[start_idx:end_idx]
 
-        #Skip NaNs and short strings
-        if pd.isna(text):
-            progress.update(1)
-            continue
-        text = str(text).strip()
-        if len(text) < 5:
-            progress.update(1)
-            continue
+    for _, row in batch.iterrows():
+        cid = row["cid"]
+        for col in char_cols:
+            text = row[col]
 
+            if pd.isna(text):
+                continue
+            text = str(text).strip()
+            if len(text) < 5:
+                continue
 
-        results = analyzer.analyze(
-            text=text,
-            language="en",
-            entities=[
-                "PERSON"
-            ]
-        )
+            results = analyzer.analyze(
+                text=text,
+                language="en",
+                entities=["PERSON"]
+            )
 
-        for res in results:
-            findings.append({
-                "CID": cid,
-                "Column": col,
-                "Text": text,
-                "Entity": res.entity_type,
-                "Matched Text": text[res.start:res.end],
-                "Score": res.score
-            })
+            for res in results:
+                findings.append({
+                    "CID": cid,
+                    "Column": col,
+                    "Text": text,
+                    "Entity": res.entity_type,
+                    "Matched Text": text[res.start:res.end],
+                    "Score": res.score
+                })
 
-        progress.update(1)
+    # Optionally: print intermediate update
+    print(f"✔️ Finished batch {batch_num + 1}/{num_batches} ({end_idx - start_idx} rows)")
 
-progress.close()
-
-# Output to DataFrame
+# Create DataFrame
 findings_df = pd.DataFrame(findings)
-print("Done. Total findings:", len(findings_df))
+print("✅ Done. Total findings:", len(findings_df))
