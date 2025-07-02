@@ -1,47 +1,50 @@
+#Residual Dz & Overall Script: 
+
 library(dplyr)
 library(rms)
 library(ggplot2)
 
-# Step 0: Prepare group variable
+# Step 0: Clean up and group margins variable
+table(NCDB_model$RX_SUMM_SURGICAL_MARGINS)
 NCDB_model <- NCDB_model %>%
   mutate(surg_margin_group = case_when(
-    RX_SUMM_SURGICAL_MARGINS %in% c("No residual tumor", "R0") ~ "No residual tumor",
-    RX_SUMM_SURGICAL_MARGINS %in% c("Residual disease", "R1", "R2") ~ "Residual disease",
+    RX_SUMM_SURGICAL_MARGINS %in% c("No residual tumor") ~ "No residual tumor",
+    RX_SUMM_SURGICAL_MARGINS %in% c("Microscopic residual tumor", "Macroscopic residual tumor", "Residual tumor, NOS") ~ "Residual disease",
     TRUE ~ NA_character_
-  )) %>%
-  filter(!is.na(surg_margin_group))
+  ))
 
-# Step 1: Fit models and generate predictions for each group
+# Step 2: Stratified models
 plot_data_stratified <- bind_rows(
-  lapply(unique(NCDB_model$surg_margin_group), function(g) {
+  lapply(unique(na.omit(NCDB_model$surg_margin_group)), function(g) {
     subset_data <- NCDB_model %>% filter(surg_margin_group == g)
-
+    
     dd_temp <<- datadist(subset_data)
     options(datadist = "dd_temp")
-
+    
     model <- cph(Surv(DX_LASTCONTACT_DEATH_YEARS, EVENT) ~ rcs(log_TTC, 4),
                  data = subset_data, x = TRUE, y = TRUE)
-
+    
     pred <- Predict(model, "log_TTC", fun = exp)
     pred_df <- as.data.frame(pred)
     pred_df$TTC_WEEKS <- exp(pred_df$log_TTC) - 1
     pred_df$surg_margin_group <- g
-
+    
     return(pred_df)
   })
-) %>% 
-  filter(TTC_WEEKS <= 18)
-
-# Step 2: Define custom colors for the two groups
-custom_colors <- c(
-  "No residual tumor" = "#1f77b4",    # blue
-  "Residual disease" = "#d62728"      # red
 )
 
-# Step 3: Final plot with shaded ribbons
+# Step 4: Define manual colors
+custom_colors <- c(
+  "Overall" = "black",
+  "No residual tumor" = "#1f77b4",      # blue
+  "Residual disease" = "#d62728"        # red
+)
+
+# Step 5: Plot
 ggplot(plot_data_stratified, aes(x = TTC_WEEKS, y = yhat, color = surg_margin_group, fill = surg_margin_group)) +
   geom_line(size = 1.2) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, color = NA) +
+  geom_line(aes(y = lower), linetype = "dashed", size = 0.6) +
+  geom_line(aes(y = upper), linetype = "dashed", size = 0.6) + 
   scale_x_continuous(breaks = c(0, 4, 8, 12, 16)) +
   scale_y_continuous(breaks = function(x) pretty(c(0, x))) +
   scale_color_manual(values = custom_colors) +
@@ -61,3 +64,4 @@ ggplot(plot_data_stratified, aes(x = TTC_WEEKS, y = yhat, color = surg_margin_gr
     plot.title = element_blank(),
     panel.grid = element_blank()
   )
+
