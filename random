@@ -1,33 +1,33 @@
-.\hf_model_cache\models--obi--deid_roberta_i2b2\snapshots\78f2152eb93ddd817290ce8dbe46f1a6685e09fc
-
 import os
-os.environ["HF_HUB_OFFLINE"] = "1"
 from huggingface_hub import snapshot_download
 from transformers import AutoTokenizer, AutoModelForTokenClassification
 
-# Define model name and local cache directory
+# --- Offline mode ---
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+
+# --- Model info ---
 transformers_model = "obi/deid_roberta_i2b2"
 local_dir = "./hf_model_cache"
 
-# This is the path where Hugging Face will store the snapshot
+# --- Determine snapshot path ---
 snapshot_subdir = os.path.join(local_dir, f"models--{transformers_model.replace('/', '--')}")
+snapshot_root = os.path.join(snapshot_subdir, "snapshots")
 
-# Step 1: Check if snapshot folder exists
-if not os.path.exists(snapshot_subdir):
+# --- If not already cached, download it ---
+if not os.path.exists(snapshot_root) or not os.listdir(snapshot_root):
     print("Model not found locally. Downloading...")
     local_model_path = snapshot_download(repo_id=transformers_model, cache_dir=local_dir)
 else:
     print("Model already downloaded. Using local copy.")
-    # Get latest snapshot folder inside that directory
-    snapshots = os.listdir(os.path.join(snapshot_subdir, "snapshots"))
+    snapshots = os.listdir(snapshot_root)
     if snapshots:
-        local_model_path = os.path.join(snapshot_subdir, "snapshots", snapshots[0])
+        snapshot_folder = snapshots[0]
+        local_model_path = os.path.join(snapshot_root, snapshot_folder)
     else:
         raise ValueError("Snapshot folder found, but no snapshot contents available.")
 
-# Step 2: Load model/tokenizer from local path
+# ✅ This is what you're referring to:
+# Use `local_model_path` to load both the tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained(local_model_path)
 model = AutoModelForTokenClassification.from_pretrained(local_model_path)
-
-LocalEntryNotFoundError: Cannot find an appropriate cached snapshot folder for the specified revision on the local disk and outgoing traffic has been disabled. To enable repo look-ups and downloads online, set 'HF_HUB_OFFLINE=0' as environment variable.
-Output is truncated. View as a scrollable element or open in a text editor. Adjust cell output settings...
