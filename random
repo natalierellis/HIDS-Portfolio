@@ -2,29 +2,18 @@ library(dplyr)
 library(rms)
 library(ggplot2)
 
-# Step 0: Clean up and group margins variable
+# Step 0: Prepare group variable
 NCDB_model <- NCDB_model %>%
   mutate(surg_margin_group = case_when(
     RX_SUMM_SURGICAL_MARGINS %in% c("No residual tumor", "R0") ~ "No residual tumor",
     RX_SUMM_SURGICAL_MARGINS %in% c("Residual disease", "R1", "R2") ~ "Residual disease",
     TRUE ~ NA_character_
-  ))
+  )) %>%
+  filter(!is.na(surg_margin_group))
 
-# Step 1: Original model (unstratified)
-dd_all <- datadist(NCDB_model)
-options(datadist = "dd_all")
-
-cox_full <- cph(Surv(DX_LASTCONTACT_DEATH_YEARS, EVENT) ~ rcs(log_TTC, 4),
-                data = NCDB_model, x = TRUE, y = TRUE)
-
-pred_full <- Predict(cox_full, "log_TTC", fun = exp)
-pred_df_full <- as.data.frame(pred_full)
-pred_df_full$TTC_WEEKS <- exp(pred_df_full$log_TTC) - 1
-pred_df_full$surg_margin_group <- "Overall"
-
-# Step 2: Stratified models
+# Step 1: Fit models and generate predictions for each group
 plot_data_stratified <- bind_rows(
-  lapply(unique(na.omit(NCDB_model$surg_margin_group)), function(g) {
+  lapply(unique(NCDB_model$surg_margin_group), function(g) {
     subset_data <- NCDB_model %>% filter(surg_margin_group == g)
 
     dd_temp <<- datadist(subset_data)
@@ -40,23 +29,19 @@ plot_data_stratified <- bind_rows(
 
     return(pred_df)
   })
-)
-
-# Step 3: Combine all predictions
-plot_data_all <- bind_rows(pred_df_full, plot_data_stratified) %>%
+) %>% 
   filter(TTC_WEEKS <= 18)
 
-# Step 4: Define manual colors
+# Step 2: Define custom colors for the two groups
 custom_colors <- c(
-  "Overall" = "black",
-  "No residual tumor" = "#1f77b4",      # blue
-  "Residual disease" = "#d62728"        # red
+  "No residual tumor" = "#1f77b4",    # blue
+  "Residual disease" = "#d62728"      # red
 )
 
-# Step 5: Plot
-ggplot(plot_data_all, aes(x = TTC_WEEKS, y = yhat, color = surg_margin_group, fill = surg_margin_group)) +
+# Step 3: Final plot with shaded ribbons
+ggplot(plot_data_stratified, aes(x = TTC_WEEKS, y = yhat, color = surg_margin_group, fill = surg_margin_group)) +
   geom_line(size = 1.2) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.15, linetype = "blank", color = NA) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, color = NA) +
   scale_x_continuous(breaks = c(0, 4, 8, 12, 16)) +
   scale_y_continuous(breaks = function(x) pretty(c(0, x))) +
   scale_color_manual(values = custom_colors) +
