@@ -1,67 +1,34 @@
-#Residual Dz & Overall Script: 
 
-library(dplyr)
-library(rms)
-library(ggplot2)
+import re
 
-# Step 0: Clean up and group margins variable
-table(NCDB_model$RX_SUMM_SURGICAL_MARGINS)
-NCDB_model <- NCDB_model %>%
-  mutate(surg_margin_group = case_when(
-    RX_SUMM_SURGICAL_MARGINS %in% c("No residual tumor") ~ "No residual tumor",
-    RX_SUMM_SURGICAL_MARGINS %in% c("Microscopic residual tumor", "Macroscopic residual tumor", "Residual tumor, NOS") ~ "Residual disease",
-    TRUE ~ NA_character_
-  ))
+def is_false_positive_person(row):
+    if row['Entity'] != "PERSON":
+        return False  # Keep non-PERSON entities
 
-# Step 2: Stratified models
-plot_data_stratified <- bind_rows(
-  lapply(unique(na.omit(NCDB_model$surg_margin_group)), function(g) {
-    subset_data <- NCDB_model %>% filter(surg_margin_group == g)
-    
-    dd_temp <<- datadist(subset_data)
-    options(datadist = "dd_temp")
-    
-    model <- cph(Surv(DX_LASTCONTACT_DEATH_YEARS, EVENT) ~ rcs(log_TTC, 4),
-                 data = subset_data, x = TRUE, y = TRUE)
-    
-    pred <- Predict(model, "log_TTC", fun = exp)
-    pred_df <- as.data.frame(pred)
-    pred_df$TTC_WEEKS <- exp(pred_df$log_TTC) - 1
-    pred_df$surg_margin_group <- g
-    
-    return(pred_df)
-  })
-)
+    text = row['Text']
+    text_lower = text.lower()
+    start = row['Start']
+    end = row['End']
+    span = text_lower[start:end].strip()
 
-# Step 4: Define manual colors
-custom_colors <- c(
-  "Overall" = "black",
-  "No residual tumor" = "#1f77b4",      # blue
-  "Residual disease" = "#d62728"        # red
-)
+    # Case 1: Exclude fragments related to "last tdan fu"
+    if any(term in span for term in ["last", "tdan", "td", "an", "fu"]):
+        return True
 
-# Step 5: Plot
-ggplot(plot_data_stratified, aes(x = TTC_WEEKS, y = yhat, color = surg_margin_group, fill = surg_margin_group)) +
-  geom_line(size = 1.2) +
-  geom_line(aes(y = lower), linetype = "dashed", size = 0.6) +
-  geom_line(aes(y = upper), linetype = "dashed", size = 0.6) + 
-  scale_x_continuous(breaks = c(0, 4, 8, 12, 16)) +
-  scale_y_continuous(breaks = function(x) pretty(c(0, x))) +
-  scale_color_manual(values = custom_colors) +
-  scale_fill_manual(values = custom_colors) +
-  labs(
-    x = "Time to Chemotherapy (Weeks)",
-    y = "Hazard Ratio",
-    color = "Surgical Margins",
-    fill = "Surgical Margins"
-  ) +
-  theme_classic(base_size = 12) +
-  theme(
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 12, color = "black"),
-    axis.line = element_line(color = "black"),
-    axis.ticks = element_line(color = "black"),
-    plot.title = element_blank(),
-    panel.grid = element_blank()
-  )
+    # Case 2: Exclude if entity is within 3 words after "Dr." (case-insensitive)
+    # Tokenize the sentence with positions
+    tokens = list(re.finditer(r"\b\w+\b", text_lower))
+    for i, token in enumerate(tokens):
+        if token.group().rstrip(".") == "dr":
+            # Look at next 3 tokens
+            dr_end = token.end()
+            for j in range(i + 1, min(i + 4, len(tokens))):  # up to 3 words after "Dr"
+                tok_start = tokens[j].start()
+                tok_end = tokens[j].end()
+                # If entity span overlaps with either of these tokens, mark as false positive
+                if not (end <= tok_start or start >= tok_end):  # overlapping
+                    return True
 
+    return False
+
+filtered_df = filtered_df[~filtered_df.apply(is_false_positive_person, axis = 1)]
