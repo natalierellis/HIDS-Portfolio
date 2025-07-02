@@ -1,31 +1,90 @@
-import re
+#Step 1: Log-transform TTC
+library(dplyr)
+library(tidyr)
+library(gt)
 
-def is_false_positive_person(row):
-    if row['entity_type'] != "PERSON":
-        return False  # Keep non-PERSON entities
+library(ggplot2)
 
-    text = row['Text']
-    text_lower = text.lower()
-    start = row['start']
-    end = row['end']
-    span = text_lower[start:end].strip()
+# What is the distribution again? 
+#Right-skewed distribution 
+NCDB_model %>%
+  ggplot(aes(x = TTC_weeks)) +
+  geom_histogram(fill = "steelblue", color = "white") +
+  labs(
+    x = "Weeks from Surgery to Chemotherapy",
+    y = "Patient Count"
+  ) + 
+  theme_minimal(base_size = 12) +
+  theme(
+    text = element_text(family = "Calibri"),
+    axis.title = element_text(size = 14),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    plot.background = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.text = element_text(size = 12, color = "black")
+  )
 
-    # Case 1: Exclude fragments related to "last tdan fu"
-    if any(term in span for term in ["last", "tdan", "td", "an", "fu"]):
-        return True
+#Apply log transformation
+NCDB_model$log_TTC <- log(NCDB_model$TTC_weeks + 1)
 
-    # Case 2: Exclude if entity is within 2 words after "Dr." (case-insensitive)
-    # Tokenize the sentence with positions
-    tokens = list(re.finditer(r"\b\w+\b", text_lower))
-    for i, token in enumerate(tokens):
-        if token.group().rstrip(".") == "dr":
-            # Look at next 2 tokens
-            dr_end = token.end()
-            for j in range(i + 1, min(i + 3, len(tokens))):  # up to 2 words after "Dr"
-                tok_start = tokens[j].start()
-                tok_end = tokens[j].end()
-                # If entity span overlaps with either of these tokens, mark as false positive
-                if not (end <= tok_start or start >= tok_end):  # overlapping
-                    return True
+#Plot
+NCDB_model %>%
+  ggplot(aes(x = log_TTC)) +
+  geom_histogram(fill = "steelblue", color = "white") +
+  labs(
+    x = "Weeks from Surgery to Chemotherapy",
+    y = "Patient Count"
+  ) + 
+  theme_minimal(base_size = 12) +
+  theme(
+    text = element_text(family = "Calibri"),
+    axis.title = element_text(size = 14),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    plot.background = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    axis.text = element_text(size = 12, color = "black")
+  )
 
-    return False
+#Step 2: Fit univariate cox model with splines
+library(rms)
+dd <- datadist(NCDB_model)
+options(datadist = 'dd')
+
+cox_splines <- cph(Surv(DX_LASTCONTACT_DEATH_YEARS, EVENT) ~ rcs(log_TTC, 4), data = NCDB_model)
+summary(cox_splines)
+
+#Step 3: Create figure
+
+library(ggplot2)
+
+pred <- Predict(cox_splines, "log_TTC", fun = exp)
+pred_df <- as.data.frame(pred)
+
+# Back-transform x-axis to weeks
+pred_df$TTC_WEEKS <- (exp(pred_df$log_TTC) - 1)
+pred_df <- pred_df %>%
+  filter(TTC_WEEKS <= 18)
+# Create clean plot
+ggplot(pred_df, aes(x = TTC_WEEKS, y = yhat)) +
+  geom_line(color = "black", size = 1.2) +  # Main HR curve
+  geom_line(aes(y = lower), linetype = "dashed", color = "black", size = 0.6) +  # Lower CI
+  geom_line(aes(y = upper), linetype = "dashed", color = "black", size = 0.6) +  # Upper CI
+  scale_x_continuous(breaks = c(0, 4, 8, 12, 16)) +
+  scale_y_continuous(breaks = function(x) pretty(c(0,x))) +
+  labs(x = "Time to Chemotherapy (Weeks)",
+       y = "Hazard Ratio") +
+  theme_classic(base_size = 12) +  # Clean theme like survminer
+  theme(
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12, color = "black"),
+    axis.line = element_line(color = "black"),
+    axis.ticks = element_line(color = "black"),
+    plot.title = element_blank(),
+    panel.grid = element_blank()
+  )
