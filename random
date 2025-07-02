@@ -1,22 +1,20 @@
-import pandas as pd
-
-def is_after_dr(row):
+def is_after_dr_or_tdan_phrase(row):
     if row['entity_type'] != "PERSON":
         return False
     
-    # Extract full text and start index of the PHI entity
     full_text = row['Text']
     start_idx = row['start']
-
-    # Get the text before the PHI span
+    end_idx = row['end']
+    detected_text = full_text[start_idx:end_idx].lower().strip()
+    
+    # Exclude if span is in "last tdan fu"
+    if any(phrase in detected_text for phrase in ["last", "tdan", "fu"]):
+        return True
+    
+    # Check if preceded by "Dr."
     before = full_text[:start_idx].lower().strip()
-
-    # Tokenize to get the last word before the entity
     words = before.split()
-    if not words:
-        return False
+    if words and words[-1].rstrip(".") == "dr":
+        return True
 
-    return words[-1].rstrip(".") == "dr"
-
-# Apply row-wise filtering
-df_filtered = df[~df.apply(is_after_dr, axis=1)]
+    return False
