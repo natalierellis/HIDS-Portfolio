@@ -1,20 +1,31 @@
-def is_after_dr_or_tdan_phrase(row):
+import re
+
+def is_false_positive_person(row):
     if row['entity_type'] != "PERSON":
-        return False
-    
-    full_text = row['Text']
-    start_idx = row['start']
-    end_idx = row['end']
-    detected_text = full_text[start_idx:end_idx].lower().strip()
-    
-    # Exclude if span is in "last tdan fu"
-    if any(phrase in detected_text for phrase in ["last", "tdan", "fu"]):
+        return False  # Keep non-PERSON entities
+
+    text = row['Text']
+    text_lower = text.lower()
+    start = row['start']
+    end = row['end']
+    span = text_lower[start:end].strip()
+
+    # Case 1: Exclude fragments related to "last tdan fu"
+    if any(term in span for term in ["last", "tdan", "td", "an", "fu"]):
         return True
-    
-    # Check if preceded by "Dr."
-    before = full_text[:start_idx].lower().strip()
-    words = before.split()
-    if words and words[-1].rstrip(".") == "dr":
-        return True
+
+    # Case 2: Exclude if entity is within 2 words after "Dr." (case-insensitive)
+    # Tokenize the sentence with positions
+    tokens = list(re.finditer(r"\b\w+\b", text_lower))
+    for i, token in enumerate(tokens):
+        if token.group().rstrip(".") == "dr":
+            # Look at next 2 tokens
+            dr_end = token.end()
+            for j in range(i + 1, min(i + 3, len(tokens))):  # up to 2 words after "Dr"
+                tok_start = tokens[j].start()
+                tok_end = tokens[j].end()
+                # If entity span overlaps with either of these tokens, mark as false positive
+                if not (end <= tok_start or start >= tok_end):  # overlapping
+                    return True
 
     return False
