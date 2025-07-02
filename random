@@ -1,85 +1,52 @@
-#Step 1: Log-transform TTC
 library(dplyr)
-library(tidyr)
-library(gt)
-
-library(ggplot2)
-
-# What is the distribution again? 
-#Right-skewed distribution 
-NCDB_model %>%
-  ggplot(aes(x = TTC_weeks)) +
-  geom_histogram(fill = "steelblue", color = "white") +
-  labs(
-    x = "Weeks from Surgery to Chemotherapy",
-    y = "Patient Count"
-  ) + 
-  theme_minimal(base_size = 12) +
-  theme(
-    text = element_text(family = "Calibri"),
-    axis.title = element_text(size = 14),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.background = element_blank(),
-    plot.background = element_blank(),
-    axis.line = element_line(color = "black"),
-    axis.ticks = element_line(color = "black"),
-    axis.text = element_text(size = 12, color = "black")
-  )
-
-#Apply log transformation
-NCDB_model$log_TTC <- log(NCDB_model$TTC_weeks + 1)
-
-#Plot
-NCDB_model %>%
-  ggplot(aes(x = log_TTC)) +
-  geom_histogram(fill = "steelblue", color = "white") +
-  labs(
-    x = "Weeks from Surgery to Chemotherapy",
-    y = "Patient Count"
-  ) + 
-  theme_minimal(base_size = 12) +
-  theme(
-    text = element_text(family = "Calibri"),
-    axis.title = element_text(size = 14),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.background = element_blank(),
-    plot.background = element_blank(),
-    axis.line = element_line(color = "black"),
-    axis.ticks = element_line(color = "black"),
-    axis.text = element_text(size = 12, color = "black")
-  )
-
-#Step 2: Fit univariate cox model with splines
 library(rms)
-dd <- datadist(NCDB_model)
-options(datadist = 'dd')
-
-cox_splines <- cph(Surv(DX_LASTCONTACT_DEATH_YEARS, EVENT) ~ rcs(log_TTC, 4), data = NCDB_model)
-summary(cox_splines)
-
-#Step 3: Create figure
-
 library(ggplot2)
 
-pred <- Predict(cox_splines, "log_TTC", fun = exp)
-pred_df <- as.data.frame(pred)
+# Ensure datadist is reset
+dd <- datadist(NCDB_model)
+options(datadist = "dd")
 
-# Back-transform x-axis to weeks
-pred_df$TTC_WEEKS <- (exp(pred_df$log_TTC) - 1)
-pred_df <- pred_df %>%
-  filter(TTC_WEEKS <= 18)
-# Create clean plot
-ggplot(pred_df, aes(x = TTC_WEEKS, y = yhat)) +
-  geom_line(color = "black", size = 1.2) +  # Main HR curve
-  geom_line(aes(y = lower), linetype = "dashed", color = "black", size = 0.6) +  # Lower CI
-  geom_line(aes(y = upper), linetype = "dashed", color = "black", size = 0.6) +  # Upper CI
+# Optional: Create a cleaner grouping variable
+NCDB_model <- NCDB_model %>%
+  mutate(surg_margin_group = case_when(
+    RX_SUMM_SURGICAL_MARGINS %in% c("No residual tumor", "R0") ~ "No residual tumor",
+    RX_SUMM_SURGICAL_MARGINS %in% c("Residual disease", "R1", "R2") ~ "Residual disease",
+    TRUE ~ NA_character_
+  )) %>%
+  filter(!is.na(surg_margin_group))
+
+# Fit model for each group and store predictions
+plot_data <- bind_rows(
+  lapply(unique(NCDB_model$surg_margin_group), function(g) {
+    subset_data <- NCDB_model %>% filter(surg_margin_group == g)
+    dd_sub <- datadist(subset_data)
+    options(datadist = "dd_sub")
+    
+    model <- cph(Surv(DX_LASTCONTACT_DEATH_YEARS, EVENT) ~ rcs(log_TTC, 4), data = subset_data, x=TRUE, y=TRUE)
+    pred <- Predict(model, "log_TTC", fun = exp)
+    pred_df <- as.data.frame(pred)
+    pred_df$TTC_WEEKS <- exp(pred_df$log_TTC) - 1
+    pred_df$surg_margin_group <- g
+    pred_df
+  })
+)
+
+# Optional: restrict to reasonable TTC range
+plot_data <- plot_data %>% filter(TTC_WEEKS <= 18)
+
+# Plot overlaid curves
+ggplot(plot_data, aes(x = TTC_WEEKS, y = yhat, color = surg_margin_group, fill = surg_margin_group)) +
+  geom_line(size = 1.2) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, linetype = "blank", color = NA) +
   scale_x_continuous(breaks = c(0, 4, 8, 12, 16)) +
   scale_y_continuous(breaks = function(x) pretty(c(0,x))) +
-  labs(x = "Time to Chemotherapy (Weeks)",
-       y = "Hazard Ratio") +
-  theme_classic(base_size = 12) +  # Clean theme like survminer
+  labs(
+    x = "Time to Chemotherapy (Weeks)",
+    y = "Hazard Ratio",
+    color = "Surgical Margins",
+    fill = "Surgical Margins"
+  ) +
+  theme_classic(base_size = 12) +
   theme(
     axis.title = element_text(size = 14),
     axis.text = element_text(size = 12, color = "black"),
