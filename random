@@ -1,33 +1,22 @@
-import os
-from huggingface_hub import snapshot_download
-from transformers import AutoTokenizer, AutoModelForTokenClassification
+import pandas as pd
 
-# --- Offline mode ---
-os.environ["HF_HUB_OFFLINE"] = "1"
-os.environ["TRANSFORMERS_OFFLINE"] = "1"
+def is_after_dr(row):
+    if row['entity_type'] != "PERSON":
+        return False
+    
+    # Extract full text and start index of the PHI entity
+    full_text = row['Text']
+    start_idx = row['start']
 
-# --- Model info ---
-transformers_model = "obi/deid_roberta_i2b2"
-local_dir = "./hf_model_cache"
+    # Get the text before the PHI span
+    before = full_text[:start_idx].lower().strip()
 
-# --- Determine snapshot path ---
-snapshot_subdir = os.path.join(local_dir, f"models--{transformers_model.replace('/', '--')}")
-snapshot_root = os.path.join(snapshot_subdir, "snapshots")
+    # Tokenize to get the last word before the entity
+    words = before.split()
+    if not words:
+        return False
 
-# --- If not already cached, download it ---
-if not os.path.exists(snapshot_root) or not os.listdir(snapshot_root):
-    print("Model not found locally. Downloading...")
-    local_model_path = snapshot_download(repo_id=transformers_model, cache_dir=local_dir)
-else:
-    print("Model already downloaded. Using local copy.")
-    snapshots = os.listdir(snapshot_root)
-    if snapshots:
-        snapshot_folder = snapshots[0]
-        local_model_path = os.path.join(snapshot_root, snapshot_folder)
-    else:
-        raise ValueError("Snapshot folder found, but no snapshot contents available.")
+    return words[-1].rstrip(".") == "dr"
 
-# ✅ This is what you're referring to:
-# Use `local_model_path` to load both the tokenizer and model
-tokenizer = AutoTokenizer.from_pretrained(local_model_path)
-model = AutoModelForTokenClassification.from_pretrained(local_model_path)
+# Apply row-wise filtering
+df_filtered = df[~df.apply(is_after_dr, axis=1)]
