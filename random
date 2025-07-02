@@ -1,4 +1,3 @@
-
 import re
 
 def is_false_positive_person(row):
@@ -15,20 +14,23 @@ def is_false_positive_person(row):
     if any(term in span for term in ["last", "tdan", "td", "an", "fu"]):
         return True
 
-    # Case 2: Exclude if entity is within 3 words after "Dr." (case-insensitive)
-    # Tokenize the sentence with positions
+    # Case 2: Exclude if the matched span is ≤ 2 characters or is "ned"
+    if len(span) <= 2 or span == "ned":
+        return True
+
+    # Case 3: Exclude if PA/NP/WHNP directly follows the matched name
+    following_text = text_lower[end:].strip()
+    if re.match(r"^(pa|np|whnp)\b", following_text):
+        return True
+
+    # Case 4: Exclude if entity is within 3 words after "Dr."
     tokens = list(re.finditer(r"\b\w+\b", text_lower))
     for i, token in enumerate(tokens):
         if token.group().rstrip(".") == "dr":
-            # Look at next 3 tokens
-            dr_end = token.end()
-            for j in range(i + 1, min(i + 4, len(tokens))):  # up to 3 words after "Dr"
+            for j in range(i + 1, min(i + 4, len(tokens))):  # next 3 tokens
                 tok_start = tokens[j].start()
                 tok_end = tokens[j].end()
-                # If entity span overlaps with either of these tokens, mark as false positive
                 if not (end <= tok_start or start >= tok_end):  # overlapping
                     return True
 
     return False
-
-filtered_df = filtered_df[~filtered_df.apply(is_false_positive_person, axis = 1)]
