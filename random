@@ -1,26 +1,33 @@
-library(ggplot2)
+.\hf_model_cache\models--obi--deid_roberta_i2b2\snapshots\78f2152eb93ddd817290ce8dbe46f1a6685e09fc
 
-pred <- Predict(cox_splines, "log_TTC", fun = exp)
-pred_df <- as.data.frame(pred)
+import os
+os.environ["HF_HUB_OFFLINE"] = "1"
+from huggingface_hub import snapshot_download
+from transformers import AutoTokenizer, AutoModelForTokenClassification
 
-# Back-transform x-axis to weeks
-pred_df$TTC_WEEKS <- (exp(pred_df$log_TTC) - 1)
+# Define model name and local cache directory
+transformers_model = "obi/deid_roberta_i2b2"
+local_dir = "./hf_model_cache"
 
-# Create clean plot
-ggplot(pred_df, aes(x = TTC_WEEKS, y = yhat)) +
-  geom_line(color = "black", size = 1.2) +  # Main HR curve
-  geom_line(aes(y = lower), linetype = "dotted", color = "black") +  # Lower CI
-  geom_line(aes(y = upper), linetype = "dotted", color = "black") +  # Upper CI
-  scale_x_continuous(breaks = c(0, 4, 8, 12, 16)) +
-  labs(x = "Time to Chemotherapy (Weeks)",
-       y = "Hazard Ratio") +
-  theme_classic(base_size = 12) +  # Clean theme like survminer
-  theme(
-    text = element_text(family = "Calibri"),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 12, color = "black"),
-    axis.line = element_line(color = "black"),
-    axis.ticks = element_line(color = "black"),
-    plot.title = element_blank(),
-    panel.grid = element_blank()
-  )
+# This is the path where Hugging Face will store the snapshot
+snapshot_subdir = os.path.join(local_dir, f"models--{transformers_model.replace('/', '--')}")
+
+# Step 1: Check if snapshot folder exists
+if not os.path.exists(snapshot_subdir):
+    print("Model not found locally. Downloading...")
+    local_model_path = snapshot_download(repo_id=transformers_model, cache_dir=local_dir)
+else:
+    print("Model already downloaded. Using local copy.")
+    # Get latest snapshot folder inside that directory
+    snapshots = os.listdir(os.path.join(snapshot_subdir, "snapshots"))
+    if snapshots:
+        local_model_path = os.path.join(snapshot_subdir, "snapshots", snapshots[0])
+    else:
+        raise ValueError("Snapshot folder found, but no snapshot contents available.")
+
+# Step 2: Load model/tokenizer from local path
+tokenizer = AutoTokenizer.from_pretrained(local_model_path)
+model = AutoModelForTokenClassification.from_pretrained(local_model_path)
+
+LocalEntryNotFoundError: Cannot find an appropriate cached snapshot folder for the specified revision on the local disk and outgoing traffic has been disabled. To enable repo look-ups and downloads online, set 'HF_HUB_OFFLINE=0' as environment variable.
+Output is truncated. View as a scrollable element or open in a text editor. Adjust cell output settings...
