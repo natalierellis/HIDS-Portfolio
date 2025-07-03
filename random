@@ -1,3 +1,11 @@
 LG Serous: Uterine G1/G2. Ovarian G1 (1 or 7)
 HG Serous: Uterine G3. Ovarian G2/G3/HG (2, 3, 8)
 Serous: GX/ Cannot be determined (Serous carcinoma by definition is HG, so that is noted as HG everywhere but Uterine Serous cases should be selected as Serous!!) 7/3/2025 per KD
+
+| **Primary Site**    | **Histology** | **Grade**         | **Final Label** |
+| ------------------- | ------------- | ----------------- | --------------- |
+| **Uterus**          | Serous        | G1/G2/LG          | LG Serous       |
+| **Uterus**          | Serous        | G3 / HG           | HG Serous       |
+| **Uterus**          | Serous        | GX                | Serous          |
+| **Ovary, FT, etc.** | Serous        | G1/LG             | LG Serous       |
+| **Ovary, FT, etc.** | Serous        | G2, G3, HG, GX    | HG Serous       |
