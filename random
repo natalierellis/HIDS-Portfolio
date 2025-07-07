@@ -1,23 +1,2 @@
-Subject: Clarification on Covariate Encoding and Surgical Complexity Mapping
 
-Dear [Recipient's Name],
-
-Good morning. I hope this message finds you well.
-
-I am reaching out with a few questions as I work on encoding covariates for the adjusted survival models. My preliminary results are attached in the accompanying Word document, and the covariates I have cleaned and encoded are summarized in the table below.
-
-At this stage, I have retained time from diagnosis to surgery as a continuous variable, given the possibility that its relationship with overall survival may also be nonlinear.
-
-I would greatly appreciate your guidance on the following points:
-
-In reviewing the literature, I noted that Nasidou et al. included a measure of surgical complexity in their NCDB-based analysis. I would like to incorporate a similar variable, but I am uncertain how best to map the raw RX_SUMM_SURG_PRIM_SITE codes into meaningful surgical complexity categories. In Table 2, I have listed the raw codes observed in my filtered cohort, their corresponding data dictionary definitions, and frequencies. Could you kindly advise on how each of these values should be categorized?
-
-I am also considering the inclusion of two additional covariates: the number of days from most definitive surgery to surgical discharge, and whether the patient was readmitted to the same hospital within 30 days. I believe these may be potential confounders in the relationship between time to chemotherapy (TTC) and overall survival. I would appreciate your thoughts on whether including these variables would be appropriate.
-
-Lastly, Dr. Darcy and I have revised the inclusion and exclusion criteria, as outlined below. I recall you previously mentioned the potential importance of excluding certain patient subgroups—specifically, those who died shortly after initiating chemotherapy. When I spoke with Dr. Darcy approximately ten days ago, we discussed seeking your input on these particular exclusions.
-
-Thank you very much for your time and guidance. I look forward to your feedback.
-
-Warm regards,
-Natalie Ellis
 
